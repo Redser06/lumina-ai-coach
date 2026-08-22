@@ -1,171 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
-import { NewsTicker } from './components/NewsFeed/NewsTicker';
-import { DashboardOverview } from './components/Overview/DashboardOverview';
-import { CoachView } from './components/AICoach/CoachView';
-import { DiagnosticModal } from './components/AICoach/DiagnosticModal';
-import { SimulatorHubView } from './components/Simulators/SimulatorHubView';
-import { CurriculumView } from './components/Curriculum/CurriculumView';
-import { NewsHub } from './components/NewsFeed/NewsHub';
-import { ToolCatalogView } from './components/ToolCatalog/ToolCatalogView';
-import { UserProfile } from './types.ts';
-import { Github } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { SideNavBar } from './components/SideNavBar.tsx';
+import { TopNavBar } from './components/TopNavBar.tsx';
+import { CoachDashboardView } from './components/AICoach/CoachDashboardView.tsx';
+import { TrainingPathsView } from './components/Curriculum/TrainingPathsView.tsx';
+import { NewsFeedView } from './components/NewsFeed/NewsFeedView.tsx';
+import { TechnicalDeepDivesView } from './components/Simulators/TechnicalDeepDivesView.tsx';
+import { ToolHubView } from './components/ToolCatalog/ToolHubView.tsx';
+import { DiagnosticModal } from './components/AICoach/DiagnosticModal.tsx';
+import type { UserProfile } from './types.ts';
 
-const STORAGE_KEY = 'lumina_user_profile_v1';
+const STORAGE_KEY = 'lumina_user_profile_v2';
 
-export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
-  const [activeSimulatorLab, setActiveSimulatorLab] = useState<string>('agent_loop');
-  const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
-  const [showDiagnosticModal, setShowDiagnosticModal] = useState<boolean>(false);
-  const [pendingCoachQuery, setPendingCoachQuery] = useState<string | null>(null);
+const DEFAULT_PROFILE: UserProfile = {
+  name: 'Alex Vance',
+  role: 'software_engineer',
+  level: 'agent_builder',
+  department: 'Platform Engineering',
+  xp: 320,
+  completedMissions: ['m-react-loop', 'm-mcp-connect'],
+  completedLessons: ['l-react-1', 'l-eval-1'],
+  bookmarkedTools: ['claude-3-7-sonnet', 'antigravity-sdk'],
+  diagnosticCompleted: false,
+};
 
+export function App() {
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-    const cached = localStorage.getItem(STORAGE_KEY);
-    if (cached) {
-      try {
-        return JSON.parse(cached);
-      } catch (e) {
-        console.error('Failed to parse cached profile', e);
-      }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : DEFAULT_PROFILE;
+    } catch {
+      return DEFAULT_PROFILE;
     }
-    return {
-      name: 'Conor Redmond',
-      role: 'software_engineer',
-      level: 'prompt_practitioner',
-      department: 'Engineering',
-      xp: 250,
-      completedMissions: [],
-      completedLessons: ['lesson-react-loop'],
-      bookmarkedTools: ['tool-claude-37', 'tool-antigravity'],
-      diagnosticCompleted: false
-    };
   });
+
+  const [activeTab, setActiveTab] = useState<string>('coach');
+  const [activeLabId, setActiveLabId] = useState<string | null>(null);
+  const [initialCoachQuery, setInitialCoachQuery] = useState<string | null>(null);
+  const [isDiagnosticOpen, setIsDiagnosticOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userProfile));
   }, [userProfile]);
 
   const handleLaunchSimulator = (labId: string) => {
-    setActiveSimulatorLab(labId);
-    setActiveTab('simulators');
+    setActiveLabId(labId);
+    setActiveTab('deep_dives');
   };
 
-  const handleSelectNews = (newsId: string) => {
-    setSelectedNewsId(newsId);
-    setActiveTab('news');
-  };
-
-  const handleQuickCoachQuery = (query: string) => {
-    setPendingCoachQuery(query);
-    setActiveTab('coach');
+  const handleNavigateWithQuery = (tab: string, query?: string, subView?: string) => {
+    if (subView) setActiveLabId(subView);
+    if (query) setInitialCoachQuery(query);
+    setActiveTab(tab);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between text-slate-900">
+    <div className="flex flex-col md:flex-row min-h-screen bg-background text-on-background antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
       
-      {/* Top Navigation & Live Radar Ticker */}
-      <div>
-        <NewsTicker
-          userRole={userProfile.role}
-          onSelectNews={handleSelectNews}
-          onNavigateNews={() => setActiveTab('news')}
-        />
-        
-        <Navbar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          userProfile={userProfile}
-          setUserProfile={setUserProfile}
-          onOpenDiagnostic={() => setShowDiagnosticModal(true)}
-        />
+      {/* Desktop Side Navigation */}
+      <SideNavBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        userProfile={userProfile}
+        setUserProfile={setUserProfile}
+        onOpenDiagnostic={() => setIsDiagnosticOpen(true)}
+      />
 
-        {/* Main Workspace Views */}
-        <main className="pb-16 animate-in fade-in duration-150">
-          {activeTab === 'dashboard' && (
-            <DashboardOverview
-              userProfile={userProfile}
-              onNavigateTab={setActiveTab}
-              onLaunchSimulator={handleLaunchSimulator}
-              onOpenDiagnostic={() => setShowDiagnosticModal(true)}
-              onQuickCoachQuery={handleQuickCoachQuery}
-            />
-          )}
+      {/* Mobile Top Navigation */}
+      <TopNavBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        userProfile={userProfile}
+        onOpenDiagnostic={() => setIsDiagnosticOpen(true)}
+      />
 
-          {activeTab === 'coach' && (
-            <CoachView
-              userProfile={userProfile}
-              setUserProfile={setUserProfile}
-              onLaunchSimulator={handleLaunchSimulator}
-              onNavigateTab={setActiveTab}
-              initialQuery={pendingCoachQuery}
-              onClearInitialQuery={() => setPendingCoachQuery(null)}
-            />
-          )}
+      {/* Main Content Area */}
+      <main className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden bg-surface">
+        {activeTab === 'coach' && (
+          <CoachDashboardView
+            userProfile={userProfile}
+            setUserProfile={setUserProfile}
+            onLaunchSimulator={handleLaunchSimulator}
+            onNavigateTab={setActiveTab}
+            initialQuery={initialCoachQuery}
+            onClearInitialQuery={() => setInitialCoachQuery(null)}
+          />
+        )}
 
-          {activeTab === 'simulators' && (
-            <SimulatorHubView initialLab={activeSimulatorLab} />
-          )}
+        {activeTab === 'paths' && (
+          <TrainingPathsView
+            userProfile={userProfile}
+            setUserProfile={setUserProfile}
+            onLaunchSimulator={handleLaunchSimulator}
+          />
+        )}
 
-          {activeTab === 'curriculum' && (
-            <CurriculumView
-              userProfile={userProfile}
-              setUserProfile={setUserProfile}
-              onLaunchSimulator={handleLaunchSimulator}
-            />
-          )}
+        {activeTab === 'news' && (
+          <NewsFeedView
+            userRole={userProfile.role}
+            onSelectActionLink={(tab, subView) => handleNavigateWithQuery(tab, undefined, subView)}
+          />
+        )}
 
-          {activeTab === 'news' && (
-            <NewsHub
-              userRole={userProfile.role}
-              onLaunchSimulator={handleLaunchSimulator}
-              selectedNewsId={selectedNewsId}
-            />
-          )}
+        {activeTab === 'deep_dives' && (
+          <TechnicalDeepDivesView
+            activeLabId={activeLabId}
+            onClearActiveLab={() => setActiveLabId(null)}
+          />
+        )}
 
-          {activeTab === 'tools' && (
-            <ToolCatalogView
-              userProfile={userProfile}
-              setUserProfile={setUserProfile}
-            />
-          )}
-        </main>
-      </div>
+        {activeTab === 'tools' && (
+          <ToolHubView
+            userProfile={userProfile}
+            setUserProfile={setUserProfile}
+            onLaunchSimulator={handleLaunchSimulator}
+          />
+        )}
+      </main>
 
-      {/* Modern Bright Footer */}
-      <footer className="bg-white border-t border-slate-200 py-8 px-4 sm:px-6 lg:px-8 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
-              L
-            </div>
-            <span className="font-semibold text-slate-800">Lumina AI Coach</span>
-            <span>— Internal AI Enablement Platform</span>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <span className="text-slate-400">Version 1.0.0 • React + Vite + Tailwind</span>
-            <a
-              href="https://github.com/Redser06/lumina-ai-coach"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-1 text-slate-600 hover:text-indigo-600 font-medium transition"
-            >
-              <Github className="w-4 h-4" />
-              <span>Redser06/lumina-ai-coach</span>
-            </a>
-          </div>
-        </div>
-      </footer>
-
-      {/* Onboarding Diagnostic Modal */}
+      {/* Interactive AI Diagnostic Modal */}
       <DiagnosticModal
-        isOpen={showDiagnosticModal}
-        onClose={() => setShowDiagnosticModal(false)}
+        isOpen={isDiagnosticOpen}
+        onClose={() => setIsDiagnosticOpen(false)}
         userProfile={userProfile}
         setUserProfile={setUserProfile}
       />
 
     </div>
   );
-};
+}
+
+export default App;
