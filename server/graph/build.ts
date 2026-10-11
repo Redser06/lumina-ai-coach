@@ -93,10 +93,6 @@ export function assertSpecClosed(args: {
       throw new GraphSpecError(`undeclared edge: ${edge.id} ${edge.from} -> ${edge.to}`);
     }
   }
-  const implementedEdgeIds = new Set(args.codeEdges.map((edge) => edge.id));
-  for (const edge of args.spec.edges) {
-    if (!implementedEdgeIds.has(edge.id)) throw new GraphSpecError(`missing edge implementation: ${edge.id}`);
-  }
 }
 
 export interface CompileOptions {
@@ -105,32 +101,84 @@ export interface CompileOptions {
   implementedNodes?: string[];
   extraCodeNodes?: string[];
   extraCodeEdges?: GraphEdgeSpec[];
+  /** Test hook: spec edges the code fails to draw. */
+  omitEdgeIds?: string[];
   conditions?: Record<string, ConditionFn>;
+}
+
+type GraphBuilder = {
+  addNode: (id: string, fn: unknown) => GraphBuilder;
+  addConditionalEdges: (
+    from: string,
+    route: (state: { learner: LearnerState }) => string,
+    pathMap: Record<string, string>,
+  ) => GraphBuilder;
+  compile: (args: { checkpointer?: BaseCheckpointSaver; interruptAfter?: string[] }) => CompiledCoachGraph;
+  allEdges?: Set<[string, string]>;
+  branches?: Record<string, Record<string, { ends?: Record<string, string> | null }>>;
+};
+
+export function collectDrawnPairs(builder: {
+  allEdges?: Iterable<[string, string]>;
+  branches?: Record<string, Record<string, { ends?: Record<string, string> | null }>>;
+}): string[] {
+  const keys = new Set<string>();
+  for (const [from, to] of builder.allEdges ?? []) {
+    keys.add(pair(from === START ? "__start__" : String(from), String(to)));
+  }
+  for (const [from, branches] of Object.entries(builder.branches ?? {})) {
+    for (const branch of Object.values(branches)) {
+      for (const to of Object.values(branch.ends ?? {})) {
+        keys.add(pair(from === START ? "__start__" : String(from), String(to)));
+      }
+    }
+  }
+  return [...keys];
+}
+
+/** Throws when the builder recorded no edges, so a skipped allEdges check cannot pass. */
+export function assertEdgesWereDrawn(drawnPairs: string[]): void {
+  if (drawnPairs.length === 0) throw new GraphSpecError("allEdges check skipped");
+}
+
+export function assertEdgeSet(spec: GraphSpec, drawnIds: string[], drawnPairs: string[]): void {
+  assertEdgesWereDrawn(drawnPairs);
+  const specIds = new Set(spec.edges.map((edge) => edge.id));
+  const actualIds = new Set(drawnIds);
+  for (const id of actualIds) {
+    if (!specIds.has(id)) throw new GraphSpecError(`undeclared edge: ${id}`);
+  }
+  for (const id of specIds) {
+    if (!actualIds.has(id)) throw new GraphSpecError(`missing edge implementation: ${id}`);
+  }
+  const expectedPairs = new Set(spec.edges.map((edge) => pair(edge.from, edge.to === "End" ? END : edge.to)));
+  const actualPairs = new Set(drawnPairs);
+  for (const key of actualPairs) {
+    if (!expectedPairs.has(key)) throw new GraphSpecError(`undeclared edge: ${key}`);
+  }
+  for (const key of expectedPairs) {
+    if (!actualPairs.has(key)) throw new GraphSpecError(`missing edge implementation: ${key}`);
+  }
 }
 
 export function compileCoachGraph(options: CompileOptions = {}) {
   const spec = options.spec ?? loadSpec();
   const implementedNodes = options.implementedNodes ?? Object.keys(NODE_IMPLS);
   const conditions = options.conditions ?? CONDITIONS;
-  const codeEdges = [...spec.edges, ...(options.extraCodeEdges ?? [])];
+  const omit = new Set(options.omitEdgeIds ?? []);
+  const drawnEdgeList = [
+    ...spec.edges.filter((edge) => !omit.has(edge.id)),
+    ...(options.extraCodeEdges ?? []),
+  ];
   assertSpecClosed({
     spec,
     implementedNodes,
     conditions,
-    codeEdges,
+    codeEdges: options.extraCodeEdges ?? [],
     extraCodeNodes: options.extraCodeNodes,
   });
 
-  let graph = new StateGraph(GraphAnnotation) as {
-    addNode: (id: string, fn: unknown) => typeof graph;
-    addConditionalEdges: (
-      from: string,
-      route: (state: { learner: LearnerState }) => string,
-      pathMap: Record<string, string>,
-    ) => typeof graph;
-    compile: (args: { checkpointer?: BaseCheckpointSaver; interruptAfter?: string[] }) => CompiledCoachGraph;
-    allEdges?: Set<[string, string]>;
-  };
+  let graph = new StateGraph(GraphAnnotation) as GraphBuilder;
 
   for (const node of spec.nodes) {
     if (node.id === "__start__" || node.id === "End") continue;
@@ -140,7 +188,7 @@ export function compileCoachGraph(options: CompileOptions = {}) {
   }
 
   const byFrom = new Map<string, GraphEdgeSpec[]>();
-  for (const edge of spec.edges) {
+  for (const edge of drawnEdgeList) {
     const list = byFrom.get(edge.from) ?? [];
     list.push(edge);
     byFrom.set(edge.from, list);
@@ -164,17 +212,11 @@ export function compileCoachGraph(options: CompileOptions = {}) {
     );
   }
 
-  const drawn = [...(graph.allEdges ?? [])];
-  if (drawn.length > 0) {
-    const expected = new Set(spec.edges.map((edge) => pair(edge.from, edge.to === "End" ? END : edge.to)));
-    const actual = new Set(drawn.map(([from, to]) => pair(from === START ? "__start__" : String(from), String(to))));
-    for (const key of actual) {
-      if (!expected.has(key)) throw new GraphSpecError(`undeclared edge: ${key}`);
-    }
-    for (const key of expected) {
-      if (!actual.has(key)) throw new GraphSpecError(`missing edge implementation: ${key}`);
-    }
-  }
+  assertEdgeSet(
+    spec,
+    drawnEdgeList.map((edge) => edge.id),
+    collectDrawnPairs(graph),
+  );
 
   return graph.compile({
     checkpointer: options.checkpointer,

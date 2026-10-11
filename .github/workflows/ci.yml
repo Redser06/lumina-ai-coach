@@ -25,10 +25,12 @@ jobs:
       - name: E2 server tests
         run: npm run test:server
       - name: E3 graph coverage
+        if: ${{ !cancelled() }}
         run: |
           npm run coverage:graph
           node -e "const r=require('./reports/graph-coverage.json');if(r.node_coverage!==1||r.edge_coverage!==1||r.uncovered.length)process.exit(1)"
       - name: E6 eval gate
+        if: ${{ !cancelled() }}
         run: npm run eval
       - name: E7 offline server tests
         run: NO_NETWORK=1 npm run test:server

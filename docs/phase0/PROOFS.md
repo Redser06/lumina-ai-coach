@@ -22,7 +22,7 @@ Done = every listed AC has its proof attached. PR count is not a success metric.
 
 - Criterion: Branch coverage: 100% of nodes and conditional edges are exercised by at least 1 scenario fixture; the CI coverage report is attached
 - Proof type required: SHA
-- Proof location: green `ci` check on this branch. Artifact `phase0-reports` contains `reports/graph-coverage.md`. The commit SHA is the PR head once that check is green (filled in the PR body).
+- Proof location: commit `b2f008b589957436f7439e9cae0edca9c4a5abaf`, green `ci` run https://github.com/Redser06/lumina-ai-coach/actions/runs/38183872596. Artifact `phase0-reports` contains `reports/graph-coverage.md` (node_coverage 1, edge_coverage 1).
 
 ## AC-4
 
@@ -56,7 +56,10 @@ FAKE_FAIL=primary-tutor LLM_PROVIDER=fake npx tsx server/scripts/proofs.ts --onl
 
 - Criterion: CI eval gate blocks a merge when any per-node or per-path eval, or branch coverage, falls below threshold (shown with a deliberately regressed commit)
 - Proof type required: SHA
-- Proof location: filled after the regression drill. The demo branch is `cursor/phase0-regression-demo-e8f4` (the spec name `phase0/regression-demo` is mapped onto the required `cursor/` prefix). One commit breaks `assess.misconception` so a misconception routes to Stretch and CI goes red. The revert commit goes green. Neither is merged. A merge is blocked only after Conor marks the `ci` check required in branch protection. This change does not edit branch protection.
+- Proof location: demo branch `cursor/phase0-regression-demo-e8f4` (spec name `phase0/regression-demo`, mapped onto the required `cursor/` prefix). Draft PR https://github.com/Redser06/lumina-ai-coach/pull/3. Do not merge it.
+  - Regressed commit `13603f98f2eff494741f29b5497c50b2009f9bab` makes `assess.misconception` always false, so a misconception routes to Stretch. Red `ci` run: https://github.com/Redser06/lumina-ai-coach/actions/runs/38183905209. Server tests failed because SCN-0001 reached Stretch where the path requires Remediate, and node/edge coverage dropped below 1.0.
+  - Revert commit `200d7da2daddd7e445499f8281ef9a6a8c329fda`. Green `ci` run: https://github.com/Redser06/lumina-ai-coach/actions/runs/38184040123.
+- A merge is blocked only after Conor marks the `ci` check required in branch protection. This change does not edit branch protection.
 
 ## Blockers / questions
 
