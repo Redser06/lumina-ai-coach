@@ -32,11 +32,11 @@ export const CONDITIONS: Record<string, ConditionFn> = {
     state.fatigue >= FATIGUE_THRESHOLD && !state.session_complete && last(state) !== "Reflect",
   "assess.disputed": (state) => state.disputed && last(state) !== "GradeDispute",
   "any.skill_map_edit": (state) => state.skill_map_edit && last(state) !== "SkillMapEdit",
-  "assess.misconception": () => false,
-  "assess.fast_mastery": (state) =>
+  "assess.misconception": (state) =>
     last(state) === "Assess" &&
     !state.disputed &&
-    (isFastMastery(state) || state.last_assessment?.error_class === "misconception"),
+    state.last_assessment?.error_class === "misconception",
+  "assess.fast_mastery": (state) => last(state) === "Assess" && !state.disputed && isFastMastery(state),
   "assess.replan": (state) =>
     last(state) === "Assess" &&
     !state.disputed &&
