@@ -57,8 +57,8 @@ FAKE_FAIL=primary-tutor LLM_PROVIDER=fake npx tsx server/scripts/proofs.ts --onl
 - Criterion: CI eval gate blocks a merge when any per-node or per-path eval, or branch coverage, falls below threshold (shown with a deliberately regressed commit)
 - Proof type required: SHA
 - Proof location: demo branch `cursor/phase0-regression-demo-e8f4` (spec name `phase0/regression-demo`, mapped onto the required `cursor/` prefix). Draft PR https://github.com/Redser06/lumina-ai-coach/pull/3. Do not merge it.
-  - Regressed commit `13603f98f2eff494741f29b5497c50b2009f9bab` makes `assess.misconception` always false, so a misconception routes to Stretch. Red `ci` run: https://github.com/Redser06/lumina-ai-coach/actions/runs/38183905209. Server tests failed because SCN-0001 reached Stretch where the path requires Remediate, and node/edge coverage dropped below 1.0.
-  - Revert commit `200d7da2daddd7e445499f8281ef9a6a8c329fda`. Green `ci` run: https://github.com/Redser06/lumina-ai-coach/actions/runs/38184040123.
+  - Regressed commit `044b66767bac8d7525c68ff9f7ae3d57ac6ccd99` makes `assess.misconception` always false, so a misconception routes to Stretch. Red `ci` run: https://github.com/Redser06/lumina-ai-coach/actions/runs/38184990340. E2 server tests failed, and E3 graph coverage and E6 eval gate both ran and failed. `npm run eval` reported `ok: false`, path failure SCN-0001, and edge coverage below 1.0. The earlier red run https://github.com/Redser06/lumina-ai-coach/actions/runs/38183905209 skipped E3 and E6, so it does not count.
+  - Revert commit `4c92c2690d881e5a8580888ecd505e9c960411ad`. Green `ci` run: https://github.com/Redser06/lumina-ai-coach/actions/runs/38185076053. E2, E3, and E6 all succeeded.
 - A merge is blocked only after Conor marks the `ci` check required in branch protection. This change does not edit branch protection.
 
 ## Blockers / questions
