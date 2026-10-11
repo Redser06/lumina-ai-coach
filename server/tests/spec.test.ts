@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { compileCoachGraph, GraphSpecError } from "../graph/build.js";
 import { CONDITIONS } from "../graph/conditions.js";
+import { NODE_IMPLS } from "../graph/nodes/registry.js";
 import { COACHING_NODES, HITL_NODES, type GraphSpec } from "../graph/spec/types.js";
 import { loadSpec, loadSpecWithHash, validateSpec, versionBumpOk } from "../graph/spec/load.js";
 
@@ -55,6 +56,44 @@ describe("spec", { concurrency: false }, () => {
           ],
         }),
       (error: unknown) => error instanceof GraphSpecError && /undeclared edge/.test(error.message),
+    );
+  });
+
+  test("build_rejects_undeclared_node", () => {
+    assert.throws(
+      () => compileCoachGraph({ extraCodeNodes: ["RogueNode"] }),
+      (error: unknown) => error instanceof GraphSpecError && /undeclared node: RogueNode/.test(error.message),
+    );
+  });
+
+  test("build_rejects_missing_node_impl", () => {
+    const spec = loadSpec();
+    const withGhost: GraphSpec = {
+      ...spec,
+      nodes: [...spec.nodes, { id: "Ghost", kind: "worker", task_type: "tutor-chat", max_steps: 1 }],
+    };
+    assert.throws(
+      () => compileCoachGraph({ spec: withGhost }),
+      (error: unknown) => error instanceof GraphSpecError && /missing node implementation: Ghost/.test(error.message),
+    );
+    assert.throws(
+      () => compileCoachGraph({ implementedNodes: Object.keys(NODE_IMPLS).filter((id) => id !== "Teach") }),
+      (error: unknown) => error instanceof GraphSpecError && /missing node implementation: Teach/.test(error.message),
+    );
+  });
+
+  test("build_rejects_missing_edge_impl", () => {
+    assert.throws(
+      () => compileCoachGraph({ omitEdgeIds: ["e-sup-end"] }),
+      (error: unknown) => error instanceof GraphSpecError && /missing edge implementation: e-sup-end/.test(error.message),
+    );
+  });
+
+  test("allEdges_check_fails_if_skipped", () => {
+    const spec = loadSpec();
+    assert.throws(
+      () => compileCoachGraph({ omitEdgeIds: spec.edges.map((edge) => edge.id) }),
+      (error: unknown) => error instanceof GraphSpecError && /allEdges check skipped/.test(error.message),
     );
   });
 

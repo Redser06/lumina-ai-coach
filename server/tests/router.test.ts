@@ -4,9 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, test } from "node:test";
 import { stringify } from "yaml";
-import { CostCapExceeded, PricingRejected, requirePrice } from "../router/pricing.js";
+import { CostCapExceeded, PricingRejected, requirePrice, type ModelPrice } from "../router/pricing.js";
 import { assertRealProviderEnabled } from "../router/providers/openai_compat.js";
-import { complete, createRouter, loadRouting, useRouterForTests } from "../router/router.js";
+import { complete, createRouter, getSessionSpend, loadRouting, resetSessionSpendForTests, useRouterForTests } from "../router/router.js";
 import { RealProviderDisabled, RouterPoolExhaustedError, type CompleteArgs, type Provider } from "../router/types.js";
 import { resetLogsForTests, logsForSession } from "../telemetry/node_log.js";
 
@@ -21,6 +21,7 @@ function restoreEnv(): void {
   }
   useRouterForTests(null);
   resetLogsForTests();
+  resetSessionSpendForTests();
 }
 
 function args(partial: Partial<CompleteArgs> = {}): CompleteArgs {
@@ -172,6 +173,98 @@ describe("router", { concurrency: false }, () => {
       CostCapExceeded,
     );
     assert.equal(calls.length, 0);
+  });
+
+  test("cap_amounts_are_exact", async () => {
+    const prices: Record<string, ModelPrice> = {
+      "m-a": { input_per_million: 1_000_000, output_per_million: 1_000_000 },
+      "m-b": { input_per_million: 1_000_000, output_per_million: 1_000_000 },
+    };
+    const routing = {
+      version: "1.0.0",
+      task_types: {
+        "tutor-chat": [
+          { model: "m-a", timeout_ms: 10 },
+          { model: "m-b", timeout_ms: 10 },
+        ],
+      },
+    };
+    const oneModel = {
+      version: "1.0.0",
+      task_types: { "tutor-chat": [{ model: "m-a", timeout_ms: 10 }] },
+    };
+    const prompt = "abcd";
+    const ok: Provider = {
+      id: "fake",
+      async complete() {
+        return { text: "{}", tokens_in: 1, tokens_out: 1, latency_ms: 1 };
+      },
+    };
+    const boundary = await createRouter({ routing: oneModel, provider: ok, prices, maxOutputTokens: 1 }).complete(
+      args({ prompt, capUsd: 2, sessionId: "cap-boundary" }),
+    );
+    assert.equal(boundary.cost_usd, 2);
+    assert.equal(getSessionSpend("cap-boundary"), 2);
+
+    let overCalls = 0;
+    const overProvider: Provider = {
+      id: "fake",
+      async complete() {
+        overCalls += 1;
+        return { text: "{}", tokens_in: 1, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    const over = createRouter({ routing: oneModel, provider: overProvider, prices, maxOutputTokens: 1 });
+    await assert.rejects(() => over.complete(args({ prompt, capUsd: 2, sessionId: "cap-over" })), CostCapExceeded);
+    assert.equal(getSessionSpend("cap-over"), 3);
+    assert.equal(overCalls, 1);
+    await assert.rejects(
+      () => over.complete(args({ prompt, capUsd: 3, sessionId: "cap-over", spentUsd: 0 })),
+      CostCapExceeded,
+    );
+    assert.equal(overCalls, 1);
+
+    let timeouts = 0;
+    const fallbackProvider: Provider = {
+      id: "fake",
+      async complete(request) {
+        if (request.model === "m-a" && timeouts === 0) {
+          timeouts += 1;
+          const timeout = new Error("timed out");
+          timeout.name = "TimeoutError";
+          throw timeout;
+        }
+        return { text: "{}", tokens_in: 1, tokens_out: 1, latency_ms: 1 };
+      },
+    };
+    const fallback = createRouter({ routing, provider: fallbackProvider, prices, maxOutputTokens: 1 });
+    const timed = await fallback.complete(args({ prompt, capUsd: 10, sessionId: "cap-timeout" }));
+    assert.equal(timed.fallback_from, "m-a");
+    assert.equal(timed.model, "m-b");
+    assert.equal(timed.cost_usd, 2);
+    assert.equal(getSessionSpend("cap-timeout"), 3);
+    const again = await fallback.complete(args({ prompt, capUsd: 10, sessionId: "cap-timeout", spentUsd: 0 }));
+    assert.equal(again.model, "m-a");
+    assert.equal(again.cost_usd, 2);
+    assert.equal(getSessionSpend("cap-timeout"), 5);
+
+    let failCalls = 0;
+    const failing: Provider = {
+      id: "fake",
+      async complete() {
+        failCalls += 1;
+        throw new Error("forced failure");
+      },
+    };
+    const failRouter = createRouter({ routing, provider: failing, prices, maxOutputTokens: 1 });
+    await assert.rejects(() => failRouter.complete(args({ prompt, capUsd: 4, sessionId: "cap-fail" })), RouterPoolExhaustedError);
+    assert.equal(failCalls, 2);
+    assert.equal(getSessionSpend("cap-fail"), 2);
+    await assert.rejects(
+      () => failRouter.complete(args({ prompt, capUsd: 3, sessionId: "cap-fail", spentUsd: 0 })),
+      CostCapExceeded,
+    );
+    assert.equal(failCalls, 2);
   });
 
   test("real provider stays disabled unless env is set", () => {

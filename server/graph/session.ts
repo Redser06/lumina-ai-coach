@@ -83,7 +83,8 @@ export class SessionService {
   }
 
   async run(initial: LearnerState, decisions: HitlDecision[] = [], threadId = initial.session_id): Promise<RunResult> {
-    return runContext.run({ runId: randomUUID() }, async () => {
+    const provider = runContext.getStore()?.provider;
+    return runContext.run({ runId: randomUUID(), provider }, async () => {
       await this.graph.invoke({ learner: initial }, this.config(threadId));
       const opened = await this.readSnap(threadId);
       stampCheckpoint(initial.session_id, opened.checkpoint_id ?? "unknown");
@@ -153,7 +154,9 @@ export class SessionService {
     const snap = await this.readSnap(threadId, from);
     if (!snap.learner) throw new Error("checkpoint not found");
     const replayThread = `${threadId}-replay-${randomUUID()}`;
-    const result = await this.run(snap.learner, decisions, replayThread);
+    const result = await runContext.run({ runId: "replay", provider: "recorded" }, () =>
+      this.run(snap.learner!, decisions, replayThread),
+    );
     const original = await this.readSnap(threadId);
     if (!original.learner) throw new Error(`session not found: ${threadId}`);
     return {

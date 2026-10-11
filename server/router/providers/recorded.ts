@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { runContext } from "../../runtime/context.js";
 import { fakeProvider } from "./fake.js";
 import type { Provider, ProviderRequest, ProviderResult } from "../types.js";
 
@@ -32,7 +33,7 @@ export const recordedProvider: Provider = {
       const stored = JSON.parse(readFileSync(path, "utf8")) as ProviderResult;
       return { ...stored, latency_ms: 1 };
     } catch (error) {
-      if (process.env.RECORD_FIXTURES === "1") {
+      if (process.env.RECORD_FIXTURES === "1" && runContext.getStore()?.provider !== "recorded") {
         const generated = await fakeProvider.complete(request);
         mkdirSync(dirname(path), { recursive: true });
         writeFileSync(path, `${JSON.stringify({ ...generated, latency_ms: 1 }, null, 2)}\n`);

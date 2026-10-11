@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
@@ -8,6 +8,9 @@ import { SqliteSaver } from "@langchain/langgraph-checkpoint-sqlite";
 import { compileCoachGraph } from "../graph/build.js";
 import { SessionService } from "../graph/session.js";
 import { loadScenario, stateFromScenario } from "../evals/scenarios.js";
+import { createRouter, useRouterForTests } from "../router/router.js";
+import type { Provider } from "../router/types.js";
+import { logsForSession } from "../telemetry/node_log.js";
 
 function serviceAt(name: string): { service: SessionService; dir: string } {
   const dir = mkdtempSync(join(tmpdir(), name));
@@ -133,5 +136,79 @@ describe("checkpoint", { concurrency: false }, () => {
     assert.equal(result.status, "done");
     assert.deepEqual(result.state.path, scenario.expected_path);
     service.close();
+  });
+
+  test("fork_rejects_cost_and_budget_patches", async () => {
+    const { service } = serviceAt("ckpt-cost-");
+    const scenario = loadScenario("SCN-0002");
+    const sessionId = "ckpt-cost";
+    await service.run(stateFromScenario(scenario, sessionId), [], sessionId);
+    const history = await service.history(sessionId);
+    const from = history.find((item) => (item.state?.cost_usd_session ?? 0) > 0 && item.checkpoint_id);
+    assert.ok(from?.checkpoint_id && from.state);
+    const parentBefore = JSON.stringify((await service.readSnap(sessionId)).learner);
+    await assert.rejects(
+      () => service.fork(sessionId, from.checkpoint_id!, { cost_usd_session: 0 }),
+      /fork cannot patch cost_usd_session/,
+    );
+    await assert.rejects(
+      () => service.fork(sessionId, from.checkpoint_id!, { cost_budget_usd: 50 }),
+      /fork cannot patch cost_budget_usd/,
+    );
+    assert.equal(JSON.stringify((await service.readSnap(sessionId)).learner), parentBefore);
+    const inherited = await service.fork(sessionId, from.checkpoint_id, { fatigue: from.state.fatigue });
+    assert.equal(inherited.state.cost_budget_usd, from.state.cost_budget_usd);
+    assert.ok(inherited.state.cost_usd_session >= from.state.cost_usd_session);
+    service.close();
+  });
+
+  test("replay_forces_recorded_provider", async () => {
+    const { service } = serviceAt("ckpt-force-");
+    const scenario = loadScenario("SCN-0002");
+    const sessionId = "ckpt-force";
+    await service.run(stateFromScenario(scenario, sessionId), [], sessionId);
+    const history = await service.history(sessionId);
+    const origin = history.find(
+      (item) => item.path.length === 0 && (item.state?.edges_taken.length ?? 1) === 0 && item.next.includes("Supervisor"),
+    );
+    assert.ok(origin?.checkpoint_id);
+    let fakeCalls = 0;
+    const fake: Provider = {
+      id: "fake",
+      async complete() {
+        fakeCalls += 1;
+        return { text: "{}", tokens_in: 1, tokens_out: 1, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: fake }));
+    const previousProvider = process.env.LLM_PROVIDER;
+    const previousRecord = process.env.RECORD_FIXTURES;
+    const previousDir = process.env.RECORDED_DIR;
+    process.env.LLM_PROVIDER = "fake";
+    process.env.RECORD_FIXTURES = "1";
+    try {
+      const before = logsForSession(sessionId).length;
+      const replay = await service.replay(sessionId, origin.checkpoint_id);
+      const added = logsForSession(sessionId).slice(before);
+      assert.equal(replay.identical, true);
+      assert.equal(fakeCalls, 0);
+      assert.ok(added.length > 0);
+      assert.ok(added.every((row) => row.provider === "recorded"));
+
+      const empty = mkdtempSync(join(tmpdir(), "recorded-empty-"));
+      process.env.RECORDED_DIR = empty;
+      await assert.rejects(() => service.replay(sessionId, origin.checkpoint_id!), /recorded fixture missing/);
+      assert.equal(fakeCalls, 0);
+      assert.equal(readdirSync(empty).length, 0);
+    } finally {
+      useRouterForTests(null);
+      if (previousProvider === undefined) delete process.env.LLM_PROVIDER;
+      else process.env.LLM_PROVIDER = previousProvider;
+      if (previousRecord === undefined) delete process.env.RECORD_FIXTURES;
+      else process.env.RECORD_FIXTURES = previousRecord;
+      if (previousDir === undefined) delete process.env.RECORDED_DIR;
+      else process.env.RECORDED_DIR = previousDir;
+      service.close();
+    }
   });
 });

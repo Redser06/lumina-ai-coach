@@ -107,7 +107,20 @@ export function fingerprintState(state: LearnerState): string {
   });
 }
 
+export const FORK_LOCKED_FIELDS = ["cost_usd_session", "cost_budget_usd"] as const;
+
+export class ForkPatchRejected extends Error {
+  readonly code = "FORK_PATCH_REJECTED";
+  constructor(field: string) {
+    super(`fork cannot patch ${field}`);
+    this.name = "ForkPatchRejected";
+  }
+}
+
 export function applyPatch(state: LearnerState, patch: Record<string, unknown>): LearnerState {
+  for (const field of FORK_LOCKED_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(patch, field)) throw new ForkPatchRejected(field);
+  }
   const next: Record<string, unknown> = { ...state };
   for (const [key, value] of Object.entries(patch)) {
     const current = next[key];
