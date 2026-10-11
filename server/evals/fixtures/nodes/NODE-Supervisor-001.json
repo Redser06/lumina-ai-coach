@@ -1,0 +1,12 @@
+{
+  "id": "NODE-Supervisor-001",
+  "node": "Supervisor",
+  "state": {
+    "fatigue": 0,
+    "step": 0
+  },
+  "model_output": {
+    "note": "route"
+  },
+  "expect_edge": "e-sup-diagnose"
+}

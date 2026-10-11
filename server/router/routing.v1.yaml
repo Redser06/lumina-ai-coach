@@ -1,0 +1,35 @@
+version: 1.0.0
+description: >
+  Task type to ordered model pool. The first healthy model wins.
+  LLM_PROVIDER selects fake, recorded, or openai_compat. The pool order is config.
+task_types:
+  tutor-chat:
+    - model: primary-tutor
+      timeout_ms: 2000
+    - model: fallback-tutor
+      timeout_ms: 2000
+  deep-reasoning:
+    - model: primary-reasoner
+      timeout_ms: 5000
+    - model: fallback-reasoner
+      timeout_ms: 5000
+  grading:
+    - model: primary-grader
+      timeout_ms: 2000
+    - model: fallback-grader
+      timeout_ms: 2000
+  self-critique:
+    - model: primary-critic
+      timeout_ms: 2000
+    - model: fallback-critic
+      timeout_ms: 2000
+  cheap-classify:
+    - model: primary-classifier
+      timeout_ms: 1000
+    - model: fallback-classifier
+      timeout_ms: 1000
+  embedding:
+    - model: primary-embed
+      timeout_ms: 1000
+    - model: fallback-embed
+      timeout_ms: 1000

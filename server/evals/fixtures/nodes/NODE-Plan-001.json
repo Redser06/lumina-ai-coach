@@ -1,0 +1,15 @@
+{
+  "id": "NODE-Plan-001",
+  "node": "Plan",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "plan": {
+      "skill": "prompting",
+      "rationale": "start"
+    }
+  },
+  "expect_edge": "e-ret-plan",
+  "expect_path_tail": "Plan"
+}

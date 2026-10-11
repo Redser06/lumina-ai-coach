@@ -1,0 +1,14 @@
+{
+  "id": "NODE-Teach-001",
+  "node": "Teach",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.4
+    }
+  },
+  "expect_edge": "e-ret-teach",
+  "expect_path_tail": "Teach"
+}

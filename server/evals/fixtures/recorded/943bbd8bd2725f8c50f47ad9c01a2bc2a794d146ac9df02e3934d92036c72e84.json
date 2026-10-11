@@ -1,0 +1,6 @@
+{
+  "text": "{\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"mastery\":{\"prompting\":0.2}}",
+  "tokens_in": 41,
+  "tokens_out": 19,
+  "latency_ms": 1
+}

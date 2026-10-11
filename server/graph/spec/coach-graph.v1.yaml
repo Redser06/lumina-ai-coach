@@ -1,0 +1,263 @@
+spec_id: coach-graph
+version: 1.0.0
+description: >
+  Phase 0 coaching agent graph. The Supervisor owns every conditional edge.
+  Workers and HITL nodes return only to the Supervisor. PlanConfirm is intentionally
+  absent (not in the PRD's named HITL list). Teach, Practice and Remediate are
+  marked subgraph: true with max_steps 1; self-prompting depth is Phase 1 (AC-5).
+nodes:
+  - id: __start__
+    kind: terminal
+    task_type: cheap-classify
+    max_steps: 0
+  - id: Supervisor
+    kind: supervisor
+    task_type: cheap-classify
+    max_steps: 40
+  - id: Diagnose
+    kind: worker
+    task_type: cheap-classify
+    max_steps: 1
+  - id: Plan
+    kind: worker
+    task_type: deep-reasoning
+    max_steps: 1
+  - id: Teach
+    kind: worker
+    task_type: tutor-chat
+    max_steps: 1
+    subgraph: true
+  - id: Practice
+    kind: worker
+    task_type: tutor-chat
+    max_steps: 1
+    subgraph: true
+  - id: Assess
+    kind: worker
+    task_type: grading
+    max_steps: 1
+  - id: Remediate
+    kind: worker
+    task_type: tutor-chat
+    max_steps: 1
+    subgraph: true
+  - id: Stretch
+    kind: worker
+    task_type: deep-reasoning
+    max_steps: 1
+  - id: Reflect
+    kind: worker
+    task_type: self-critique
+    max_steps: 1
+  - id: GradeDispute
+    kind: hitl
+    task_type: cheap-classify
+    max_steps: 1
+    type: interrupt
+  - id: SkillMapEdit
+    kind: hitl
+    task_type: cheap-classify
+    max_steps: 1
+    type: interrupt
+  - id: SafetyEscalation
+    kind: hitl
+    task_type: cheap-classify
+    max_steps: 1
+    type: interrupt
+  - id: End
+    kind: terminal
+    task_type: cheap-classify
+    max_steps: 0
+edges:
+  - id: e-start
+    from: __start__
+    to: Supervisor
+    condition_id: session.start
+    condition_expr: "session_id != ''"
+    priority: 1
+  - id: e-ret-diagnose
+    from: Diagnose
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-plan
+    from: Plan
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-teach
+    from: Teach
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-practice
+    from: Practice
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-assess
+    from: Assess
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-remediate
+    from: Remediate
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-stretch
+    from: Stretch
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-reflect
+    from: Reflect
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-dispute
+    from: GradeDispute
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-skill
+    from: SkillMapEdit
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-ret-safety
+    from: SafetyEscalation
+    to: Supervisor
+    condition_id: worker.return
+    condition_expr: "path.length >= 1"
+    priority: 1
+  - id: e-sup-loop
+    from: Supervisor
+    to: SafetyEscalation
+    condition_id: any.loop_detected
+    condition_expr: "loop_detected == true && loop_cleared == false && path[-1] != 'SafetyEscalation'"
+    priority: 100
+  - id: e-sup-end
+    from: Supervisor
+    to: End
+    condition_id: reflect.done
+    condition_expr: "path[-1] == 'Reflect' && session_complete == true"
+    priority: 95
+  - id: e-sup-step
+    from: Supervisor
+    to: Reflect
+    condition_id: any.step_limit
+    condition_expr: "step >= 40 && session_complete == false && path[-1] != 'Reflect'"
+    priority: 90
+  - id: e-sup-fatigue
+    from: Supervisor
+    to: Reflect
+    condition_id: any.fatigue
+    condition_expr: "fatigue >= 0.8 && session_complete == false && path[-1] != 'Reflect'"
+    priority: 80
+  - id: e-sup-dispute
+    from: Supervisor
+    to: GradeDispute
+    condition_id: assess.disputed
+    condition_expr: "disputed == true && path[-1] != 'GradeDispute'"
+    priority: 70
+  - id: e-sup-skill
+    from: Supervisor
+    to: SkillMapEdit
+    condition_id: any.skill_map_edit
+    condition_expr: "skill_map_edit == true && path[-1] != 'SkillMapEdit'"
+    priority: 60
+  - id: e-sup-plan-reflect
+    from: Supervisor
+    to: Plan
+    condition_id: reflect.continue
+    condition_expr: "path[-1] == 'Reflect' && session_complete == false"
+    priority: 56
+  - id: e-sup-misconception
+    from: Supervisor
+    to: Remediate
+    condition_id: assess.misconception
+    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class == 'misconception'"
+    priority: 50
+  - id: e-sup-fast
+    from: Supervisor
+    to: Stretch
+    condition_id: assess.fast_mastery
+    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class == null && last_assessment.score >= 0.85 && last_assessment.confidence >= 0.8"
+    priority: 40
+  - id: e-sup-replan
+    from: Supervisor
+    to: Plan
+    condition_id: assess.replan
+    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class != 'misconception' && fast_mastery == false"
+    priority: 30
+  - id: e-sup-diagnose
+    from: Supervisor
+    to: Diagnose
+    condition_id: diagnose.needed
+    condition_expr: "session_complete == false && diagnosis.placed != true && path[-1] != 'Diagnose'"
+    priority: 28
+  - id: e-sup-plan
+    from: Supervisor
+    to: Plan
+    condition_id: diagnose.complete
+    condition_expr: "path[-1] == 'Diagnose' && diagnosis.placed == true"
+    priority: 26
+  - id: e-sup-teach
+    from: Supervisor
+    to: Teach
+    condition_id: plan.ready
+    condition_expr: "path[-1] == 'Plan' && plan.skill != ''"
+    priority: 24
+  - id: e-sup-practice
+    from: Supervisor
+    to: Practice
+    condition_id: teach.complete
+    condition_expr: "path[-1] == 'Teach'"
+    priority: 22
+  - id: e-sup-assess
+    from: Supervisor
+    to: Assess
+    condition_id: practice.complete
+    condition_expr: "path[-1] == 'Practice'"
+    priority: 20
+  - id: e-sup-practice-rem
+    from: Supervisor
+    to: Practice
+    condition_id: remediate.done
+    condition_expr: "path[-1] == 'Remediate'"
+    priority: 18
+  - id: e-sup-reflect-stretch
+    from: Supervisor
+    to: Reflect
+    condition_id: stretch.done
+    condition_expr: "path[-1] == 'Stretch'"
+    priority: 16
+  - id: e-sup-reflect-dispute
+    from: Supervisor
+    to: Reflect
+    condition_id: dispute.resolved
+    condition_expr: "path[-1] == 'GradeDispute'"
+    priority: 15
+  - id: e-sup-reflect-skill
+    from: Supervisor
+    to: Reflect
+    condition_id: skill_map.resolved
+    condition_expr: "path[-1] == 'SkillMapEdit'"
+    priority: 14
+  - id: e-sup-reflect-safety
+    from: Supervisor
+    to: Reflect
+    condition_id: safety.resolved
+    condition_expr: "path[-1] == 'SafetyEscalation'"
+    priority: 13

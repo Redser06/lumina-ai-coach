@@ -1,0 +1,2432 @@
+{
+  "scenario": "SCN-0001",
+  "session_id": "crash-scn-0001",
+  "kill_after": "Practice",
+  "crash": {
+    "signal": "SIGKILL",
+    "exit_code": null,
+    "request_error": "fetch failed"
+  },
+  "resume": {
+    "status": "done",
+    "session_id": "crash-scn-0001",
+    "thread_id": "crash-scn-0001",
+    "checkpoint_id": "1f1c5ca0-c4b8-6ea0-8015-77a94335c07e",
+    "next": [],
+    "resumed_node": "Practice",
+    "state": {
+      "learner_id": "nia",
+      "session_id": "crash-scn-0001",
+      "scenario_id": "SCN-0001",
+      "goal": "Write a first useful prompt",
+      "mastery": {
+        "prompting": 0.95
+      },
+      "last_assessment": {
+        "score": 0.93,
+        "error_class": null,
+        "confidence": 0.9
+      },
+      "time_on_task_s": 0,
+      "fatigue": 0.2,
+      "step": 21,
+      "cost_usd_session": 0.0004833,
+      "cost_budget_usd": 1,
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice",
+        "Assess",
+        "Stretch",
+        "Reflect"
+      ],
+      "edges_taken": [
+        "e-sup-diagnose",
+        "e-ret-diagnose",
+        "e-sup-plan",
+        "e-ret-plan",
+        "e-sup-teach",
+        "e-ret-teach",
+        "e-sup-practice",
+        "e-ret-practice",
+        "e-sup-assess",
+        "e-ret-assess",
+        "e-sup-misconception",
+        "e-ret-remediate",
+        "e-sup-practice-rem",
+        "e-ret-practice",
+        "e-sup-assess",
+        "e-ret-assess",
+        "e-sup-fast",
+        "e-ret-stretch",
+        "e-sup-reflect-stretch",
+        "e-ret-reflect",
+        "e-sup-end"
+      ],
+      "trace_nodes": [
+        "Supervisor",
+        "Diagnose",
+        "Supervisor",
+        "Plan",
+        "Supervisor",
+        "Teach",
+        "Supervisor",
+        "Practice",
+        "Supervisor",
+        "Assess",
+        "Supervisor",
+        "Remediate",
+        "Supervisor",
+        "Practice",
+        "Supervisor",
+        "Assess",
+        "Supervisor",
+        "Stretch",
+        "Supervisor",
+        "Reflect",
+        "Supervisor"
+      ],
+      "fingerprints": [
+        "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.9},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+        "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0.2,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":true}"
+      ],
+      "hitl_pending": null,
+      "hitl_log": [],
+      "loop_detected": false,
+      "loop_cleared": false,
+      "disputed": false,
+      "skill_map_edit": false,
+      "session_complete": true,
+      "diagnosis": {
+        "placed": true,
+        "tier": "novice"
+      },
+      "plan": {
+        "skill": "prompting",
+        "rationale": "Start with a single clear prompt"
+      },
+      "last_edge": "e-sup-end",
+      "last_condition": "reflect.done"
+    },
+    "interrupts": [],
+    "node_logs": [
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c40b-6930-8008-f1040dee3c63",
+        "node": "Practice",
+        "task_type": "tutor-chat",
+        "provider": "recorded",
+        "model": "primary-tutor",
+        "fallback_from": null,
+        "tokens_in": 49,
+        "tokens_out": 8,
+        "cost_usd": 0.00001215,
+        "latency_ms": 1,
+        "edge_taken": "e-ret-practice",
+        "condition_id": "worker.return",
+        "ts_utc": "2026-10-11T23:18:20.477Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c42b-6500-8009-29c6b4bca572",
+        "node": "Supervisor",
+        "task_type": "cheap-classify",
+        "provider": "recorded",
+        "model": "primary-classifier",
+        "fallback_from": null,
+        "tokens_in": 52,
+        "tokens_out": 4,
+        "cost_usd": 0.0000034,
+        "latency_ms": 1,
+        "edge_taken": "e-sup-assess",
+        "condition_id": "practice.complete",
+        "ts_utc": "2026-10-11T23:18:20.494Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c439-6f60-800a-caaa40620e07",
+        "node": "Assess",
+        "task_type": "grading",
+        "provider": "recorded",
+        "model": "primary-grader",
+        "fallback_from": null,
+        "tokens_in": 49,
+        "tokens_out": 21,
+        "cost_usd": 0.0000266,
+        "latency_ms": 1,
+        "edge_taken": "e-ret-assess",
+        "condition_id": "worker.return",
+        "ts_utc": "2026-10-11T23:18:20.501Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c448-69c0-800b-acee0be225f4",
+        "node": "Supervisor",
+        "task_type": "cheap-classify",
+        "provider": "recorded",
+        "model": "primary-classifier",
+        "fallback_from": null,
+        "tokens_in": 69,
+        "tokens_out": 4,
+        "cost_usd": 0.00000425,
+        "latency_ms": 1,
+        "edge_taken": "e-sup-misconception",
+        "condition_id": "assess.misconception",
+        "ts_utc": "2026-10-11T23:18:20.507Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c454-6d10-800c-95c27f7ac78d",
+        "node": "Remediate",
+        "task_type": "tutor-chat",
+        "provider": "recorded",
+        "model": "primary-tutor",
+        "fallback_from": null,
+        "tokens_in": 67,
+        "tokens_out": 8,
+        "cost_usd": 0.00001485,
+        "latency_ms": 1,
+        "edge_taken": "e-ret-remediate",
+        "condition_id": "worker.return",
+        "ts_utc": "2026-10-11T23:18:20.512Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c46d-63b0-800d-a8fd6907ca17",
+        "node": "Supervisor",
+        "task_type": "cheap-classify",
+        "provider": "recorded",
+        "model": "primary-classifier",
+        "fallback_from": null,
+        "tokens_in": 71,
+        "tokens_out": 4,
+        "cost_usd": 0.00000435,
+        "latency_ms": 1,
+        "edge_taken": "e-sup-practice-rem",
+        "condition_id": "remediate.done",
+        "ts_utc": "2026-10-11T23:18:20.521Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c476-6ff0-800e-522fb0a4405e",
+        "node": "Practice",
+        "task_type": "tutor-chat",
+        "provider": "recorded",
+        "model": "primary-tutor",
+        "fallback_from": null,
+        "tokens_in": 70,
+        "tokens_out": 8,
+        "cost_usd": 0.0000153,
+        "latency_ms": 1,
+        "edge_taken": "e-ret-practice",
+        "condition_id": "worker.return",
+        "ts_utc": "2026-10-11T23:18:20.526Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c480-6c30-800f-a59d45410800",
+        "node": "Supervisor",
+        "task_type": "cheap-classify",
+        "provider": "recorded",
+        "model": "primary-classifier",
+        "fallback_from": null,
+        "tokens_in": 73,
+        "tokens_out": 4,
+        "cost_usd": 0.00000445,
+        "latency_ms": 1,
+        "edge_taken": "e-sup-assess",
+        "condition_id": "practice.complete",
+        "ts_utc": "2026-10-11T23:18:20.530Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c48a-6871-8010-c9e253d9a0ac",
+        "node": "Assess",
+        "task_type": "grading",
+        "provider": "recorded",
+        "model": "primary-grader",
+        "fallback_from": null,
+        "tokens_in": 71,
+        "tokens_out": 25,
+        "cost_usd": 0.0000342,
+        "latency_ms": 1,
+        "edge_taken": "e-ret-assess",
+        "condition_id": "worker.return",
+        "ts_utc": "2026-10-11T23:18:20.534Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c496-6bc0-8011-49843d002543",
+        "node": "Supervisor",
+        "task_type": "cheap-classify",
+        "provider": "recorded",
+        "model": "primary-classifier",
+        "fallback_from": null,
+        "tokens_in": 72,
+        "tokens_out": 4,
+        "cost_usd": 0.0000044,
+        "latency_ms": 1,
+        "edge_taken": "e-sup-fast",
+        "condition_id": "assess.fast_mastery",
+        "ts_utc": "2026-10-11T23:18:20.538Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c49e-60f1-8012-8f7dc99e5d50",
+        "node": "Stretch",
+        "task_type": "deep-reasoning",
+        "provider": "recorded",
+        "model": "primary-reasoner",
+        "fallback_from": null,
+        "tokens_in": 71,
+        "tokens_out": 8,
+        "cost_usd": 0.00012875,
+        "latency_ms": 1,
+        "edge_taken": "e-ret-stretch",
+        "condition_id": "worker.return",
+        "ts_utc": "2026-10-11T23:18:20.542Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c4a7-6d30-8013-bb0d1624c0c0",
+        "node": "Supervisor",
+        "task_type": "cheap-classify",
+        "provider": "recorded",
+        "model": "primary-classifier",
+        "fallback_from": null,
+        "tokens_in": 74,
+        "tokens_out": 4,
+        "cost_usd": 0.0000045,
+        "latency_ms": 1,
+        "edge_taken": "e-sup-reflect-stretch",
+        "condition_id": "stretch.done",
+        "ts_utc": "2026-10-11T23:18:20.546Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c4af-6261-8014-23ff6869820e",
+        "node": "Reflect",
+        "task_type": "self-critique",
+        "provider": "recorded",
+        "model": "primary-critic",
+        "fallback_from": null,
+        "tokens_in": 73,
+        "tokens_out": 10,
+        "cost_usd": 0.0000339,
+        "latency_ms": 1,
+        "edge_taken": "e-ret-reflect",
+        "condition_id": "worker.return",
+        "ts_utc": "2026-10-11T23:18:20.549Z"
+      },
+      {
+        "run_id": "a57ae2e3-f99d-46d6-b7c8-a3dd17997d40",
+        "session_id": "crash-scn-0001",
+        "checkpoint_id": "1f1c5ca0-c4b8-6ea0-8015-77a94335c07e",
+        "node": "Supervisor",
+        "task_type": "cheap-classify",
+        "provider": "recorded",
+        "model": "primary-classifier",
+        "fallback_from": null,
+        "tokens_in": 77,
+        "tokens_out": 4,
+        "cost_usd": 0.00000465,
+        "latency_ms": 1,
+        "edge_taken": "e-sup-end",
+        "condition_id": "reflect.done",
+        "ts_utc": "2026-10-11T23:18:20.553Z"
+      }
+    ],
+    "edges": [
+      "e-start",
+      "e-sup-diagnose",
+      "e-ret-diagnose",
+      "e-sup-plan",
+      "e-ret-plan",
+      "e-sup-teach",
+      "e-ret-teach",
+      "e-sup-practice",
+      "e-ret-practice",
+      "e-sup-assess",
+      "e-ret-assess",
+      "e-sup-misconception",
+      "e-ret-remediate",
+      "e-sup-practice-rem",
+      "e-ret-practice",
+      "e-sup-assess",
+      "e-ret-assess",
+      "e-sup-fast",
+      "e-ret-stretch",
+      "e-sup-reflect-stretch",
+      "e-ret-reflect",
+      "e-sup-end"
+    ],
+    "nodes": [
+      "__start__",
+      "Supervisor",
+      "Diagnose",
+      "Supervisor",
+      "Plan",
+      "Supervisor",
+      "Teach",
+      "Supervisor",
+      "Practice",
+      "Supervisor",
+      "Assess",
+      "Supervisor",
+      "Remediate",
+      "Supervisor",
+      "Practice",
+      "Supervisor",
+      "Assess",
+      "Supervisor",
+      "Stretch",
+      "Supervisor",
+      "Reflect",
+      "Supervisor",
+      "End"
+    ]
+  },
+  "checkpoints": [
+    {
+      "checkpoint_id": "1f1c5ca0-c4b8-6ea0-8015-77a94335c07e",
+      "next": [],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice",
+        "Assess",
+        "Stretch",
+        "Reflect"
+      ],
+      "step": 21,
+      "last_edge": "e-sup-end",
+      "last_assessment": {
+        "score": 0.93,
+        "error_class": null,
+        "confidence": 0.9
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.95
+        },
+        "last_assessment": {
+          "score": 0.93,
+          "error_class": null,
+          "confidence": 0.9
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0.2,
+        "step": 21,
+        "cost_usd_session": 0.0004833,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice",
+          "Assess",
+          "Stretch",
+          "Reflect"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-fast",
+          "e-ret-stretch",
+          "e-sup-reflect-stretch",
+          "e-ret-reflect",
+          "e-sup-end"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Stretch",
+          "Supervisor",
+          "Reflect",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.9},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0.2,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":true}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": true,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-end",
+        "last_condition": "reflect.done"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c4af-6261-8014-23ff6869820e",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice",
+        "Assess",
+        "Stretch",
+        "Reflect"
+      ],
+      "step": 20,
+      "last_edge": "e-ret-reflect",
+      "last_assessment": {
+        "score": 0.93,
+        "error_class": null,
+        "confidence": 0.9
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.95
+        },
+        "last_assessment": {
+          "score": 0.93,
+          "error_class": null,
+          "confidence": 0.9
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0.2,
+        "step": 20,
+        "cost_usd_session": 0.00047865,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice",
+          "Assess",
+          "Stretch",
+          "Reflect"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-fast",
+          "e-ret-stretch",
+          "e-sup-reflect-stretch",
+          "e-ret-reflect"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Stretch",
+          "Supervisor",
+          "Reflect"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.9},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0.2,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":true}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": true,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-reflect",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c4a7-6d30-8013-bb0d1624c0c0",
+      "next": [
+        "Reflect"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice",
+        "Assess",
+        "Stretch"
+      ],
+      "step": 19,
+      "last_edge": "e-sup-reflect-stretch",
+      "last_assessment": {
+        "score": 0.93,
+        "error_class": null,
+        "confidence": 0.9
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.95
+        },
+        "last_assessment": {
+          "score": 0.93,
+          "error_class": null,
+          "confidence": 0.9
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 19,
+        "cost_usd_session": 0.00044475,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice",
+          "Assess",
+          "Stretch"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-fast",
+          "e-ret-stretch",
+          "e-sup-reflect-stretch"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Stretch",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.9},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-reflect-stretch",
+        "last_condition": "stretch.done"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c49e-60f1-8012-8f7dc99e5d50",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice",
+        "Assess",
+        "Stretch"
+      ],
+      "step": 18,
+      "last_edge": "e-ret-stretch",
+      "last_assessment": {
+        "score": 0.93,
+        "error_class": null,
+        "confidence": 0.9
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.95
+        },
+        "last_assessment": {
+          "score": 0.93,
+          "error_class": null,
+          "confidence": 0.9
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 18,
+        "cost_usd_session": 0.00044025,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice",
+          "Assess",
+          "Stretch"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-fast",
+          "e-ret-stretch"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Stretch"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.9},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.95},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-stretch",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c496-6bc0-8011-49843d002543",
+      "next": [
+        "Stretch"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice",
+        "Assess"
+      ],
+      "step": 17,
+      "last_edge": "e-sup-fast",
+      "last_assessment": {
+        "score": 0.93,
+        "error_class": null,
+        "confidence": 0.9
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.9
+        },
+        "last_assessment": {
+          "score": 0.93,
+          "error_class": null,
+          "confidence": 0.9
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 17,
+        "cost_usd_session": 0.0003115,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice",
+          "Assess"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-fast"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.9},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-fast",
+        "last_condition": "assess.fast_mastery"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c48a-6871-8010-c9e253d9a0ac",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice",
+        "Assess"
+      ],
+      "step": 16,
+      "last_edge": "e-ret-assess",
+      "last_assessment": {
+        "score": 0.93,
+        "error_class": null,
+        "confidence": 0.9
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.9
+        },
+        "last_assessment": {
+          "score": 0.93,
+          "error_class": null,
+          "confidence": 0.9
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 16,
+        "cost_usd_session": 0.0003071,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice",
+          "Assess"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.9},\"last_assessment\":{\"score\":0.93,\"error_class\":null,\"confidence\":0.9},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-assess",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c480-6c30-800f-a59d45410800",
+      "next": [
+        "Assess"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice"
+      ],
+      "step": 15,
+      "last_edge": "e-sup-assess",
+      "last_assessment": {
+        "score": 0.42,
+        "error_class": "misconception",
+        "confidence": 0.35
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.7
+        },
+        "last_assessment": {
+          "score": 0.42,
+          "error_class": "misconception",
+          "confidence": 0.35
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 15,
+        "cost_usd_session": 0.0002729,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice",
+          "e-sup-assess"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-assess",
+        "last_condition": "practice.complete"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c476-6ff0-800e-522fb0a4405e",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate",
+        "Practice"
+      ],
+      "step": 14,
+      "last_edge": "e-ret-practice",
+      "last_assessment": {
+        "score": 0.42,
+        "error_class": "misconception",
+        "confidence": 0.35
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.7
+        },
+        "last_assessment": {
+          "score": 0.42,
+          "error_class": "misconception",
+          "confidence": 0.35
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 14,
+        "cost_usd_session": 0.00026845,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate",
+          "Practice"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem",
+          "e-ret-practice"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor",
+          "Practice"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.7},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-practice",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c46d-63b0-800d-a8fd6907ca17",
+      "next": [
+        "Practice"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate"
+      ],
+      "step": 13,
+      "last_edge": "e-sup-practice-rem",
+      "last_assessment": {
+        "score": 0.42,
+        "error_class": "misconception",
+        "confidence": 0.35
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.55
+        },
+        "last_assessment": {
+          "score": 0.42,
+          "error_class": "misconception",
+          "confidence": 0.35
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 13,
+        "cost_usd_session": 0.00025315,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate",
+          "e-sup-practice-rem"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-practice-rem",
+        "last_condition": "remediate.done"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c454-6d10-800c-95c27f7ac78d",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess",
+        "Remediate"
+      ],
+      "step": 12,
+      "last_edge": "e-ret-remediate",
+      "last_assessment": {
+        "score": 0.42,
+        "error_class": "misconception",
+        "confidence": 0.35
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.55
+        },
+        "last_assessment": {
+          "score": 0.42,
+          "error_class": "misconception",
+          "confidence": 0.35
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 12,
+        "cost_usd_session": 0.0002488,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess",
+          "Remediate"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception",
+          "e-ret-remediate"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor",
+          "Remediate"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.55},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-remediate",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c448-69c0-800b-acee0be225f4",
+      "next": [
+        "Remediate"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess"
+      ],
+      "step": 11,
+      "last_edge": "e-sup-misconception",
+      "last_assessment": {
+        "score": 0.42,
+        "error_class": "misconception",
+        "confidence": 0.35
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.4
+        },
+        "last_assessment": {
+          "score": 0.42,
+          "error_class": "misconception",
+          "confidence": 0.35
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 11,
+        "cost_usd_session": 0.00023395,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess",
+          "e-sup-misconception"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-misconception",
+        "last_condition": "assess.misconception"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c439-6f60-800a-caaa40620e07",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice",
+        "Assess"
+      ],
+      "step": 10,
+      "last_edge": "e-ret-assess",
+      "last_assessment": {
+        "score": 0.42,
+        "error_class": "misconception",
+        "confidence": 0.35
+      },
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.4
+        },
+        "last_assessment": {
+          "score": 0.42,
+          "error_class": "misconception",
+          "confidence": 0.35
+        },
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 10,
+        "cost_usd_session": 0.0002297,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice",
+          "Assess"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess",
+          "e-ret-assess"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor",
+          "Assess"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":{\"score\":0.42,\"error_class\":\"misconception\",\"confidence\":0.35},\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-assess",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c42b-6500-8009-29c6b4bca572",
+      "next": [
+        "Assess"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice"
+      ],
+      "step": 9,
+      "last_edge": "e-sup-assess",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.4
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 9,
+        "cost_usd_session": 0.0002031,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice",
+          "e-sup-assess"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-assess",
+        "last_condition": "practice.complete"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-c40b-6930-8008-f1040dee3c63",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach",
+        "Practice"
+      ],
+      "step": 8,
+      "last_edge": "e-ret-practice",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.4
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 8,
+        "cost_usd_session": 0.0001997,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach",
+          "Practice"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice",
+          "e-ret-practice"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor",
+          "Practice"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.4},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-practice",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-bea3-64c0-8007-1fd8f2b1f4b8",
+      "next": [
+        "Practice"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach"
+      ],
+      "step": 7,
+      "last_edge": "e-sup-practice",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.35
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 7,
+        "cost_usd_session": 0.00018755,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach",
+          "e-sup-practice"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-practice",
+        "last_condition": "teach.complete"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be8d-6531-8006-66d278438e29",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan",
+        "Teach"
+      ],
+      "step": 6,
+      "last_edge": "e-ret-teach",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.35
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 6,
+        "cost_usd_session": 0.00018425,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan",
+          "Teach"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach",
+          "e-ret-teach"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor",
+          "Teach"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.35},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-teach",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be83-68f0-8005-f5b11bfc5c03",
+      "next": [
+        "Teach"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan"
+      ],
+      "step": 5,
+      "last_edge": "e-sup-teach",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.2
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 5,
+        "cost_usd_session": 0.00017255,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan",
+          "e-sup-teach"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-sup-teach",
+        "last_condition": "plan.ready"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be77-65a0-8004-6637acef2582",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose",
+        "Plan"
+      ],
+      "step": 4,
+      "last_edge": "e-ret-plan",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.2
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 4,
+        "cost_usd_session": 0.00016935,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose",
+          "Plan"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan",
+          "e-ret-plan"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor",
+          "Plan"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}",
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"},\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        },
+        "last_edge": "e-ret-plan",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be68-6b40-8003-6fc53a034321",
+      "next": [
+        "Plan"
+      ],
+      "path": [
+        "Diagnose"
+      ],
+      "step": 3,
+      "last_edge": "e-sup-plan",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.2
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 3,
+        "cost_usd_session": 0.00001185,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose",
+          "e-sup-plan"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose",
+          "Supervisor"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": null,
+        "last_edge": "e-sup-plan",
+        "last_condition": "diagnose.complete"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be5a-60e0-8002-faaf26a30b1f",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [
+        "Diagnose"
+      ],
+      "step": 2,
+      "last_edge": "e-ret-diagnose",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {
+          "prompting": 0.2
+        },
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 2,
+        "cost_usd_session": 0.0000087,
+        "cost_budget_usd": 1,
+        "path": [
+          "Diagnose"
+        ],
+        "edges_taken": [
+          "e-sup-diagnose",
+          "e-ret-diagnose"
+        ],
+        "trace_nodes": [
+          "Supervisor",
+          "Diagnose"
+        ],
+        "fingerprints": [
+          "{\"mastery\":{\"prompting\":0.2},\"last_assessment\":null,\"fatigue\":0,\"goal\":\"Write a first useful prompt\",\"diagnosis\":{\"placed\":true,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+        ],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "plan": null,
+        "last_edge": "e-ret-diagnose",
+        "last_condition": "worker.return"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be3c-6c20-8001-70d7ae833535",
+      "next": [
+        "Diagnose"
+      ],
+      "path": [],
+      "step": 1,
+      "last_edge": "e-sup-diagnose",
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {},
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 1,
+        "cost_usd_session": 0.00000285,
+        "cost_budget_usd": 1,
+        "path": [],
+        "edges_taken": [
+          "e-sup-diagnose"
+        ],
+        "trace_nodes": [
+          "Supervisor"
+        ],
+        "fingerprints": [],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": null,
+        "plan": null,
+        "last_edge": "e-sup-diagnose",
+        "last_condition": "diagnose.needed"
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be2b-6ab0-8000-f42b5f105a22",
+      "next": [
+        "Supervisor"
+      ],
+      "path": [],
+      "step": 0,
+      "last_edge": null,
+      "last_assessment": null,
+      "state": {
+        "learner_id": "nia",
+        "session_id": "crash-scn-0001",
+        "scenario_id": "SCN-0001",
+        "goal": "Write a first useful prompt",
+        "mastery": {},
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 0,
+        "cost_usd_session": 0,
+        "cost_budget_usd": 1,
+        "path": [],
+        "edges_taken": [],
+        "trace_nodes": [],
+        "fingerprints": [],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": null,
+        "plan": null,
+        "last_edge": null,
+        "last_condition": null
+      }
+    },
+    {
+      "checkpoint_id": "1f1c5ca0-be18-6230-ffff-d40125bd04c5",
+      "next": [
+        "__start__"
+      ],
+      "path": [],
+      "step": 0,
+      "last_edge": null,
+      "last_assessment": null,
+      "state": {
+        "learner_id": "unset",
+        "session_id": "unset",
+        "scenario_id": null,
+        "goal": "",
+        "mastery": {},
+        "last_assessment": null,
+        "time_on_task_s": 0,
+        "fatigue": 0,
+        "step": 0,
+        "cost_usd_session": 0,
+        "cost_budget_usd": 1,
+        "path": [],
+        "edges_taken": [],
+        "trace_nodes": [],
+        "fingerprints": [],
+        "hitl_pending": null,
+        "hitl_log": [],
+        "loop_detected": false,
+        "loop_cleared": false,
+        "disputed": false,
+        "skill_map_edit": false,
+        "session_complete": false,
+        "diagnosis": null,
+        "plan": null,
+        "last_edge": null,
+        "last_condition": null
+      }
+    }
+  ]
+}

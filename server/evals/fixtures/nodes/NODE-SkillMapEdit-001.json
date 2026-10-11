@@ -1,0 +1,9 @@
+{
+  "id": "NODE-SkillMapEdit-001",
+  "node": "SkillMapEdit",
+  "kind": "hitl",
+  "expect_decision": {
+    "decision": "accept",
+    "actor": "learner"
+  }
+}

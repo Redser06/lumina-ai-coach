@@ -1,0 +1,6 @@
+{
+  "text": "{\"diagnosis\":{\"placed\":true,\"tier\":\"practitioner\"},\"mastery\":{\"evals\":0.45}}",
+  "tokens_in": 41,
+  "tokens_out": 19,
+  "latency_ms": 1
+}

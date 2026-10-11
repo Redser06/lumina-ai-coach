@@ -1,0 +1,6 @@
+{
+  "text": "{\"last_assessment\":{\"score\":0.48,\"error_class\":\"misconception\",\"confidence\":0.4},\"disputed\":true}",
+  "tokens_in": 48,
+  "tokens_out": 25,
+  "latency_ms": 1
+}

@@ -1,0 +1,28 @@
+{
+  "id": "SCN-0003",
+  "persona": "P3",
+  "title": "Builder hits the session step bound",
+  "learner_id": "ben",
+  "goal": "Ship an eval harness",
+  "initial": {
+    "step": 40
+  },
+  "hitl": [],
+  "script": {
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": [
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-step",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

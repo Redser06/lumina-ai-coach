@@ -1,0 +1,59 @@
+{
+  "id": "SCN-0008",
+  "persona": "P1",
+  "title": "Reflect continues into another skill before fatigue",
+  "learner_id": "nia",
+  "goal": "Keep going after a short reflection",
+  "initial": {
+    "fatigue": 0.88,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    }
+  },
+  "hitl": [],
+  "script": {
+    "Reflect": [
+      {
+        "session_complete": false,
+        "fatigue": 0.15
+      },
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ],
+    "Plan": [
+      {
+        "plan": {
+          "skill": "tools",
+          "rationale": "Continue after reflection"
+        },
+        "fatigue": 0.15
+      }
+    ],
+    "Teach": [
+      {
+        "fatigue": 0.92
+      }
+    ]
+  },
+  "expected_path": [
+    "Reflect",
+    "Plan",
+    "Teach",
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-fatigue",
+    "e-ret-reflect",
+    "e-sup-plan-reflect",
+    "e-ret-plan",
+    "e-sup-teach",
+    "e-ret-teach",
+    "e-sup-fatigue",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

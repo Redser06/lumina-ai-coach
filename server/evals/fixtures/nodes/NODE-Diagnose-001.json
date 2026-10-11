@@ -1,0 +1,15 @@
+{
+  "id": "NODE-Diagnose-001",
+  "node": "Diagnose",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    }
+  },
+  "expect_edge": "e-ret-diagnose",
+  "expect_path_tail": "Diagnose"
+}

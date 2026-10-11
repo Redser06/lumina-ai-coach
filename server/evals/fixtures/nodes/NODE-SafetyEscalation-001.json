@@ -1,0 +1,9 @@
+{
+  "id": "NODE-SafetyEscalation-001",
+  "node": "SafetyEscalation",
+  "kind": "hitl",
+  "expect_decision": {
+    "decision": "accept",
+    "actor": "learner"
+  }
+}

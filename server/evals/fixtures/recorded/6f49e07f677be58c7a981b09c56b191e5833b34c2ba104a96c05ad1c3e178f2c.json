@@ -1,0 +1,6 @@
+{
+  "text": "{\"plan\":{\"skill\":\"prompting\",\"rationale\":\"Start with a single clear prompt\"}}",
+  "tokens_in": 46,
+  "tokens_out": 20,
+  "latency_ms": 1
+}

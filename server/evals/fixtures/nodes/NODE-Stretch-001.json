@@ -1,0 +1,14 @@
+{
+  "id": "NODE-Stretch-001",
+  "node": "Stretch",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.9
+    }
+  },
+  "expect_edge": "e-ret-stretch",
+  "expect_path_tail": "Stretch"
+}

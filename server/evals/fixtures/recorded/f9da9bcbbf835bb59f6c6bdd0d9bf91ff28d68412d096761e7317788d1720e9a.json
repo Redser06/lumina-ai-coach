@@ -1,0 +1,6 @@
+{
+  "text": "{\"mastery\":{\"prompting\":0.55}}",
+  "tokens_in": 67,
+  "tokens_out": 8,
+  "latency_ms": 1
+}

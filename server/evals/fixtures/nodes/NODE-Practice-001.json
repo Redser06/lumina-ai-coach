@@ -1,0 +1,14 @@
+{
+  "id": "NODE-Practice-001",
+  "node": "Practice",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.5
+    }
+  },
+  "expect_edge": "e-ret-practice",
+  "expect_path_tail": "Practice"
+}

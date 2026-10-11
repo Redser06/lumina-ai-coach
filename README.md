@@ -80,4 +80,20 @@ gh repo create Redser06/lumina-ai-coach --public --source=. --push
 
 ---
 
+## Server (Phase 0)
+
+The coaching agent graph lives in `server/` (LangGraph.js, Hono, SQLite checkpoints). It does not change the front end. Offline by default (`LLM_PROVIDER=fake`).
+
+```bash
+npm run spec:check
+npm run test:server
+npm run coverage:graph
+npm run eval
+npm run proofs
+```
+
+Node is pinned in `.nvmrc` (22.23.3). See `docs/phase0/PROOFS.md` for the Phase 0 acceptance proofs.
+
+---
+
 *Engineered with precision for the Rapid Prototypes Suite.*

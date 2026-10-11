@@ -1,0 +1,49 @@
+{
+  "id": "SCN-0006",
+  "persona": "P4",
+  "title": "Skill map edit waits for a curator",
+  "learner_id": "eva",
+  "goal": "Propose a skill-map edit",
+  "initial": {
+    "skill_map_edit": true,
+    "diagnosis": {
+      "placed": true,
+      "tier": "expert"
+    },
+    "plan": {
+      "skill": "teaching",
+      "rationale": "Already placed"
+    }
+  },
+  "hitl": [
+    {
+      "decision": "approve",
+      "actor": "curator"
+    }
+  ],
+  "script": {
+    "SkillMapEdit": [
+      {
+        "note": "proposal"
+      }
+    ],
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.15
+      }
+    ]
+  },
+  "expected_path": [
+    "SkillMapEdit",
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-skill",
+    "e-ret-skill",
+    "e-sup-reflect-skill",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

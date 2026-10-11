@@ -1,0 +1,9 @@
+{
+  "id": "NODE-GradeDispute-001",
+  "node": "GradeDispute",
+  "kind": "hitl",
+  "expect_decision": {
+    "decision": "accept",
+    "actor": "learner"
+  }
+}

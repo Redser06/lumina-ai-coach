@@ -1,0 +1,92 @@
+{
+  "id": "SCN-0007",
+  "persona": "P3",
+  "title": "Mid score replans, then fatigue ends the session",
+  "learner_id": "ben",
+  "goal": "Replan after a middling assessment",
+  "hitl": [],
+  "script": {
+    "Diagnose": [
+      {
+        "diagnosis": {
+          "placed": true,
+          "tier": "builder"
+        },
+        "mastery": {
+          "tools": 0.5
+        }
+      }
+    ],
+    "Plan": [
+      {
+        "plan": {
+          "skill": "tools",
+          "rationale": "First plan"
+        }
+      },
+      {
+        "plan": {
+          "skill": "evals",
+          "rationale": "Replan after a middling score"
+        },
+        "fatigue": 0.9
+      }
+    ],
+    "Teach": [
+      {
+        "mastery": {
+          "tools": 0.55
+        }
+      }
+    ],
+    "Practice": [
+      {
+        "mastery": {
+          "tools": 0.58
+        }
+      }
+    ],
+    "Assess": [
+      {
+        "last_assessment": {
+          "score": 0.55,
+          "error_class": null,
+          "confidence": 0.45
+        }
+      }
+    ],
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": [
+    "Diagnose",
+    "Plan",
+    "Teach",
+    "Practice",
+    "Assess",
+    "Plan",
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-diagnose",
+    "e-ret-diagnose",
+    "e-sup-plan",
+    "e-ret-plan",
+    "e-sup-teach",
+    "e-ret-teach",
+    "e-sup-practice",
+    "e-ret-practice",
+    "e-sup-assess",
+    "e-ret-assess",
+    "e-sup-replan",
+    "e-ret-plan",
+    "e-sup-fatigue",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

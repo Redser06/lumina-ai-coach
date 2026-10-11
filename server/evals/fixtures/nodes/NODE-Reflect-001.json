@@ -1,0 +1,12 @@
+{
+  "id": "NODE-Reflect-001",
+  "node": "Reflect",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "session_complete": true
+  },
+  "expect_edge": "e-ret-reflect",
+  "expect_path_tail": "Reflect"
+}
