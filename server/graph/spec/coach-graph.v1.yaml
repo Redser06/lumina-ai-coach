@@ -199,7 +199,7 @@ edges:
     from: Supervisor
     to: Plan
     condition_id: assess.replan
-    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class != 'misconception' && fast_mastery == false"
+    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class != 'misconception' && !(last_assessment.error_class == null && last_assessment.score >= 0.85 && last_assessment.confidence >= 0.8)"
     priority: 30
   - id: e-sup-diagnose
     from: Supervisor
@@ -217,7 +217,7 @@ edges:
     from: Supervisor
     to: Teach
     condition_id: plan.ready
-    condition_expr: "path[-1] == 'Plan' && plan.skill != ''"
+    condition_expr: "path[-1] == 'Plan' && plan.skill != null && plan.skill != ''"
     priority: 24
   - id: e-sup-practice
     from: Supervisor

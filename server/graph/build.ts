@@ -5,7 +5,8 @@ import { NODE_IMPLS } from "./nodes/registry.js";
 import { selectEdge } from "./route.js";
 import { loadSpec } from "./spec/load.js";
 import type { GraphEdgeSpec, GraphSpec } from "./spec/types.js";
-import type { LearnerState } from "./state.js";
+import { assertConditionsMatchCode, ConditionExprError } from "./expr.js";
+import { initialLearnerState, type LearnerState } from "./state.js";
 
 export class GraphSpecError extends Error {
   readonly code = "GRAPH_SPEC";
@@ -18,40 +19,9 @@ export class GraphSpecError extends Error {
 const GraphAnnotation = Annotation.Root({
   learner: Annotation<LearnerState>({
     reducer: (left, right) => ({ ...left, ...right }),
-    default: () => emptyLearner(),
+    default: () => initialLearnerState({ learner_id: "unset", session_id: "unset", goal: "" }),
   }),
 });
-
-function emptyLearner(): LearnerState {
-  return {
-    learner_id: "unset",
-    session_id: "unset",
-    scenario_id: null,
-    goal: "",
-    mastery: {},
-    last_assessment: null,
-    time_on_task_s: 0,
-    fatigue: 0,
-    step: 0,
-    cost_usd_session: 0,
-    cost_budget_usd: 1,
-    path: [],
-    edges_taken: [],
-    trace_nodes: [],
-    fingerprints: [],
-    hitl_pending: null,
-    hitl_log: [],
-    loop_detected: false,
-    loop_cleared: false,
-    disputed: false,
-    skill_map_edit: false,
-    session_complete: false,
-    diagnosis: null,
-    plan: null,
-    last_edge: null,
-    last_condition: null,
-  };
-}
 
 export function assertSpecClosed(args: {
   spec: GraphSpec;
@@ -92,6 +62,12 @@ export function assertSpecClosed(args: {
     if (!match || match.from !== edge.from || match.to !== edge.to || match.condition_id !== edge.condition_id) {
       throw new GraphSpecError(`undeclared edge: ${edge.id} ${edge.from} -> ${edge.to}`);
     }
+  }
+  try {
+    assertConditionsMatchCode(args.spec, args.conditions);
+  } catch (error) {
+    if (error instanceof ConditionExprError) throw new GraphSpecError(error.message);
+    throw error;
   }
 }
 
@@ -202,7 +178,11 @@ export function compileCoachGraph(options: CompileOptions = {}) {
     graph = graph.addConditionalEdges(
       from === "__start__" ? START : from,
       (state) => {
-        const chosen = selectEdge(from, state.learner, spec);
+        const chosen =
+          from === "__start__"
+            ? selectEdge(from, state.learner, spec)
+            : spec.edges.find((edge) => edge.id === state.learner.last_edge && edge.from === from);
+        if (!chosen) throw new GraphSpecError(`missing routed edge from ${from}`);
         if (!conditions[chosen.condition_id]) {
           throw new GraphSpecError(`missing condition implementation: ${chosen.condition_id}`);
         }
@@ -241,4 +221,5 @@ export interface CompiledCoachGraph {
     values: { learner?: LearnerState };
     config: { configurable?: { checkpoint_id?: string } };
   }>;
+  updateState(config: unknown, values: { learner: LearnerState }, asNode?: string): Promise<unknown>;
 }

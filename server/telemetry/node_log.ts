@@ -30,6 +30,7 @@ export function appendNodeLog(record: NodeLog): NodeLog {
   const list = memory.get(record.session_id) ?? [];
   list.push(record);
   memory.set(record.session_id, list);
+  flushRecord(record);
   return record;
 }
 

@@ -1,5 +1,5 @@
 import { attachEdge } from "../../telemetry/node_log.js";
-import { complete } from "../../router/router.js";
+import { complete, sessionSpentUsd } from "../../router/router.js";
 import { currentRunId } from "../../runtime/context.js";
 import { renderPrompt } from "../prompt.js";
 import { loadSpec } from "../spec/load.js";
@@ -18,7 +18,7 @@ export async function runWorker(nodeId: string, state: { learner: LearnerState }
   const node = loadSpec().nodes.find((item) => item.id === nodeId);
   if (!node) throw new Error(`unknown node ${nodeId}`);
   const prompt = renderPrompt(nodeId, node.task_type, learner);
-  const call = await complete({
+  const call = await completeCharged(nodeId, {
     node: nodeId,
     taskType: node.task_type,
     prompt,
@@ -43,4 +43,18 @@ export async function runWorker(nodeId: string, state: { learner: LearnerState }
 
 export function makeWorker(nodeId: string) {
   return (state: { learner: LearnerState }) => runWorker(nodeId, state);
+}
+
+export async function completeCharged(
+  nodeId: string,
+  args: Parameters<typeof complete>[0],
+): Promise<Awaited<ReturnType<typeof complete>>> {
+  try {
+    return await complete(args);
+  } catch (error) {
+    if (error && typeof error === "object" && sessionSpentUsd(error) !== undefined) {
+      Object.assign(error, { chargedNode: nodeId });
+    }
+    throw error;
+  }
 }

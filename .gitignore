@@ -12,3 +12,4 @@ server/.checkpoints/
 *.sqlite
 *.sqlite-*
 reports/
+proofs/

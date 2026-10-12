@@ -16,7 +16,7 @@ Done = every listed AC has its proof attached. PR count is not a success metric.
 
 - Criterion: Coaching agent graph spec published and versioned: nodes Diagnose, Plan, Teach, Practice, Assess, Remediate, Stretch, Reflect + HITL nodes, with every conditional edge and its learner-state condition declared
 - Proof type required: fixture id
-- Proof location: fixture id `GRAPH-SPEC-coach-graph@1.0.0` (`server/graph/spec/coach-graph.v1.yaml`). `npm run spec:check` prints `sha256=5ad56f5a877ff3708af08b97baabcdb5e89bd5893783a24ac18322e9216cbfbf`.
+- Proof location: fixture id `GRAPH-SPEC-coach-graph@1.0.0` (`server/graph/spec/coach-graph.v1.yaml`). `npm run spec:check` prints `sha256=3932b894f5788056d9991bae8a69d382fad25a71d1ccb037fdc9d10c9097618b`.
 
 ## AC-3
 
@@ -28,10 +28,7 @@ Done = every listed AC has its proof attached. PR count is not a success metric.
 
 - Criterion: Checkpoint replay: a session checkpointed per node can (a) resume after a forced crash at the same node, (b) replay to an identical path using recorded outputs, (c) fork from a chosen checkpoint
 - Proof type required: API JSON
-- Proof location:
-  - `proofs/phase0/ac4-resume.json`
-  - `proofs/phase0/ac4-replay.json`
-  - `proofs/phase0/ac4-fork.json`
+- Proof location: CI artifact `phase0-reports` (`proofs/phase0/ac4-resume.json`, `ac4-replay.json`, `ac4-fork.json`). The JSON is generated in CI and is not committed.
 
 Reproduce:
 
@@ -44,7 +41,7 @@ npx tsx server/scripts/proofs.ts --out proofs/phase0
 
 - Criterion: Model router picks the model per node task type from config, falls back on a forced failure, and logs model/tokens/cost/latency per node
 - Proof type required: API JSON
-- Proof location: `proofs/phase0/ac7-router.json`
+- Proof location: CI artifact `phase0-reports` (`proofs/phase0/ac7-router.json`). The JSON is generated in CI and is not committed.
 
 Reproduce:
 

@@ -1,3 +1,4 @@
+import "../runtime/network_guard.js";
 import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { executeScenarios } from "../evals/execute.js";
 import { loadScenario, stateFromScenario } from "../evals/scenarios.js";

@@ -6,7 +6,7 @@ import { afterEach, describe, test } from "node:test";
 import { stringify } from "yaml";
 import { CostCapExceeded, PricingRejected, requirePrice, type ModelPrice } from "../router/pricing.js";
 import { assertRealProviderEnabled } from "../router/providers/openai_compat.js";
-import { complete, createRouter, getSessionSpend, loadRouting, resetSessionSpendForTests, useRouterForTests } from "../router/router.js";
+import { complete, createRouter, loadRouting, sessionSpentUsd, useRouterForTests } from "../router/router.js";
 import { RealProviderDisabled, RouterPoolExhaustedError, type CompleteArgs, type Provider } from "../router/types.js";
 import { resetLogsForTests, logsForSession } from "../telemetry/node_log.js";
 
@@ -21,7 +21,6 @@ function restoreEnv(): void {
   }
   useRouterForTests(null);
   resetLogsForTests();
-  resetSessionSpendForTests();
 }
 
 function args(partial: Partial<CompleteArgs> = {}): CompleteArgs {
@@ -169,6 +168,14 @@ describe("router", { concurrency: false }, () => {
       PricingRejected,
     );
     await assert.rejects(
+      () => createRouter({ provider }).complete(args({ capUsd: Number.POSITIVE_INFINITY, sessionId: "inf-cap" })),
+      PricingRejected,
+    );
+    await assert.rejects(
+      () => createRouter({ provider }).complete(args({ capUsd: -1, sessionId: "neg-cap" })),
+      PricingRejected,
+    );
+    await assert.rejects(
       () => createRouter({ provider }).complete(args({ capUsd: 1e-12, sessionId: "over-cap" })),
       CostCapExceeded,
     );
@@ -204,7 +211,7 @@ describe("router", { concurrency: false }, () => {
       args({ prompt, capUsd: 2, sessionId: "cap-boundary" }),
     );
     assert.equal(boundary.cost_usd, 2);
-    assert.equal(getSessionSpend("cap-boundary"), 2);
+    assert.equal(boundary.session_spent_usd, 2);
 
     let overCalls = 0;
     const overProvider: Provider = {
@@ -215,11 +222,13 @@ describe("router", { concurrency: false }, () => {
       },
     };
     const over = createRouter({ routing: oneModel, provider: overProvider, prices, maxOutputTokens: 1 });
-    await assert.rejects(() => over.complete(args({ prompt, capUsd: 2, sessionId: "cap-over" })), CostCapExceeded);
-    assert.equal(getSessionSpend("cap-over"), 3);
+    await assert.rejects(
+      () => over.complete(args({ prompt, capUsd: 2, sessionId: "cap-over" })),
+      (error: unknown) => error instanceof CostCapExceeded && sessionSpentUsd(error) === 3,
+    );
     assert.equal(overCalls, 1);
     await assert.rejects(
-      () => over.complete(args({ prompt, capUsd: 3, sessionId: "cap-over", spentUsd: 0 })),
+      () => over.complete(args({ prompt, capUsd: 3, sessionId: "cap-over-next", spentUsd: 3 })),
       CostCapExceeded,
     );
     assert.equal(overCalls, 1);
@@ -242,11 +251,11 @@ describe("router", { concurrency: false }, () => {
     assert.equal(timed.fallback_from, "m-a");
     assert.equal(timed.model, "m-b");
     assert.equal(timed.cost_usd, 2);
-    assert.equal(getSessionSpend("cap-timeout"), 3);
-    const again = await fallback.complete(args({ prompt, capUsd: 10, sessionId: "cap-timeout", spentUsd: 0 }));
+    assert.equal(timed.session_spent_usd, 3);
+    const again = await fallback.complete(args({ prompt, capUsd: 10, sessionId: "cap-timeout", spentUsd: timed.session_spent_usd }));
     assert.equal(again.model, "m-a");
     assert.equal(again.cost_usd, 2);
-    assert.equal(getSessionSpend("cap-timeout"), 5);
+    assert.equal(again.session_spent_usd, 5);
 
     let failCalls = 0;
     const failing: Provider = {
@@ -257,11 +266,13 @@ describe("router", { concurrency: false }, () => {
       },
     };
     const failRouter = createRouter({ routing, provider: failing, prices, maxOutputTokens: 1 });
-    await assert.rejects(() => failRouter.complete(args({ prompt, capUsd: 4, sessionId: "cap-fail" })), RouterPoolExhaustedError);
-    assert.equal(failCalls, 2);
-    assert.equal(getSessionSpend("cap-fail"), 2);
     await assert.rejects(
-      () => failRouter.complete(args({ prompt, capUsd: 3, sessionId: "cap-fail", spentUsd: 0 })),
+      () => failRouter.complete(args({ prompt, capUsd: 4, sessionId: "cap-fail" })),
+      (error: unknown) => error instanceof RouterPoolExhaustedError && error.sessionSpentUsd === 2,
+    );
+    assert.equal(failCalls, 2);
+    await assert.rejects(
+      () => failRouter.complete(args({ prompt, capUsd: 3, sessionId: "cap-fail-next", spentUsd: 2 })),
       CostCapExceeded,
     );
     assert.equal(failCalls, 2);

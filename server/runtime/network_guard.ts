@@ -1,6 +1,9 @@
 import { Socket } from "node:net";
 
-const LOOPBACK = new Set(["127.0.0.1", "localhost", "::1", "::ffff:127.0.0.1", ""]);
+function isLoopback(host: string): boolean {
+  const bare = host.trim().toLowerCase().replace(/^\[|\]$/g, "");
+  return bare === "localhost" || bare === "127.0.0.1" || bare === "::1" || bare === "::ffff:127.0.0.1" || bare === "";
+}
 
 function hostFrom(args: unknown[]): string {
   const first = args[0];
@@ -14,11 +17,15 @@ function hostFrom(args: unknown[]): string {
   return "127.0.0.1";
 }
 
-if (process.env.NO_NETWORK === "1") {
+/**
+ * Blocks non-loopback sockets and fetch. On unless NO_NETWORK=0.
+ * `[::1]` is loopback: Node reports that hostname with the brackets.
+ */
+if (process.env.NO_NETWORK !== "0") {
   const original = Socket.prototype.connect;
   Socket.prototype.connect = function connect(this: Socket, ...args: unknown[]) {
     const host = hostFrom(args);
-    if (!LOOPBACK.has(host)) {
+    if (!isLoopback(host)) {
       throw new Error(`network blocked: ${host}`);
     }
     return original.apply(this, args as never);
@@ -28,7 +35,7 @@ if (process.env.NO_NETWORK === "1") {
   globalThis.fetch = (async (input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
     const raw = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
     const url = new URL(raw);
-    if (!LOOPBACK.has(url.hostname)) throw new Error(`network blocked: ${url.hostname}`);
+    if (!isLoopback(url.hostname)) throw new Error(`network blocked: ${url.hostname}`);
     return originalFetch(input, init);
   }) as typeof fetch;
 }

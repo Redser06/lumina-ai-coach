@@ -1,11 +1,14 @@
 import { randomUUID } from "node:crypto";
 import type { BaseCheckpointSaver } from "@langchain/langgraph-checkpoint";
-import { Command } from "@langchain/langgraph";
+import { Command, isGraphInterrupt } from "@langchain/langgraph";
 import { closeCheckpointer, createCheckpointer } from "../checkpoint/index.js";
+import { chargedNode, sessionSpentUsd } from "../router/router.js";
 import { runContext } from "../runtime/context.js";
+import "../runtime/network_guard.js";
 import { logsForSession, stampCheckpoint, type NodeLog } from "../telemetry/node_log.js";
 import { compileCoachGraph, type CompiledCoachGraph } from "./build.js";
 import type { HitlDecision } from "./hitl.js";
+import { selectEdge } from "./route.js";
 import { applyPatch, LearnerStateSchema, type LearnerState } from "./state.js";
 
 const STEP_CAP = 80;
@@ -85,7 +88,7 @@ export class SessionService {
   async run(initial: LearnerState, decisions: HitlDecision[] = [], threadId = initial.session_id): Promise<RunResult> {
     const provider = runContext.getStore()?.provider;
     return runContext.run({ runId: randomUUID(), provider }, async () => {
-      await this.graph.invoke({ learner: initial }, this.config(threadId));
+      await this.invoke(threadId, { learner: initial });
       const opened = await this.readSnap(threadId);
       stampCheckpoint(initial.session_id, opened.checkpoint_id ?? "unknown");
       return this.continueUntil(threadId, decisions, null, initial.session_id);
@@ -105,13 +108,13 @@ export class SessionService {
       if (snap.interrupts.length > 0) {
         const decision = queue.shift();
         if (!decision) return this.toResult(threadId, snap, "interrupted", resumedNode, sessionId);
-        await this.graph.invoke(new Command({ resume: decision }), this.config(threadId));
+        await this.invoke(threadId, new Command({ resume: decision }));
         const after = await this.readSnap(threadId);
         stampCheckpoint(sessionId, after.checkpoint_id ?? "unknown");
         continue;
       }
       if (snap.next.length === 0) return this.toResult(threadId, snap, "done", resumedNode, sessionId);
-      await this.graph.invoke(null, this.config(threadId));
+      await this.invoke(threadId, null);
       const after = await this.readSnap(threadId);
       stampCheckpoint(sessionId, after.checkpoint_id ?? "unknown");
     }
@@ -124,7 +127,7 @@ export class SessionService {
     if (before.interrupts.length > 0) return this.toResult(threadId, before, "interrupted", null, before.learner.session_id);
     if (before.next.length === 0) return this.toResult(threadId, before, "done", null, before.learner.session_id);
     return runContext.run({ runId: randomUUID() }, async () => {
-      await this.graph.invoke(null, this.config(threadId));
+      await this.invoke(threadId, null);
       const after = await this.readSnap(threadId);
       stampCheckpoint(before.learner!.session_id, after.checkpoint_id ?? "unknown");
       const status = after.interrupts.length > 0 ? "interrupted" : after.next.length === 0 ? "done" : "paused";
@@ -154,6 +157,8 @@ export class SessionService {
     const snap = await this.readSnap(threadId, from);
     if (!snap.learner) throw new Error("checkpoint not found");
     const replayThread = `${threadId}-replay-${randomUUID()}`;
+    // Spend starts at this checkpoint's cost_usd_session. A finished session's later
+    // total is not applied on top, so replaying an early checkpoint cannot trip the cap.
     const result = await runContext.run({ runId: "replay", provider: "recorded" }, () =>
       this.run(snap.learner!, decisions, replayThread),
     );
@@ -190,9 +195,9 @@ export class SessionService {
     const snap = await this.readSnap(threadId, from);
     if (!snap.learner || !parentBefore.learner) throw new Error("checkpoint not found");
     const childThread = `${threadId}-fork-${randomUUID()}`;
-    const seeded = applyPatch(snap.learner, patch);
+    const seeded = { ...applyPatch(snap.learner, patch), session_id: childThread };
     await runContext.run({ runId: randomUUID() }, async () => {
-      await this.graph.invoke({ learner: seeded }, this.config(childThread));
+      await this.invoke(childThread, { learner: seeded });
       const opened = await this.readSnap(childThread);
       stampCheckpoint(seeded.session_id, opened.checkpoint_id ?? "unknown");
     });
@@ -239,8 +244,6 @@ export class SessionService {
     sessionId: string,
   ): RunResult {
     if (!snap.learner) throw new Error(`session not found: ${threadId}`);
-    const nodes = ["__start__", ...snap.learner.trace_nodes];
-    if (snap.learner.edges_taken.includes("e-sup-end")) nodes.push("End");
     return {
       status,
       session_id: sessionId,
@@ -251,9 +254,35 @@ export class SessionService {
       state: snap.learner,
       interrupts: snap.interrupts.map((item) => item.value),
       node_logs: logsForSession(sessionId),
-      edges: ["e-start", ...snap.learner.edges_taken],
-      nodes,
+      edges: snap.learner.edges_taken,
+      nodes: snap.learner.trace_nodes,
     };
+  }
+
+  private async invoke(threadId: string, input: unknown): Promise<void> {
+    try {
+      await this.graph.invoke(input, this.config(threadId));
+    } catch (error) {
+      if (!isGraphInterrupt(error)) await this.persistChargedSpend(threadId, error);
+      throw error;
+    }
+  }
+
+  private async persistChargedSpend(threadId: string, error: unknown): Promise<void> {
+    const spent = sessionSpentUsd(error);
+    const node = chargedNode(error);
+    if (spent === undefined || !node) return;
+    const snap = await this.readSnap(threadId);
+    if (!snap.learner || spent === snap.learner.cost_usd_session) return;
+    const patched = LearnerStateSchema.parse({ ...snap.learner, cost_usd_session: spent });
+    const edge = selectEdge(node, patched);
+    const learner = LearnerStateSchema.parse({
+      ...patched,
+      last_edge: edge.id,
+      last_condition: edge.condition_id,
+      edges_taken: patched.edges_taken.includes(edge.id) ? patched.edges_taken : [...patched.edges_taken, edge.id],
+    });
+    await this.graph.updateState(this.config(threadId), { learner }, node);
   }
 }
 

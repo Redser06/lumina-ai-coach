@@ -1,3 +1,4 @@
+import "../runtime/network_guard.js";
 import { spawn, type ChildProcess } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";

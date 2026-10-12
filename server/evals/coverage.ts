@@ -1,3 +1,4 @@
+import "../runtime/network_guard.js";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { loadSpec } from "../graph/spec/load.js";

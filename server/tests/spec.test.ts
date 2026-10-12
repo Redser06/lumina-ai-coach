@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { compileCoachGraph, GraphSpecError } from "../graph/build.js";
 import { CONDITIONS } from "../graph/conditions.js";
+import { compileConditionExpr, ConditionExprError } from "../graph/expr.js";
 import { NODE_IMPLS } from "../graph/nodes/registry.js";
 import { COACHING_NODES, HITL_NODES, type GraphSpec } from "../graph/spec/types.js";
 import { loadSpec, loadSpecWithHash, validateSpec, versionBumpOk } from "../graph/spec/load.js";
@@ -94,6 +95,34 @@ describe("spec", { concurrency: false }, () => {
     assert.throws(
       () => compileCoachGraph({ omitEdgeIds: spec.edges.map((edge) => edge.id) }),
       (error: unknown) => error instanceof GraphSpecError && /allEdges check skipped/.test(error.message),
+    );
+  });
+
+  test("build_rejects_unused_condition", () => {
+    assert.throws(
+      () => compileCoachGraph({ conditions: { ...CONDITIONS, "extra.unused": () => false } }),
+      (error: unknown) => error instanceof GraphSpecError && /unused condition: extra\.unused/.test(error.message),
+    );
+  });
+
+  test("build_rejects_condition_expr_that_disagrees_with_code", () => {
+    const spec = loadSpec();
+    const rewritten: GraphSpec = {
+      ...spec,
+      edges: spec.edges.map((edge) =>
+        edge.condition_id === "assess.misconception" ? { ...edge, condition_expr: "false" } : edge,
+      ),
+    };
+    assert.throws(
+      () => compileCoachGraph({ spec: rewritten }),
+      (error: unknown) => error instanceof GraphSpecError && /condition_expr does not match code/.test(error.message),
+    );
+  });
+
+  test("condition_expr_rejects_unknown_state_field", () => {
+    assert.throws(
+      () => compileConditionExpr("fast_mastery == false"),
+      (error: unknown) => error instanceof ConditionExprError && /unknown learner-state field fast_mastery/.test(error.message),
     );
   });
 

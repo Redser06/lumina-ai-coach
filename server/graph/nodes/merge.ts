@@ -1,4 +1,3 @@
-import { roundUsd } from "../../router/pricing.js";
 import type { ModelCall } from "../../router/types.js";
 import { fingerprintState, type LearnerPatch, type LearnerState } from "../state.js";
 
@@ -30,7 +29,7 @@ export function withBookkeeping(state: LearnerState, nodeId: string, call: Model
     ...state,
     ...patch,
     step: state.step + 1,
-    cost_usd_session: roundUsd(state.cost_usd_session + call.cost_usd),
+    cost_usd_session: call.session_spent_usd,
     trace_nodes: [...state.trace_nodes, nodeId],
     last_edge: state.last_edge,
     last_condition: state.last_condition,

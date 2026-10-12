@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import "../../runtime/network_guard.js";
 import { parse } from "yaml";
 import { compileCoachGraph } from "../build.js";
 import { CONDITIONS } from "../conditions.js";

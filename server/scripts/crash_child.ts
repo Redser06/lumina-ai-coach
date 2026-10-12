@@ -1,3 +1,4 @@
+import "../runtime/network_guard.js";
 import { createCheckpointer } from "../checkpoint/index.js";
 import { loadScenario, stateFromScenario } from "../evals/scenarios.js";
 import { compileCoachGraph } from "../graph/build.js";

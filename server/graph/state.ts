@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DEFAULT_COST_BUDGET_USD } from "./limits.js";
+import { MAX_COST_BUDGET_USD, costBudgetFromConfig } from "./limits.js";
 
 export const LastAssessmentSchema = z.object({
   score: z.number().finite(),
@@ -39,7 +39,7 @@ export const LearnerStateSchema = z.object({
   fatigue: z.number().finite().nonnegative(),
   step: z.number().int().nonnegative(),
   cost_usd_session: z.number().finite().nonnegative(),
-  cost_budget_usd: z.number().finite().positive(),
+  cost_budget_usd: z.number().finite().positive().max(MAX_COST_BUDGET_USD),
   path: z.array(z.string()),
   edges_taken: z.array(z.string()),
   trace_nodes: z.array(z.string()),
@@ -72,7 +72,7 @@ export function initialLearnerState(partial: Partial<LearnerState> & Pick<Learne
     fatigue: partial.fatigue ?? 0,
     step: partial.step ?? 0,
     cost_usd_session: partial.cost_usd_session ?? 0,
-    cost_budget_usd: partial.cost_budget_usd ?? DEFAULT_COST_BUDGET_USD,
+    cost_budget_usd: costBudgetFromConfig(),
     path: partial.path ?? [],
     edges_taken: partial.edges_taken ?? [],
     trace_nodes: partial.trace_nodes ?? [],
@@ -107,7 +107,8 @@ export function fingerprintState(state: LearnerState): string {
   });
 }
 
-export const FORK_LOCKED_FIELDS = ["cost_usd_session", "cost_budget_usd"] as const;
+/** Learner-visible fields a fork may change. Everything else, including spend and bookkeeping, is rejected. */
+export const FORK_PATCH_FIELDS = ["fatigue", "last_assessment", "mastery", "disputed", "skill_map_edit", "goal"] as const;
 
 export class ForkPatchRejected extends Error {
   readonly code = "FORK_PATCH_REJECTED";
@@ -118,8 +119,9 @@ export class ForkPatchRejected extends Error {
 }
 
 export function applyPatch(state: LearnerState, patch: Record<string, unknown>): LearnerState {
-  for (const field of FORK_LOCKED_FIELDS) {
-    if (Object.prototype.hasOwnProperty.call(patch, field)) throw new ForkPatchRejected(field);
+  const allowed = new Set<string>(FORK_PATCH_FIELDS);
+  for (const field of Object.keys(patch)) {
+    if (!allowed.has(field)) throw new ForkPatchRejected(field);
   }
   const next: Record<string, unknown> = { ...state };
   for (const [key, value] of Object.entries(patch)) {

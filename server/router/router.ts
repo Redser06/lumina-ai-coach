@@ -2,10 +2,9 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
-import { isGraphInterrupt } from "@langchain/langgraph";
 import { runContext } from "../runtime/context.js";
 import { appendNodeLog } from "../telemetry/node_log.js";
-import { MAX_OUTPUT_TOKENS, assertWithinCap, computeCost, enforceRunCostCap, roundUsd, type ModelPrice } from "./pricing.js";
+import { MAX_OUTPUT_TOKENS, CostCapExceeded, PricingRejected, assertWithinCap, computeCost, enforceRunCostCap, roundUsd, type ModelPrice } from "./pricing.js";
 import { fakeProvider } from "./providers/fake.js";
 import { openaiCompatProvider } from "./providers/openai_compat.js";
 import { recordedProvider } from "./providers/recorded.js";
@@ -31,24 +30,16 @@ export function resolveProvider(kind = process.env.LLM_PROVIDER ?? "fake"): Prov
   throw new RealProviderDisabled(`unknown LLM_PROVIDER ${kind}`);
 }
 
-const spentBySession = new Map<string, number>();
-
-export function getSessionSpend(sessionId: string): number {
-  return spentBySession.get(sessionId) ?? 0;
+export function sessionSpentUsd(error: unknown): number | undefined {
+  if (!error || typeof error !== "object") return undefined;
+  const value = (error as { sessionSpentUsd?: unknown }).sessionSpentUsd;
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
 
-export function resetSessionSpendForTests(): void {
-  spentBySession.clear();
-}
-
-function spentSoFar(sessionId: string, stateSpend: number): number {
-  return roundUsd(Math.max(stateSpend, spentBySession.get(sessionId) ?? 0));
-}
-
-function noteSpend(sessionId: string, total: number): number {
-  const next = roundUsd(total);
-  spentBySession.set(sessionId, next);
-  return next;
+export function chargedNode(error: unknown): string | undefined {
+  if (!error || typeof error !== "object") return undefined;
+  const value = (error as { chargedNode?: unknown }).chargedNode;
+  return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
 function usageFrom(error: unknown): { tokens_in: number; tokens_out: number } | null {
@@ -62,7 +53,12 @@ function usageFrom(error: unknown): { tokens_in: number; tokens_out: number } | 
 
 /**
  * A failed or timed-out call still costs money. Use provider-reported usage when
- * the error carries it; otherwise charge the input estimate (output was not produced).
+ * the error carries it. Otherwise charge the input estimate and zero output.
+ *
+ * That estimate is also used when nothing was sent: a missing recording and
+ * RealProviderDisabled fail inside the provider call, after the preflight, and
+ * they do not carry usage. Charging the input estimate is the safe default so
+ * a later call cannot pretend the attempt was free.
  */
 export function failureCharge(
   model: string,
@@ -102,7 +98,19 @@ export function createRouter(options?: {
       if (!pool?.length) throw new Error(`unknown task type ${args.taskType}`);
       const causes: unknown[] = [];
       let fallbackFrom: string | null = null;
-      let spent = spentSoFar(args.sessionId, args.spentUsd);
+      let spent = roundUsd(args.spentUsd);
+      let chargedThisCall = false;
+      const note = (cost: number): number => {
+        spent = roundUsd(spent + cost);
+        chargedThisCall = true;
+        return spent;
+      };
+      const bubble = (error: unknown): never => {
+        if (chargedThisCall && error && typeof error === "object") {
+          Object.assign(error, { sessionSpentUsd: spent });
+        }
+        throw error;
+      };
       for (const candidate of pool) {
         const tokensIn = Math.max(1, Math.ceil(args.prompt.length / 4));
         try {
@@ -114,34 +122,21 @@ export function createRouter(options?: {
             capUsd: args.capUsd,
             table: prices,
           });
-          const result = await provider.complete({
+        } catch (error) {
+          bubble(error);
+        }
+        let result: Awaited<ReturnType<Provider["complete"]>>;
+        try {
+          result = await provider.complete({
             model: candidate.model,
             taskType: args.taskType,
             prompt: args.prompt,
             timeoutMs: candidate.timeout_ms,
           });
-          const cost = computeCost(candidate.model, result.tokens_in, result.tokens_out, prices);
-          spent = noteSpend(args.sessionId, spent + cost);
-          const call: ModelCall = {
-            provider: provider.id,
-            model: candidate.model,
-            fallback_from: fallbackFrom,
-            text: result.text,
-            json: parseJson(result.text),
-            tokens_in: result.tokens_in,
-            tokens_out: result.tokens_out,
-            cost_usd: cost,
-            latency_ms: result.latency_ms,
-          };
-          appendNodeLog(logFrom(args, call));
-          assertWithinCap(spent - cost, cost, args.capUsd);
-          return call;
         } catch (error) {
-          if (isGraphInterrupt(error)) throw error;
-          if (error instanceof Error && error.name === "PricingRejected") throw error;
-          if (error instanceof Error && error.name === "CostCapExceeded") throw error;
+          if (error instanceof PricingRejected || error instanceof CostCapExceeded) bubble(error);
           const cost = failureCharge(candidate.model, tokensIn, error, prices);
-          spent = noteSpend(args.sessionId, spent + cost);
+          note(cost);
           appendNodeLog({
             run_id: args.runId,
             session_id: args.sessionId,
@@ -161,9 +156,31 @@ export function createRouter(options?: {
           });
           causes.push(error);
           fallbackFrom = candidate.model;
+          continue;
         }
+        const cost = computeCost(candidate.model, result.tokens_in, result.tokens_out, prices);
+        note(cost);
+        const call: ModelCall = {
+          provider: provider.id,
+          model: candidate.model,
+          fallback_from: fallbackFrom,
+          text: result.text,
+          json: parseJson(result.text),
+          tokens_in: result.tokens_in,
+          tokens_out: result.tokens_out,
+          cost_usd: cost,
+          session_spent_usd: spent,
+          latency_ms: result.latency_ms,
+        };
+        appendNodeLog(logFrom(args, call));
+        try {
+          assertWithinCap(spent - cost, cost, args.capUsd);
+        } catch (error) {
+          bubble(error);
+        }
+        return call;
       }
-      throw new RouterPoolExhaustedError(args.taskType, causes);
+      throw new RouterPoolExhaustedError(args.taskType, causes, spent);
     },
   };
 }

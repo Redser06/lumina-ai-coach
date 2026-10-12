@@ -56,5 +56,3 @@ export const CONDITIONS: Record<string, ConditionFn> = {
   "reflect.continue": (state) => last(state) === "Reflect" && !state.session_complete,
   "reflect.done": (state) => last(state) === "Reflect" && state.session_complete,
 };
-
-export const CONDITION_IDS = Object.keys(CONDITIONS);

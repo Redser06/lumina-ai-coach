@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { detectLoop } from "../graph/guards.js";
+import { costBudgetFromConfig } from "../graph/limits.js";
 import { supervisorNode } from "../graph/nodes/supervisor.js";
 import { fingerprintState, initialLearnerState, type LearnerState } from "../graph/state.js";
 import { createRouter, useRouterForTests } from "../router/router.js";
@@ -49,5 +50,23 @@ describe("guards", { concurrency: false }, () => {
     assert.equal(update.learner.last_edge, "e-sup-loop");
     assert.equal(update.learner.last_condition, "any.loop_detected");
     useRouterForTests(null);
+  });
+
+  test("cost_budget_comes_from_config_and_rejects_a_raise", () => {
+    const state = initialLearnerState({
+      learner_id: "l",
+      session_id: "s",
+      goal: "g",
+      cost_budget_usd: 50,
+    });
+    assert.equal(state.cost_budget_usd, 1);
+    const previous = process.env.COST_BUDGET_USD;
+    process.env.COST_BUDGET_USD = "50";
+    try {
+      assert.throws(() => costBudgetFromConfig(), /outside \(0, 1\]/);
+    } finally {
+      if (previous === undefined) delete process.env.COST_BUDGET_USD;
+      else process.env.COST_BUDGET_USD = previous;
+    }
   });
 });
