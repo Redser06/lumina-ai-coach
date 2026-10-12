@@ -6,3 +6,10 @@ dist-ssr
 .env
 .firebase
 .vite
+.data/
+coverage/
+server/.checkpoints/
+*.sqlite
+*.sqlite-*
+reports/
+proofs/

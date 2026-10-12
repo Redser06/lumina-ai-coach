@@ -1,0 +1,6 @@
+{
+  "text": "{\"plan\":{\"skill\":\"tools\",\"rationale\":\"Continue after reflection\"},\"fatigue\":0.15}",
+  "tokens_in": 44,
+  "tokens_out": 21,
+  "latency_ms": 1
+}

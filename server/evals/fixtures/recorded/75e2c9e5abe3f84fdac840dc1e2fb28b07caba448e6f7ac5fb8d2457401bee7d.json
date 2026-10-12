@@ -1,0 +1,6 @@
+{
+  "text": "{\"session_complete\":true,\"fatigue\":0.2}",
+  "tokens_in": 73,
+  "tokens_out": 10,
+  "latency_ms": 1
+}

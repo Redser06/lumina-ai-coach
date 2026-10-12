@@ -1,0 +1,6 @@
+{
+  "text": "{\"plan\":{\"skill\":\"evals\",\"rationale\":\"Grade the lab\"}}",
+  "tokens_in": 45,
+  "tokens_out": 14,
+  "latency_ms": 1
+}

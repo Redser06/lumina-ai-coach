@@ -1,0 +1,14 @@
+{
+  "id": "NODE-Remediate-001",
+  "node": "Remediate",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.55
+    }
+  },
+  "expect_edge": "e-ret-remediate",
+  "expect_path_tail": "Remediate"
+}

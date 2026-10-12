@@ -1,0 +1,28 @@
+{
+  "id": "SCN-0002",
+  "persona": "P2",
+  "title": "Practitioner stops on fatigue",
+  "learner_id": "pat",
+  "goal": "Build a small agent",
+  "initial": {
+    "fatigue": 0.91
+  },
+  "hitl": [],
+  "script": {
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.3
+      }
+    ]
+  },
+  "expected_path": [
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-fatigue",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

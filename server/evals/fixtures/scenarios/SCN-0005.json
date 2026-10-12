@@ -1,0 +1,96 @@
+{
+  "id": "SCN-0005",
+  "persona": "P2",
+  "title": "Practitioner disputes a grade",
+  "learner_id": "pat",
+  "goal": "Get the lab grade reviewed",
+  "hitl": [
+    {
+      "decision": "accept",
+      "actor": "learner"
+    }
+  ],
+  "script": {
+    "Diagnose": [
+      {
+        "diagnosis": {
+          "placed": true,
+          "tier": "practitioner"
+        },
+        "mastery": {
+          "evals": 0.45
+        }
+      }
+    ],
+    "Plan": [
+      {
+        "plan": {
+          "skill": "evals",
+          "rationale": "Grade the lab"
+        }
+      }
+    ],
+    "Teach": [
+      {
+        "mastery": {
+          "evals": 0.5
+        }
+      }
+    ],
+    "Practice": [
+      {
+        "mastery": {
+          "evals": 0.55
+        }
+      }
+    ],
+    "Assess": [
+      {
+        "last_assessment": {
+          "score": 0.48,
+          "error_class": "misconception",
+          "confidence": 0.4
+        },
+        "disputed": true
+      }
+    ],
+    "GradeDispute": [
+      {
+        "note": "ask"
+      }
+    ],
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": [
+    "Diagnose",
+    "Plan",
+    "Teach",
+    "Practice",
+    "Assess",
+    "GradeDispute",
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-diagnose",
+    "e-ret-diagnose",
+    "e-sup-plan",
+    "e-ret-plan",
+    "e-sup-teach",
+    "e-ret-teach",
+    "e-sup-practice",
+    "e-ret-practice",
+    "e-sup-assess",
+    "e-ret-assess",
+    "e-sup-dispute",
+    "e-ret-dispute",
+    "e-sup-reflect-dispute",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

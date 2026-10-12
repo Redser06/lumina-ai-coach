@@ -1,0 +1,64 @@
+{
+  "id": "SCN-0004",
+  "persona": "P4",
+  "title": "Expert-track loop escalates to safety",
+  "learner_id": "eva",
+  "goal": "Design a novel coaching graph",
+  "initial": {
+    "path": [
+      "Teach",
+      "Teach",
+      "Teach"
+    ],
+    "fingerprints": [
+      "same",
+      "same",
+      "same"
+    ],
+    "diagnosis": {
+      "placed": true,
+      "tier": "expert"
+    },
+    "plan": {
+      "skill": "orchestration",
+      "rationale": "Already planned"
+    },
+    "mastery": {
+      "orchestration": 0.4
+    }
+  },
+  "hitl": [
+    {
+      "decision": "continue",
+      "actor": "safety-lead"
+    }
+  ],
+  "script": {
+    "SafetyEscalation": [
+      {
+        "note": "paused"
+      }
+    ],
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": [
+    "Teach",
+    "Teach",
+    "Teach",
+    "SafetyEscalation",
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-loop",
+    "e-ret-safety",
+    "e-sup-reflect-safety",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

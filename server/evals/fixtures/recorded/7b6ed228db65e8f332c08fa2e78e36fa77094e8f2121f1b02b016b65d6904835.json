@@ -1,0 +1,6 @@
+{
+  "text": "{\"plan\":{\"skill\":\"evals\",\"rationale\":\"Replan after a middling score\"},\"fatigue\":0.9}",
+  "tokens_in": 65,
+  "tokens_out": 21,
+  "latency_ms": 1
+}

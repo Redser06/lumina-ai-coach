@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: E0 existing front-end gates
+        run: npm test && npm run build
+      - name: typecheck
+        run: npm run typecheck
+      - name: E1 spec
+        run: npm run spec:check
+      - name: E2 server tests
+        run: npm run test:server
+      - name: E3 graph coverage
+        if: ${{ !cancelled() }}
+        run: |
+          npm run coverage:graph
+          node -e "const r=require('./reports/graph-coverage.json');if(r.node_coverage!==1||r.edge_coverage!==1||r.uncovered.length)process.exit(1)"
+      - name: E6 eval gate
+        if: ${{ !cancelled() }}
+        run: npm run eval
+      - name: E7 offline server tests
+        run: NO_NETWORK=1 npm run test:server
+      - name: E4 crash resume replay fork
+        run: |
+          CHECKPOINTER=sqlite LLM_PROVIDER=recorded npx tsx server/scripts/crash_drill.ts --scenario SCN-0001 --kill-after Practice
+          npx tsx server/scripts/proofs.ts --out proofs/phase0
+      - name: E5 router proof
+        run: FAKE_FAIL=primary-tutor LLM_PROVIDER=fake npx tsx server/scripts/proofs.ts --only router --out proofs/phase0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase0-reports
+          retention-days: 90
+          path: |
+            reports/
+            proofs/

@@ -3,11 +3,23 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "workspaces": [
+    "server"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p server/tsconfig.json --noEmit",
+    "test:server": "node --test --import tsx --import ./server/runtime/network_guard.ts server/tests/*.test.ts",
+    "eval": "tsx server/evals/run.ts",
+    "coverage:graph": "tsx server/evals/coverage.ts",
+    "spec:check": "tsx server/graph/spec/check.ts",
+    "proofs": "tsx server/scripts/proofs.ts --out proofs/phase0"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

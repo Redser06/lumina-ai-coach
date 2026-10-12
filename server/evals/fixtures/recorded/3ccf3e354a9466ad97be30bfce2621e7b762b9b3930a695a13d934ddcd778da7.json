@@ -1,0 +1,6 @@
+{
+  "text": "{\"diagnosis\":{\"placed\":true,\"tier\":\"builder\"},\"mastery\":{\"tools\":0.5}}",
+  "tokens_in": 43,
+  "tokens_out": 18,
+  "latency_ms": 1
+}

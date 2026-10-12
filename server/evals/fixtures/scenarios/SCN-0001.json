@@ -1,0 +1,123 @@
+{
+  "id": "SCN-0001",
+  "persona": "P1",
+  "title": "Novice misconception then fast mastery",
+  "learner_id": "nia",
+  "goal": "Write a first useful prompt",
+  "hitl": [],
+  "script": {
+    "Diagnose": [
+      {
+        "diagnosis": {
+          "placed": true,
+          "tier": "novice"
+        },
+        "mastery": {
+          "prompting": 0.2
+        }
+      }
+    ],
+    "Plan": [
+      {
+        "plan": {
+          "skill": "prompting",
+          "rationale": "Start with a single clear prompt"
+        }
+      }
+    ],
+    "Teach": [
+      {
+        "mastery": {
+          "prompting": 0.35
+        }
+      }
+    ],
+    "Practice": [
+      {
+        "mastery": {
+          "prompting": 0.4
+        }
+      },
+      {
+        "mastery": {
+          "prompting": 0.7
+        }
+      }
+    ],
+    "Assess": [
+      {
+        "last_assessment": {
+          "score": 0.42,
+          "error_class": "misconception",
+          "confidence": 0.35
+        }
+      },
+      {
+        "last_assessment": {
+          "score": 0.93,
+          "error_class": null,
+          "confidence": 0.9
+        },
+        "mastery": {
+          "prompting": 0.9
+        }
+      }
+    ],
+    "Remediate": [
+      {
+        "mastery": {
+          "prompting": 0.55
+        }
+      }
+    ],
+    "Stretch": [
+      {
+        "mastery": {
+          "prompting": 0.95
+        }
+      }
+    ],
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": [
+    "Diagnose",
+    "Plan",
+    "Teach",
+    "Practice",
+    "Assess",
+    "Remediate",
+    "Practice",
+    "Assess",
+    "Stretch",
+    "Reflect"
+  ],
+  "expected_edges": [
+    "e-start",
+    "e-sup-diagnose",
+    "e-ret-diagnose",
+    "e-sup-plan",
+    "e-ret-plan",
+    "e-sup-teach",
+    "e-ret-teach",
+    "e-sup-practice",
+    "e-ret-practice",
+    "e-sup-assess",
+    "e-ret-assess",
+    "e-sup-misconception",
+    "e-ret-remediate",
+    "e-sup-practice-rem",
+    "e-ret-practice",
+    "e-sup-assess",
+    "e-ret-assess",
+    "e-sup-fast",
+    "e-ret-stretch",
+    "e-sup-reflect-stretch",
+    "e-ret-reflect",
+    "e-sup-end"
+  ]
+}

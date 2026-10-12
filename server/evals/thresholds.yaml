@@ -1,0 +1,4 @@
+per_node_pass_rate: 1.0
+per_path_pass_rate: 1.0
+node_coverage: 1.0
+edge_coverage: 1.0

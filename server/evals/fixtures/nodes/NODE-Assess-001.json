@@ -1,0 +1,16 @@
+{
+  "id": "NODE-Assess-001",
+  "node": "Assess",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "last_assessment": {
+      "score": 0.5,
+      "error_class": null,
+      "confidence": 0.5
+    }
+  },
+  "expect_edge": "e-ret-assess",
+  "expect_path_tail": "Assess"
+}
