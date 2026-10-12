@@ -1,5 +1,5 @@
 spec_id: coach-graph
-version: 1.0.0
+version: 2.0.0
 description: >
   Phase 0 coaching agent graph. The Supervisor owns every conditional edge.
   Workers and HITL nodes return only to the Supervisor. PlanConfirm is intentionally

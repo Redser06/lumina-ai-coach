@@ -17,8 +17,11 @@ describe("coverage", { concurrency: false }, () => {
     const missingNodes = report.uncovered.filter((item) => item.type === "node").map((item) => item.id);
     const missingEdges = report.uncovered.filter((item) => item.type === "edge").map((item) => item.id);
     assert.ok(missingNodes.includes("Diagnose"));
+    assert.ok(missingNodes.includes("End"));
+    assert.ok(!missingNodes.includes("__start__"));
+    assert.ok(!missingNodes.includes("Supervisor"));
     assert.ok(missingEdges.includes("e-sup-diagnose"));
-    assert.equal(missingNodes.length, spec.nodes.length - 1);
+    assert.equal(missingNodes.length, spec.nodes.length - 2);
     assert.ok(report.node_coverage < 1);
     assert.ok(report.edge_coverage < 1);
   });

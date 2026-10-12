@@ -1,4 +1,3 @@
-import "../runtime/network_guard.js";
 import { serve } from "@hono/node-server";
 import { createApp } from "./app.js";
 

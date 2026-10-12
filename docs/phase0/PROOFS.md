@@ -16,13 +16,13 @@ Done = every listed AC has its proof attached. PR count is not a success metric.
 
 - Criterion: Coaching agent graph spec published and versioned: nodes Diagnose, Plan, Teach, Practice, Assess, Remediate, Stretch, Reflect + HITL nodes, with every conditional edge and its learner-state condition declared
 - Proof type required: fixture id
-- Proof location: fixture id `GRAPH-SPEC-coach-graph@1.0.0` (`server/graph/spec/coach-graph.v1.yaml`). `npm run spec:check` prints `sha256=3932b894f5788056d9991bae8a69d382fad25a71d1ccb037fdc9d10c9097618b`.
+- Proof location: fixture id `GRAPH-SPEC-coach-graph@2.0.0` (`server/graph/spec/coach-graph.v1.yaml`). `npm run spec:check` prints `sha256=cd3f0e050383937c5e8e1f17f37573cb054d38b3d52fe04e981f7a5261aeb99e`. Version 2.0.0 is the major bump for the `condition_expr` edits. The file name stays `coach-graph.v1.yaml`.
 
 ## AC-3
 
 - Criterion: Branch coverage: 100% of nodes and conditional edges are exercised by at least 1 scenario fixture; the CI coverage report is attached
 - Proof type required: SHA
-- Proof location: commit `b2f008b589957436f7439e9cae0edca9c4a5abaf`, green `ci` run https://github.com/Redser06/lumina-ai-coach/actions/runs/38183872596. Artifact `phase0-reports` contains `reports/graph-coverage.md` (node_coverage 1, edge_coverage 1).
+- Proof location: the green `ci` run on the head commit of `cursor/phase0-agent-graph-e8f4`. Artifact `phase0-reports` (retention 90 days) contains `reports/graph-coverage.md` (node_coverage 1, edge_coverage 1). The run URL is in `docs/phase0/proof-summary.md` and the PR body.
 
 ## AC-4
 
@@ -62,7 +62,7 @@ FAKE_FAIL=primary-tutor LLM_PROVIDER=fake npx tsx server/scripts/proofs.ts --onl
 
 - PlanConfirm is not declared. Adding it is a minor spec bump if Conor wants the learner plan-confirm pause from PRD §5.
 - Q2 is still open. Checkpoints are SQLite locally and in CI. The production backend is decided before Phase 1.
-- Q4 is still open. CI stays at $0 with no real-model calls and no paid key. The placeholder session cap is $1.00. The real provider stays disabled unless `LLM_PROVIDER=openai_compat`, `OPENAI_COMPAT_API_KEY`, and `OPENAI_COMPAT_BASE_URL` are set. Unknown model ids, zero or non-finite prices, and invalid caps are rejected and do not fall through to another model. That is stricter than the architect note that an unknown model would log `cost_usd: null`.
+- Q4 is still open. CI stays at $0 with no real-model calls and no paid key. The placeholder session cap is $1.00. The real provider stays disabled unless `LLM_PROVIDER=openai_compat`, `OPENAI_COMPAT_API_KEY`, and `OPENAI_COMPAT_BASE_URL` are set. Unknown model ids, zero or non-finite prices, and invalid caps are rejected and do not fall through to another model. That is stricter than the architect note that an unknown model would log `cost_usd: null`. The network guard is not installed by the API server. Tests load it with `node --import`, and the proof and drill scripts import it. `NO_NETWORK=0` is only for a script that must call a non-loopback host.
 - Q6 is still open. Eng for this handoff is the Expert Coder. QA sign-off is Conor's. Please confirm.
 - The Google Doc `1juArbTb8Y3k0-AYJszA5haCLh0JEIkVtx2TFjtG8_PY` ("Lumina AI Coach PRD cut 2026-10-11 (DRAFT)") matches cut r2 on the Phase 0 ACs. No Phase 0 drift against the box copy.
 - The Supervisor node is in the spec and is not in AC-1's node list. PRD §5 has it own routing, so coverage counts its edges.

@@ -1,18 +1,18 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdtempSync, readdirSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { SqliteSaver } from "@langchain/langgraph-checkpoint-sqlite";
 import { compileCoachGraph } from "../graph/build.js";
 import { SessionService } from "../graph/session.js";
-import { initialLearnerState } from "../graph/state.js";
+import { GOAL_MAX_CHARS } from "../graph/state.js";
 import { loadScenario, stateFromScenario } from "../evals/scenarios.js";
-import { CostCapExceeded, type ModelPrice } from "../router/pricing.js";
-import { createRouter, sessionSpentUsd, useRouterForTests } from "../router/router.js";
+import { CostCapExceeded } from "../router/pricing.js";
+import { createRouter, useRouterForTests } from "../router/router.js";
 import type { Provider } from "../router/types.js";
-import { logsForSession } from "../telemetry/node_log.js";
+import { logsForSession, resetLogsForTests } from "../telemetry/node_log.js";
 
 function serviceAt(name: string): { service: SessionService; dir: string } {
   const dir = mkdtempSync(join(tmpdir(), name));
@@ -37,8 +37,9 @@ describe("checkpoint", { concurrency: false }, () => {
     }
     assert.equal(Math.max(...seen), nodeRuns);
     assert.ok(history.length > nodeRuns);
-    assert.ok(result.state.trace_nodes[0] === "__start__");
-    assert.equal(result.state.trace_nodes.at(-1), "End");
+    assert.equal(result.state.trace_nodes[0], "Supervisor");
+    assert.equal(result.state.trace_nodes.includes("__start__"), false);
+    assert.equal(result.state.trace_nodes.includes("End"), false);
     assert.equal(result.edges[0], "e-start");
     assert.ok(result.edges.includes("e-sup-end"));
     const checkpointIds = new Set(history.map((item) => item.checkpoint_id));
@@ -269,46 +270,127 @@ describe("checkpoint", { concurrency: false }, () => {
   test("failure_spend_survives_crash_and_resume_hits_cap", async () => {
     const dir = mkdtempSync(join(tmpdir(), "ckpt-spend-"));
     const sqlite = join(dir, "checkpoints.sqlite");
+    const sessionId = "spend-crash";
+    await new Promise<void>((resolve, reject) => {
+      const child = spawn(process.execPath, ["--import", "tsx", "server/scripts/spend_crash_child.ts"], {
+        env: {
+          ...process.env,
+          CHECKPOINTER: "sqlite",
+          SQLITE_PATH: sqlite,
+          LLM_PROVIDER: "fake",
+          CRASH_AFTER_SPEND: "1",
+          CRASH_SESSION: sessionId,
+        },
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      let err = "";
+      child.stderr?.on("data", (chunk: Buffer) => {
+        err += chunk.toString();
+      });
+      child.on("exit", (code, signal) => {
+        if (signal === "SIGKILL" || code === 137) resolve();
+        else reject(new Error(`expected SIGKILL, got code=${code} signal=${signal} ${err}`));
+      });
+    });
     let calls = 0;
     const provider: Provider = {
       id: "fake",
       async complete() {
         calls += 1;
-        const timeout = new Error("timed out");
-        timeout.name = "TimeoutError";
-        return Promise.reject(Object.assign(timeout, { tokens_in: 1_000_000, tokens_out: 0 }));
+        return { text: "{}", tokens_in: 1, tokens_out: 1, latency_ms: 1 };
       },
     };
-    const prices: Record<string, ModelPrice> = {
-      "primary-classifier": { input_per_million: 1, output_per_million: 1 },
-      "fallback-classifier": { input_per_million: 1, output_per_million: 1 },
-    };
-    useRouterForTests(createRouter({ provider, prices }));
-    const first = SqliteSaver.fromConnString(sqlite);
-    const service = new SessionService(compileCoachGraph({ checkpointer: first }), first);
-    const sessionId = "spend-crash";
-    try {
-      await assert.rejects(
-        () => service.run(initialLearnerState({ learner_id: "l", session_id: sessionId, goal: "g" }), [], sessionId),
-        (error: unknown) => sessionSpentUsd(error) === 1,
-      );
-      assert.equal(calls, 1);
-    } finally {
-      service.close();
-      useRouterForTests(null);
-    }
-    const second = SqliteSaver.fromConnString(sqlite);
-    const resumed = new SessionService(compileCoachGraph({ checkpointer: second }), second);
-    useRouterForTests(createRouter({ provider, prices }));
+    const checkpointer = SqliteSaver.fromConnString(sqlite);
+    const resumed = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    useRouterForTests(createRouter({ provider }));
     try {
       const snap = await resumed.readSnap(sessionId);
+      assert.equal(snap.next[0], "Supervisor");
       assert.equal(snap.learner?.cost_usd_session, 1);
-      const callsAtResume = calls;
+      assert.equal(snap.learner?.step, 0);
+      assert.deepEqual(snap.learner?.path, []);
+      assert.deepEqual(snap.learner?.edges_taken, []);
+      const checkpointId = snap.checkpoint_id;
       await assert.rejects(() => resumed.resume(sessionId), CostCapExceeded);
-      assert.equal(calls, callsAtResume);
+      assert.equal(calls, 0);
+      const after = await resumed.readSnap(sessionId);
+      assert.equal(after.next[0], "Supervisor");
+      assert.equal(after.learner?.step, 0);
+      assert.deepEqual(after.learner?.path, []);
+      assert.deepEqual(after.learner?.edges_taken, []);
+      assert.equal(after.learner?.cost_usd_session, 1);
+      assert.equal(after.checkpoint_id, checkpointId);
     } finally {
       useRouterForTests(null);
       resumed.close();
+    }
+  });
+
+  test("fork_field_ranges_reject_out_of_bounds", async () => {
+    const { service } = serviceAt("ckpt-range-");
+    const scenario = loadScenario("SCN-0002");
+    const sessionId = "ckpt-range";
+    await service.run(stateFromScenario(scenario, sessionId), [], sessionId);
+    const from = (await service.history(sessionId)).find((item) => item.checkpoint_id);
+    assert.ok(from?.checkpoint_id);
+    await assert.rejects(
+      () => service.fork(sessionId, from.checkpoint_id!, { mastery: { loops: 1.5 } }),
+      /less than or equal to 1/,
+    );
+    await assert.rejects(
+      () => service.fork(sessionId, from.checkpoint_id!, { mastery: { loops: -0.1 } }),
+      /greater than or equal to 0/,
+    );
+    await assert.rejects(
+      () => service.fork(sessionId, from.checkpoint_id!, { goal: "g".repeat(GOAL_MAX_CHARS + 1) }),
+      /2000/,
+    );
+    await assert.rejects(
+      () =>
+        service.fork(sessionId, from.checkpoint_id!, {
+          last_assessment: { score: 1.2, error_class: null, confidence: 0.4 },
+        }),
+      /less than or equal to 1/,
+    );
+    await assert.rejects(
+      () =>
+        service.fork(sessionId, from.checkpoint_id!, {
+          last_assessment: { score: 0.4, error_class: "other", confidence: 0.4 },
+        }),
+      /Invalid enum/,
+    );
+    service.close();
+  });
+
+  test("node_log_file_lines_are_complete", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "node-log-"));
+    const file = join(dir, "node-log.jsonl");
+    const previous = process.env.NODE_LOG_PATH;
+    process.env.NODE_LOG_PATH = file;
+    resetLogsForTests();
+    const { service } = serviceAt("ckpt-log-");
+    try {
+      const scenario = loadScenario("SCN-0002");
+      await service.run(stateFromScenario(scenario, "ckpt-log"), [], "ckpt-log");
+      const lines = readFileSync(file, "utf8").split("\n").filter((line) => line.length > 0);
+      assert.ok(lines.length > 0);
+      for (const line of lines) {
+        const row = JSON.parse(line) as Record<string, unknown>;
+        assert.equal(typeof row.model, "string");
+        assert.ok(row.model);
+        assert.equal(typeof row.tokens_in, "number");
+        assert.equal(typeof row.tokens_out, "number");
+        assert.equal(typeof row.cost_usd, "number");
+        assert.equal(typeof row.latency_ms, "number");
+        assert.equal(typeof row.checkpoint_id, "string");
+        assert.ok(row.checkpoint_id);
+        assert.equal(typeof row.edge_taken, "string");
+        assert.ok(row.edge_taken);
+      }
+    } finally {
+      if (previous === undefined) delete process.env.NODE_LOG_PATH;
+      else process.env.NODE_LOG_PATH = previous;
+      service.close();
     }
   });
 });

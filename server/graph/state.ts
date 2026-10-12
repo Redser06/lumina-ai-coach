@@ -1,10 +1,13 @@
 import { z } from "zod";
 import { MAX_COST_BUDGET_USD, costBudgetFromConfig } from "./limits.js";
 
+export const ERROR_CLASSES = ["misconception", "slip"] as const;
+export const GOAL_MAX_CHARS = 2000;
+
 export const LastAssessmentSchema = z.object({
-  score: z.number().finite(),
-  error_class: z.string().nullable(),
-  confidence: z.number().finite(),
+  score: z.number().finite().min(0).max(1),
+  error_class: z.enum(ERROR_CLASSES).nullable(),
+  confidence: z.number().finite().min(0).max(1),
 });
 
 export const DiagnosisSchema = z.object({
@@ -32,8 +35,8 @@ export const LearnerStateSchema = z.object({
   learner_id: z.string().min(1),
   session_id: z.string().min(1),
   scenario_id: z.string().nullable(),
-  goal: z.string(),
-  mastery: z.record(z.string(), z.number()),
+  goal: z.string().max(GOAL_MAX_CHARS),
+  mastery: z.record(z.string().min(1).max(64), z.number().finite().min(0).max(1)),
   last_assessment: LastAssessmentSchema.nullable(),
   time_on_task_s: z.number().finite().nonnegative(),
   fatigue: z.number().finite().nonnegative(),

@@ -1,4 +1,4 @@
-import { CONDITIONS, type ConditionFn } from "./conditions.js";
+import type { ConditionFn } from "./conditions.js";
 import { initialLearnerState, type LearnerState } from "./state.js";
 import type { GraphSpec } from "./spec/types.js";
 
@@ -40,8 +40,6 @@ type Token =
 type Segment = { kind: "prop"; name: string } | { kind: "index"; index: number };
 type ValueFn = (state: LearnerState) => unknown;
 type BoolFn = (state: LearnerState) => boolean;
-
-const canonicalConditions: Record<string, ConditionFn> = { ...CONDITIONS };
 
 export class ConditionExprError extends Error {
   readonly code = "CONDITION_EXPR";
@@ -242,64 +240,84 @@ export function compileConditionExpr(source: string): BoolFn {
   return fn;
 }
 
-function sample(partial: Partial<LearnerState> = {}): LearnerState {
-  return initialLearnerState({
-    learner_id: "learner",
-    session_id: "session",
-    goal: "goal",
-    ...partial,
-  });
-}
+const PATHS: string[][] = [
+  [],
+  ["Diagnose"],
+  ["Plan"],
+  ["Teach"],
+  ["Practice"],
+  ["Assess"],
+  ["Remediate"],
+  ["Stretch"],
+  ["Reflect"],
+  ["GradeDispute"],
+  ["SkillMapEdit"],
+  ["SafetyEscalation"],
+  ["Other"],
+];
 
-export function conditionSamples(): LearnerState[] {
-  const paths = [
-    [],
-    ["Diagnose"],
-    ["Plan"],
-    ["Teach"],
-    ["Practice"],
-    ["Assess"],
-    ["Remediate"],
-    ["Stretch"],
-    ["Reflect"],
-    ["GradeDispute"],
-    ["SkillMapEdit"],
-    ["SafetyEscalation"],
-  ];
-  const assessments: LearnerState["last_assessment"][] = [
-    null,
-    { score: 0.9, error_class: null, confidence: 0.9 },
-    { score: 0.5, error_class: null, confidence: 0.5 },
-    { score: 0.9, error_class: "misconception", confidence: 0.9 },
-    { score: 0.2, error_class: "slip", confidence: 0.4 },
-  ];
-  const states: LearnerState[] = [];
-  for (const path of paths) {
-    for (const last_assessment of assessments) {
-      states.push(sample({ path, last_assessment }));
-      states.push(sample({ path, last_assessment, disputed: true, fatigue: 0.91, step: 40, session_complete: true }));
-      states.push(
-        sample({
-          path,
-          last_assessment,
-          loop_detected: true,
-          loop_cleared: false,
-          skill_map_edit: true,
-          diagnosis: { placed: true, tier: "novice" },
-          plan: { skill: "prompting", rationale: "because" },
-        }),
-      );
+const ASSESSMENTS: LearnerState["last_assessment"][] = [null];
+for (const score of [0.84, 0.85]) {
+  for (const confidence of [0.79, 0.8]) {
+    for (const errorClass of [null, "misconception", "slip"] as const) {
+      ASSESSMENTS.push({ score, error_class: errorClass, confidence });
     }
   }
-  states.push(sample({ session_id: "x", path: ["Plan"], plan: null }));
-  states.push(sample({ path: ["Plan"], plan: { skill: "", rationale: "" } }));
-  states.push(sample({ path: ["Diagnose"], diagnosis: null }));
-  states.push(sample({ path: ["Diagnose"], diagnosis: { placed: false, tier: "novice" } }));
-  states.push(sample({ fatigue: 0.8, session_complete: false, path: ["Teach"] }));
-  states.push(sample({ step: 40, session_complete: false, path: ["Teach"] }));
-  states.push(sample({ loop_detected: true, loop_cleared: true, path: ["Teach"] }));
+}
+
+const DIAGNOSES: LearnerState["diagnosis"][] = [null, { placed: false, tier: "novice" }, { placed: true, tier: "novice" }];
+const PLANS: LearnerState["plan"][] = [null, { skill: "", rationale: "" }, { skill: "prompting", rationale: "because" }];
+
+let boundaryStates: LearnerState[] | undefined;
+
+/** Every combination of the predicate boundaries the expressions branch on. */
+export function conditionBoundaries(): LearnerState[] {
+  if (boundaryStates) return boundaryStates;
+  const base = initialLearnerState({ learner_id: "learner", session_id: "session", goal: "goal" });
+  const states: LearnerState[] = [];
+  for (const path of PATHS) {
+    for (const disputed of [false, true]) {
+      for (const skill_map_edit of [false, true]) {
+        for (const loop_detected of [false, true]) {
+          for (const loop_cleared of [false, true]) {
+            for (const session_complete of [false, true]) {
+              for (const fatigue of [0.79, 0.8]) {
+                for (const step of [39, 40]) {
+                  for (const diagnosis of DIAGNOSES) {
+                    for (const plan of PLANS) {
+                      for (const last_assessment of ASSESSMENTS) {
+                        states.push({
+                          ...base,
+                          path,
+                          disputed,
+                          skill_map_edit,
+                          loop_detected,
+                          loop_cleared,
+                          session_complete,
+                          fatigue,
+                          step,
+                          diagnosis,
+                          plan,
+                          last_assessment,
+                        });
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  states.push({ ...base, session_id: "" });
+  states.push({ ...base, session_id: "session" });
+  boundaryStates = states;
   return states;
 }
+
+const verified = new Set<string>();
 
 export function assertConditionsMatchCode(spec: GraphSpec, conditions: Record<string, ConditionFn>): void {
   const used = new Set(spec.edges.map((edge) => edge.condition_id));
@@ -314,15 +332,17 @@ export function assertConditionsMatchCode(spec: GraphSpec, conditions: Record<st
     }
     exprById.set(edge.condition_id, edge.condition_expr);
   }
-  const samples = conditionSamples();
   for (const [id, expr] of exprById) {
-    const fn = canonicalConditions[id] ?? conditions[id];
+    const fn = conditions[id];
     if (!fn) throw new ConditionExprError(`missing condition implementation: ${id}`);
+    const mark = `${id}\0${expr}\0${fn.toString()}`;
+    if (verified.has(mark)) continue;
     const compiled = compileConditionExpr(expr);
-    for (const state of samples) {
+    for (const state of conditionBoundaries()) {
       if (compiled(state) !== fn(state)) {
         throw new ConditionExprError(`condition_expr does not match code for ${id}: ${expr}`);
       }
     }
+    verified.add(mark);
   }
 }

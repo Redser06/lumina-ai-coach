@@ -52,6 +52,32 @@ describe("guards", { concurrency: false }, () => {
     useRouterForTests(null);
   });
 
+  test("supervisor_records_the_start_edge_only_on_an_empty_trace", async () => {
+    useRouterForTests(createRouter({ provider: scripted() }));
+    try {
+      const first = await supervisorNode({
+        learner: base({ path: [], edges_taken: [], trace_nodes: [], diagnosis: null, plan: null }),
+      });
+      assert.equal(first.learner.edges_taken[0], "e-start");
+      assert.equal(first.learner.trace_nodes.includes("__start__"), false);
+      assert.equal(first.learner.trace_nodes.includes("End"), false);
+      const later = await supervisorNode({
+        learner: base({
+          path: ["Reflect"],
+          session_complete: true,
+          edges_taken: ["e-start", "e-sup-fatigue", "e-ret-reflect"],
+          trace_nodes: ["Supervisor", "Reflect"],
+        }),
+      });
+      assert.equal(later.learner.last_edge, "e-sup-end");
+      assert.equal(later.learner.trace_nodes.includes("__start__"), false);
+      assert.equal(later.learner.trace_nodes.includes("End"), false);
+      assert.equal(later.learner.edges_taken.filter((id) => id === "e-start").length, 1);
+    } finally {
+      useRouterForTests(null);
+    }
+  });
+
   test("cost_budget_comes_from_config_and_rejects_a_raise", () => {
     const state = initialLearnerState({
       learner_id: "l",

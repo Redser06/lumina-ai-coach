@@ -16,6 +16,14 @@ export function coverageFromVisits(visitedNodes: Iterable<string>, visitedEdges:
   const spec = loadSpec();
   const nodes = new Set(visitedNodes);
   const edges = new Set(visitedEdges);
+  // __start__ and End have no node function. They count as visited when a taken edge touches them.
+  for (const edge of spec.edges) {
+    if (!edges.has(edge.id)) continue;
+    for (const id of [edge.from, edge.to]) {
+      const node = spec.nodes.find((item) => item.id === id);
+      if (node?.kind === "terminal") nodes.add(id);
+    }
+  }
   const uncovered: CoverageReport["uncovered"] = [];
   for (const node of spec.nodes) {
     if (!nodes.has(node.id)) uncovered.push({ type: "node", id: node.id });

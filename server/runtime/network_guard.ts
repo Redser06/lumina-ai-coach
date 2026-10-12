@@ -20,6 +20,10 @@ function hostFrom(args: unknown[]): string {
 /**
  * Blocks non-loopback sockets and fetch. On unless NO_NETWORK=0.
  * `[::1]` is loopback: Node reports that hostname with the brackets.
+ *
+ * Tests install this with `node --import`. Scripts that talk to the model router import it.
+ * The API server does not. A real provider on that server is not blocked by this guard.
+ * Set NO_NETWORK=0 only for a script that must call a non-loopback host.
  */
 if (process.env.NO_NETWORK !== "0") {
   const original = Socket.prototype.connect;

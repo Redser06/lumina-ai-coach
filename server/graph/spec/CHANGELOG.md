@@ -2,6 +2,11 @@
 
 Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump.
 
+## 2.0.0 - 2026-10-12
+
+- Major bump for `condition_expr` edits that shipped under 1.0.0. `plan.ready` requires a non-empty `plan.skill`. The replan expression no longer names `fast_mastery`, which is not a learner-state field.
+- The version field is the spec version. The file name stays `coach-graph.v1.yaml`.
+
 ## 1.0.0 - 2026-10-11
 
 - Initial Phase 0 graph.

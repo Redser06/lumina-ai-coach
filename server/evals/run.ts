@@ -3,12 +3,14 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
+import { GraphSpecError } from "../graph/build.js";
 import { assertHitlDecision } from "../graph/hitl.js";
 import { NODE_IMPLS } from "../graph/nodes/registry.js";
 import { supervisorNode } from "../graph/nodes/supervisor.js";
 import { runWorker } from "../graph/nodes/worker.js";
 import { loadSpec } from "../graph/spec/load.js";
 import { initialLearnerState, type LearnerState } from "../graph/state.js";
+import { loadScenarios } from "./scenarios.js";
 import { createRouter, useRouterForTests } from "../router/router.js";
 import type { Provider } from "../router/types.js";
 import { collectCoverage, type CoverageReport } from "./coverage.js";
@@ -147,24 +149,41 @@ async function runNodeFixtures(): Promise<{ pass: number; total: number; failure
 
 export async function runEval(thresholds = loadThresholds()): Promise<EvalReport> {
   const node = await runNodeFixtures();
-  const { runs, service } = await executeScenarios();
-  service.close();
-  const pathFailures = runs.filter((run) => !run.path_pass || !run.edge_pass).map((run) => run.scenario.id);
-  const coverage = await collectCoverage();
-  const perNode = node.total === 0 ? 0 : (node.total - node.failures.length) / node.total;
-  const perPath = runs.length === 0 ? 0 : (runs.length - pathFailures.length) / runs.length;
-  return judge(
-    {
-      per_node_pass_rate: perNode,
-      per_path_pass_rate: perPath,
-      node_coverage: coverage.node_coverage,
-      edge_coverage: coverage.edge_coverage,
-      node_failures: node.failures,
-      path_failures: pathFailures,
-      uncovered: coverage.uncovered,
-    },
-    thresholds,
-  );
+  try {
+    const { runs, service } = await executeScenarios();
+    service.close();
+    const pathFailures = runs.filter((run) => !run.path_pass || !run.edge_pass).map((run) => run.scenario.id);
+    const coverage = await collectCoverage();
+    const perNode = node.total === 0 ? 0 : (node.total - node.failures.length) / node.total;
+    const perPath = runs.length === 0 ? 0 : (runs.length - pathFailures.length) / runs.length;
+    return judge(
+      {
+        per_node_pass_rate: perNode,
+        per_path_pass_rate: perPath,
+        node_coverage: coverage.node_coverage,
+        edge_coverage: coverage.edge_coverage,
+        node_failures: node.failures,
+        path_failures: pathFailures,
+        uncovered: coverage.uncovered,
+      },
+      thresholds,
+    );
+  } catch (error) {
+    if (!(error instanceof GraphSpecError)) throw error;
+    const perNode = node.total === 0 ? 0 : (node.total - node.failures.length) / node.total;
+    return judge(
+      {
+        per_node_pass_rate: perNode,
+        per_path_pass_rate: 0,
+        node_coverage: 0,
+        edge_coverage: 0,
+        node_failures: [...node.failures, error.message],
+        path_failures: loadScenarios().map((scenario) => scenario.id),
+        uncovered: [],
+      },
+      thresholds,
+    );
+  }
 }
 
 async function main(): Promise<void> {

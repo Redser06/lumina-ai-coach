@@ -2,13 +2,12 @@ import { randomUUID } from "node:crypto";
 import type { BaseCheckpointSaver } from "@langchain/langgraph-checkpoint";
 import { Command, isGraphInterrupt } from "@langchain/langgraph";
 import { closeCheckpointer, createCheckpointer } from "../checkpoint/index.js";
-import { chargedNode, sessionSpentUsd } from "../router/router.js";
+import { writeSessionCost } from "../checkpoint/cost.js";
+import { sessionSpentUsd } from "../router/router.js";
 import { runContext } from "../runtime/context.js";
-import "../runtime/network_guard.js";
 import { logsForSession, stampCheckpoint, type NodeLog } from "../telemetry/node_log.js";
 import { compileCoachGraph, type CompiledCoachGraph } from "./build.js";
 import type { HitlDecision } from "./hitl.js";
-import { selectEdge } from "./route.js";
 import { applyPatch, LearnerStateSchema, type LearnerState } from "./state.js";
 
 const STEP_CAP = 80;
@@ -270,19 +269,11 @@ export class SessionService {
 
   private async persistChargedSpend(threadId: string, error: unknown): Promise<void> {
     const spent = sessionSpentUsd(error);
-    const node = chargedNode(error);
-    if (spent === undefined || !node) return;
-    const snap = await this.readSnap(threadId);
-    if (!snap.learner || spent === snap.learner.cost_usd_session) return;
-    const patched = LearnerStateSchema.parse({ ...snap.learner, cost_usd_session: spent });
-    const edge = selectEdge(node, patched);
-    const learner = LearnerStateSchema.parse({
-      ...patched,
-      last_edge: edge.id,
-      last_condition: edge.condition_id,
-      edges_taken: patched.edges_taken.includes(edge.id) ? patched.edges_taken : [...patched.edges_taken, edge.id],
-    });
-    await this.graph.updateState(this.config(threadId), { learner }, node);
+    if (spent === undefined) return;
+    const wrote = await writeSessionCost(this.checkpointer, threadId, spent);
+    if (wrote && process.env.CRASH_AFTER_SPEND === "1") {
+      process.kill(process.pid, "SIGKILL");
+    }
   }
 }
 

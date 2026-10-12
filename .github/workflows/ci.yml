@@ -44,6 +44,7 @@ jobs:
         if: always()
         with:
           name: phase0-reports
+          retention-days: 90
           path: |
             reports/
             proofs/

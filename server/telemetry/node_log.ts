@@ -30,12 +30,23 @@ export function appendNodeLog(record: NodeLog): NodeLog {
   const list = memory.get(record.session_id) ?? [];
   list.push(record);
   memory.set(record.session_id, list);
-  flushRecord(record);
   return record;
 }
 
+function recordComplete(record: NodeLog): boolean {
+  return (
+    record.checkpoint_id !== null &&
+    record.edge_taken !== null &&
+    record.model.length > 0 &&
+    Number.isFinite(record.tokens_in) &&
+    Number.isFinite(record.tokens_out) &&
+    Number.isFinite(record.cost_usd) &&
+    Number.isFinite(record.latency_ms)
+  );
+}
+
 function flushRecord(record: NodeLog): void {
-  if (flushed.has(record)) return;
+  if (flushed.has(record) || !recordComplete(record)) return;
   const path = logPath();
   mkdirSync(dirname(path), { recursive: true });
   appendFileSync(path, `${JSON.stringify(record)}\n`);

@@ -9,13 +9,7 @@ import { mergeModelOutput, withBookkeeping } from "./merge.js";
 import { completeCharged, type GraphUpdate } from "./worker.js";
 
 export async function supervisorNode(state: { learner: LearnerState }): Promise<GraphUpdate> {
-  let learner = state.learner;
-  if (!learner.edges_taken.includes("e-start")) {
-    learner = { ...learner, edges_taken: ["e-start", ...learner.edges_taken] };
-  }
-  if (!learner.trace_nodes.includes("__start__")) {
-    learner = { ...learner, trace_nodes: ["__start__", ...learner.trace_nodes] };
-  }
+  const learner = state.learner;
   const guarded: LearnerState = { ...learner, ...applyGuards(learner) };
   const node = loadSpec().nodes.find((item) => item.id === "Supervisor");
   if (!node) throw new Error("missing Supervisor spec");
@@ -32,13 +26,14 @@ export async function supervisorNode(state: { learner: LearnerState }): Promise<
   });
   const drafted = withBookkeeping(guarded, "Supervisor", call, mergeModelOutput(call.json));
   const edge = selectEdge("Supervisor", drafted);
-  const trace = edge.to === "End" ? [...drafted.trace_nodes, "End"] : drafted.trace_nodes;
+  // Conditional edges cannot write channels. An empty edge list is how this node
+  // was scheduled: the start edge fired, and this commit is the first place that fact can be stored.
+  const edgesTaken = learner.edges_taken.length === 0 ? ["e-start", edge.id] : [...learner.edges_taken, edge.id];
   const finished = LearnerStateSchema.parse({
     ...drafted,
-    trace_nodes: trace,
     last_edge: edge.id,
     last_condition: edge.condition_id,
-    edges_taken: [...learner.edges_taken, edge.id],
+    edges_taken: edgesTaken,
   });
   attachEdge(learner.session_id, "Supervisor", edge.id, edge.condition_id);
   return { learner: finished };

@@ -17,8 +17,8 @@ describe("api", { concurrency: false }, () => {
     assert.equal(spec.status, 200);
     const body = (await spec.json()) as { version: string; sha256: string; fixture_id: string };
     const loaded = loadSpecWithHash();
-    assert.equal(body.version, "1.0.0");
+    assert.equal(body.version, "2.0.0");
     assert.equal(body.sha256, loaded.sha256);
-    assert.equal(body.fixture_id, "GRAPH-SPEC-coach-graph@1.0.0");
+    assert.equal(body.fixture_id, "GRAPH-SPEC-coach-graph@2.0.0");
   });
 });
