@@ -22,7 +22,7 @@ Done = every listed AC has its proof attached. PR count is not a success metric.
 
 - Criterion: Branch coverage: 100% of nodes and conditional edges are exercised by at least 1 scenario fixture; the CI coverage report is attached
 - Proof type required: SHA
-- Proof location: the green `ci` run on the head commit of `cursor/phase0-agent-graph-e8f4`. Artifact `phase0-reports` (retention 90 days) contains `reports/graph-coverage.md` (node_coverage 1, edge_coverage 1). The run URL is in `docs/phase0/proof-summary.md` and the PR body.
+- Proof location: commit `a0e41fae3c8cb8a5e1a827419d20042355065498`, green `ci` run https://github.com/Redser06/lumina-ai-coach/actions/runs/38187828688. Artifact `phase0-reports` (retention 90 days) contains `reports/graph-coverage.md` (`node_coverage` 1, `edge_coverage` 1).
 
 ## AC-4
 
