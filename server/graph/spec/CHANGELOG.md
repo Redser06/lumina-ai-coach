@@ -2,15 +2,18 @@
 
 Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
 
+## 3.1.0 - 2026-11-15
+
+- Minor. New edge `e-sup-reflect-stop` (`reflect.stop`, priority 55) sends an unfinished Reflect to End, so a dead end cannot bounce Reflect → Plan until the cost cap. `reflect.done` still ends a Reflect that sets `session_complete`.
+- `reflect.continue` now also requires `step < 40`, a placed diagnosis, and that the previous node was not a Plan with an empty skill. A placed learner who has not just failed Plan still continues to Plan, including when they have no plan yet.
+- Numeric cutoffs are the Phase 0 limits in `server/graph/limits.ts`, not new PRD numbers: fatigue `0.8`, fast mastery score `0.85` and confidence `0.8`, session step bound `40`, loop repeat `3`.
+
 ## 3.0.0 - 2026-11-15
 
 - Major, because `assess.replan` no longer matches `error_class == slip`. A slip is not a replan.
 - New edge `e-sup-slip` (`assess.slip`, priority 35): after Assess, a slip goes to Practice. It sits below fast mastery and above replan.
 - New edge `e-sup-ready` (`session.ready`, priority 12): a placed learner with no plan skill, who is not already on a pipeline node, goes to Plan. Diagnose-complete, reflect-continue, and a middling null-error assessment still go to Plan on their existing edges.
 - New edge `e-sup-dead` (`any.dead_end`, priority 1): Diagnose without a placement, Plan without a skill after placement, or an unknown node that already has a plan, goes to Reflect. Loop detection still goes to SafetyEscalation. The step bound and fatigue still go to Reflect at higher priority.
-- `reflect.continue` now also requires `step < 40`, a placed diagnosis, and that the previous node was not a Plan with an empty skill. A placed learner who has not just failed Plan still continues to Plan, including when they have no plan yet.
-- New edge `e-sup-reflect-stop` (`reflect.stop`, priority 55) sends that unfinished Reflect to End, so a dead end cannot bounce Reflect → Plan until the cost cap. `reflect.done` still ends a Reflect that sets `session_complete`.
-- Numeric cutoffs are the Phase 0 limits in `server/graph/limits.ts`, not new PRD numbers: fatigue `0.8`, fast mastery score `0.85` and confidence `0.8`, session step bound `40`, loop repeat `3`.
 - Teach, Practice and Remediate `max_depth` values are unchanged.
 
 ## 2.0.1 - 2026-11-15
