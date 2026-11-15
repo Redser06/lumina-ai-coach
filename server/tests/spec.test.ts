@@ -13,9 +13,9 @@ describe("spec", { concurrency: false }, () => {
     const validated = validateSpec(spec);
     assert.equal(validated.ok, true);
     assert.equal(spec.spec_id, "coach-graph");
-    assert.equal(spec.version, "4.3.0");
+    assert.equal(spec.version, "5.0.0");
     assert.match(sha256, /^[a-f0-9]{64}$/);
-    assert.equal(`GRAPH-SPEC-${spec.spec_id}@${spec.version}`, "GRAPH-SPEC-coach-graph@4.3.0");
+    assert.equal(`GRAPH-SPEC-${spec.spec_id}@${spec.version}`, "GRAPH-SPEC-coach-graph@5.0.0");
   });
 
   test("spec_declares_all_8_coaching_nodes_and_3_hitl", () => {
@@ -150,7 +150,7 @@ describe("spec", { concurrency: false }, () => {
     const spec = loadSpec();
     const removed: GraphSpec = { ...spec, edges: spec.edges.slice(0, -1) };
     assert.equal(versionBumpOk(spec, removed), false);
-    assert.equal(versionBumpOk(spec, { ...removed, version: "4.4.0" }), true);
+    assert.equal(versionBumpOk(spec, { ...removed, version: "5.1.0" }), true);
     const rewritten: GraphSpec = {
       ...spec,
       version: "4.1.0",
@@ -159,7 +159,7 @@ describe("spec", { concurrency: false }, () => {
       ),
     };
     assert.equal(versionBumpOk(spec, rewritten), false);
-    assert.equal(versionBumpOk(spec, { ...rewritten, version: "5.0.0" }), true);
+    assert.equal(versionBumpOk(spec, { ...rewritten, version: "6.0.0" }), true);
     assert.equal(versionBumpOk(spec, spec), true);
   });
 

@@ -1,10 +1,15 @@
 # coach-graph changelog
 
-Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A priority change that alters which edge wins is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
+Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
+
+## 5.0.0 - 2026-11-15
+
+- Major. `e-sup-hitl-reject`'s priority moved from 17 to 96. Changing which edge wins changes routing outcomes, the same kind of change as a `condition_expr` edit, so it's major. This supersedes the 4.3.0 minor labelling.
 
 ## 4.3.0 - 2026-11-15
 
 - Minor. `e-sup-hitl-reject` priority moves from 17 to 96. It now sits above fatigue (80) and the step bound (90), and below the loop edge (100). A model-set `fatigue` can no longer outrank a human `reject`. The `condition_expr` is unchanged.
+- Superseded by 5.0.0: that priority move is major, not minor.
 
 ## 4.2.0 - 2026-11-15
 
