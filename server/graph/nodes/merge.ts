@@ -11,7 +11,6 @@ const MODEL_KEYS = [
   "diagnosis",
   "plan",
   "session_complete",
-  "hitl_pending",
 ] as const;
 
 export function mergeModelOutput(json: Record<string, unknown>): LearnerPatch {

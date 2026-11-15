@@ -26,11 +26,13 @@ export async function supervisorNode(state: { learner: LearnerState }): Promise<
   });
   const drafted = withBookkeeping(guarded, "Supervisor", call, mergeModelOutput(call.json));
   const edge = selectEdge("Supervisor", drafted);
+  // A reject ends the session. The model output is used only to choose the edge.
+  const recorded = edge.id === "e-sup-hitl-reject" ? withBookkeeping(guarded, "Supervisor", call, {}) : drafted;
   // Conditional edges cannot write channels. An empty edge list is how this node
   // was scheduled: the start edge fired, and this commit is the first place that fact can be stored.
   const edgesTaken = learner.edges_taken.length === 0 ? ["e-start", edge.id] : [...learner.edges_taken, edge.id];
   const finished = LearnerStateSchema.parse({
-    ...drafted,
+    ...recorded,
     last_edge: edge.id,
     last_condition: edge.condition_id,
     edges_taken: edgesTaken,

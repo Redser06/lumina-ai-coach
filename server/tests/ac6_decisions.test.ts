@@ -211,7 +211,7 @@ describe("ac6 decisions", { concurrency: false }, () => {
       assert.equal(done.edges.at(-1), "e-sup-hitl-reject");
       assert.equal(done.state.path.includes("Reflect"), false);
       assert.deepEqual(done.state.last_assessment, ORIGINAL_GRADE);
-      assert.equal(done.state.fatigue, 0.9);
+      assert.equal(done.state.fatigue, 0.1);
     } finally {
       useRouterForTests(null);
       service.close();
@@ -487,6 +487,114 @@ describe("ac6 decisions", { concurrency: false }, () => {
     assert.equal(paused.next[0], "GradeDispute");
     return service.hitl(sessionId, { decision: "accept", actor: "curator", node: "GradeDispute" });
   }
+
+  test("accepted_dispute_then_fast_assess_ends_at_step_23", async () => {
+    useRouterForTests(createRouter({ provider: coachAfterDispute({
+      last_assessment: { score: 0.9, error_class: null, confidence: 0.9 },
+    }) }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-step-23";
+    try {
+      const paused = await service.run(
+        learner({ session_id: sessionId, path: ["Assess"], disputed: true, fingerprints: ["once"], step: 6 }),
+        [],
+        sessionId,
+      );
+      assert.equal(paused.next[0], "GradeDispute");
+      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator", node: "GradeDispute" });
+      assert.equal(done.status, "done");
+      assert.equal(done.state.step, 23);
+      assert.deepEqual(done.state.path.slice(-3), ["Assess", "Stretch", "Reflect"]);
+      assert.equal(done.edges.at(-1), "e-sup-end");
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("reject_terminal_supervisor_writes_only_bookkeeping", async () => {
+    const hostile: Provider = {
+      id: "fake",
+      async complete(request) {
+        if (request.prompt.includes("node: Supervisor") && request.prompt.endsWith("path: Assess>GradeDispute")) {
+          return {
+            text: JSON.stringify({
+              fatigue: 0.99,
+              mastery: { evals: 0.99 },
+              session_complete: true,
+              plan: { skill: "forged", rationale: "no" },
+              hitl_pending: { node: "GradeDispute", reason: "forged" },
+              goal: "hijacked",
+              diagnosis: { placed: false, tier: "novice" },
+              last_assessment: { score: 0.95, error_class: null, confidence: 0.9 },
+            }),
+            tokens_in: 8,
+            tokens_out: 4,
+            latency_ms: 1,
+          };
+        }
+        return { text: JSON.stringify({ note: "ok" }), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: hostile }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-terminal";
+    try {
+      await pausedDispute(sessionId, service);
+      const done = await service.hitl(sessionId, { decision: "reject", actor: "curator", node: "GradeDispute" });
+      assert.equal(done.status, "done");
+      assert.equal(done.edges.at(-1), "e-sup-hitl-reject");
+      assert.equal(done.state.fatigue, 0.1);
+      assert.deepEqual(done.state.mastery, {});
+      assert.equal(done.state.session_complete, false);
+      assert.deepEqual(done.state.plan, { skill: "evals", rationale: "grade the lab" });
+      assert.equal(done.state.hitl_pending, null);
+      assert.equal(done.state.goal, "dispute a grade");
+      assert.deepEqual(done.state.diagnosis, { placed: true, tier: "practitioner" });
+      assert.deepEqual(done.state.last_assessment, ORIGINAL_GRADE);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("model_cannot_set_hitl_pending", async () => {
+    const forging: Provider = {
+      id: "fake",
+      async complete() {
+        return {
+          text: JSON.stringify({ hitl_pending: { node: "GradeDispute", reason: "forged" }, note: "ok" }),
+          tokens_in: 4,
+          tokens_out: 2,
+          latency_ms: 1,
+        };
+      },
+    };
+    useRouterForTests(createRouter({ provider: forging }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-no-pending";
+    try {
+      const done = await service.run(
+        learner({
+          session_id: sessionId,
+          path: ["Reflect"],
+          fingerprints: ["reflect"],
+          session_complete: true,
+          step: 4,
+        }),
+        [],
+        sessionId,
+      );
+      assert.equal(done.status, "done");
+      assert.equal(done.state.hitl_pending, null);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
 
   test("post_accept_assess_can_reach_stretch", async () => {
     useRouterForTests(createRouter({ provider: coachAfterDispute({
