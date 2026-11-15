@@ -10,8 +10,11 @@ import type { Provider } from "../router/types.js";
 const DIR = join(dirname(fileURLToPath(import.meta.url)), "fixtures/routing");
 
 export const ROUTE_SET_ID = "ROUTE-P1";
-/** AC-2 bar. Do not lower it. */
-export const ROUTE_ACCURACY_MIN = 0.95;
+/**
+ * AC-2 requires at least 0.95. This suite is deterministic, so the gate is 1:
+ * an off-by-one on a threshold is two misses, which 0.95 would still pass.
+ */
+export const ROUTE_ACCURACY_MIN = 1;
 
 export interface RouteFixture {
   id: string;
@@ -20,6 +23,8 @@ export interface RouteFixture {
   expect_node: string;
   expect_edge: string;
   signal?: string;
+  /** Tail the live graph cannot produce. Kept so a corrupted path still has a route. */
+  defensive?: boolean;
   why: string;
   state: Partial<LearnerState>;
 }

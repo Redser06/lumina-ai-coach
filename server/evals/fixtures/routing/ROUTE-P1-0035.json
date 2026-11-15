@@ -4,7 +4,8 @@
   "branch": "ready",
   "expect_node": "Plan",
   "expect_edge": "e-sup-ready",
-  "why": "Placed, empty plan skill, unknown tail. That is ready for a plan, not a dead end.",
+  "defensive": true,
+  "why": "Defensive. The live graph never writes an Other tail. A corrupted path that is placed with an empty plan is still ready for a plan, not a dead end.",
   "state": {
     "fatigue": 0.2,
     "step": 4,

@@ -4,7 +4,7 @@
   "spec": {
     "fixture_id": "GRAPH-SPEC-coach-graph@3.0.0",
     "version": "3.0.0",
-    "sha256": "fef4643d08aedb893daf8cc10fef37656d11b828260f070c6399bd8d6ea6122e",
+    "sha256": "f518d12b745d7499b1df3a7e02a7012e5960c5ec22ed616192c9249ca5729752",
     "max_depth": {
       "Teach": 2,
       "Practice": 3,

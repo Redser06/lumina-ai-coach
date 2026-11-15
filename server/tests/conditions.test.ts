@@ -45,6 +45,31 @@ describe("conditions", { concurrency: false }, () => {
     assert.equal(CONDITIONS["any.dead_end"]!(unknown), true);
     assert.equal(CONDITIONS["session.ready"]!(unknown), false);
   });
+
+  test("unfinished_reflect_ends_instead_of_replaying_a_dead_end", () => {
+    const firstPlan = routed({ path: ["Reflect"], plan: null, step: 2 });
+    const unplaced = routed({
+      path: ["Diagnose", "Reflect"],
+      diagnosis: { placed: false, tier: "novice" },
+      plan: null,
+      step: 4,
+    });
+    const emptySkill = routed({
+      path: ["Plan", "Reflect"],
+      plan: { skill: "", rationale: "" },
+      step: 4,
+    });
+    const exhausted = routed({ path: ["Reflect"], step: 40 });
+    for (const state of [unplaced, emptySkill, exhausted]) {
+      assert.equal(CONDITIONS["reflect.continue"]!(state), false);
+      assert.equal(CONDITIONS["reflect.stop"]!(state), true);
+    }
+    assert.equal(CONDITIONS["reflect.continue"]!(firstPlan), true);
+    assert.equal(CONDITIONS["reflect.stop"]!(firstPlan), false);
+    const finished = routed({ path: ["Reflect"], session_complete: true, step: 40 });
+    assert.equal(CONDITIONS["reflect.done"]!(finished), true);
+    assert.equal(CONDITIONS["reflect.stop"]!(finished), false);
+  });
 });
 
 function routed(partial: Partial<LearnerState>): LearnerState {

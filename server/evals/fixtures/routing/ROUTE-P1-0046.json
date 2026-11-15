@@ -4,7 +4,8 @@
   "branch": "dead_end",
   "expect_node": "Reflect",
   "expect_edge": "e-sup-dead",
-  "why": "Unknown node, already placed, and a plan skill exists, so this is not ready-for-plan.",
+  "defensive": true,
+  "why": "Defensive. The live graph never writes a Mystery tail. A corrupted path that is already placed and already has a plan skill has nowhere to go, so it reflects.",
   "state": {
     "fatigue": 0.2,
     "step": 4,

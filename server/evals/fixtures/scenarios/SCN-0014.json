@@ -1,0 +1,24 @@
+{
+  "id": "SCN-0014",
+  "persona": "P2",
+  "title": "Empty plan skill reflects and ends without looping",
+  "learner_id": "pat",
+  "goal": "Stop when planning produces no skill",
+  "initial": {
+    "path": ["Plan"],
+    "diagnosis": { "placed": true, "tier": "practitioner" },
+    "plan": { "skill": "", "rationale": "" },
+    "fatigue": 0.1,
+    "step": 3
+  },
+  "hitl": [],
+  "script": {
+    "Reflect": [
+      {
+        "note": "still going"
+      }
+    ]
+  },
+  "expected_path": ["Plan", "Reflect"],
+  "expected_edges": ["e-start", "e-sup-dead", "e-ret-reflect", "e-sup-reflect-stop"]
+}

@@ -9,6 +9,9 @@ description: >
   A slip after Assess goes to Practice. A placed learner with no plan who is
   not already on a pipeline node goes to Plan. Diagnose without a placement,
   Plan without a skill, or an unknown node that already has a plan goes to Reflect.
+  Reflect continues to Plan only when the learner is placed, under the step bound,
+  and the previous node was not a Plan that produced no skill. Otherwise an
+  unfinished Reflect ends the session.
 nodes:
   - id: __start__
     kind: terminal
@@ -188,8 +191,14 @@ edges:
     from: Supervisor
     to: Plan
     condition_id: reflect.continue
-    condition_expr: "path[-1] == 'Reflect' && session_complete == false"
+    condition_expr: "path[-1] == 'Reflect' && session_complete == false && step < 40 && diagnosis.placed == true && !(path[-2] == 'Plan' && (plan == null || plan.skill == null || plan.skill == ''))"
     priority: 56
+  - id: e-sup-reflect-stop
+    from: Supervisor
+    to: End
+    condition_id: reflect.stop
+    condition_expr: "path[-1] == 'Reflect' && session_complete == false && (step >= 40 || diagnosis.placed != true || (path[-2] == 'Plan' && (plan == null || plan.skill == null || plan.skill == '')))"
+    priority: 55
   - id: e-sup-misconception
     from: Supervisor
     to: Remediate

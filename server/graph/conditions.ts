@@ -41,6 +41,15 @@ function offPipeline(state: LearnerState): boolean {
   return tail != null && !PIPELINE.has(tail);
 }
 
+function previous(state: LearnerState): string | null {
+  return state.path.length >= 2 ? (state.path[state.path.length - 2] ?? null) : null;
+}
+
+/** Reflect was just entered from a Plan that produced no skill. Sending them back would loop. */
+function failedPlan(state: LearnerState): boolean {
+  return previous(state) === "Plan" && emptyPlan(state);
+}
+
 /**
  * Pure functions of LearnerState. No I/O. Workers never call each other;
  * the Supervisor evaluates these and is the only node that branches.
@@ -86,6 +95,15 @@ export const CONDITIONS: Record<string, ConditionFn> = {
   "dispute.resolved": (state) => last(state) === "GradeDispute",
   "skill_map.resolved": (state) => last(state) === "SkillMapEdit",
   "safety.resolved": (state) => last(state) === "SafetyEscalation",
-  "reflect.continue": (state) => last(state) === "Reflect" && !state.session_complete,
+  "reflect.continue": (state) =>
+    last(state) === "Reflect" &&
+    !state.session_complete &&
+    state.step < SESSION_STEP_BOUND &&
+    state.diagnosis?.placed === true &&
+    !failedPlan(state),
+  "reflect.stop": (state) =>
+    last(state) === "Reflect" &&
+    !state.session_complete &&
+    (state.step >= SESSION_STEP_BOUND || state.diagnosis?.placed !== true || failedPlan(state)),
   "reflect.done": (state) => last(state) === "Reflect" && state.session_complete,
 };
