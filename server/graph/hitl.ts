@@ -59,21 +59,30 @@ export function makeHitl(nodeId: "GradeDispute" | "SkillMapEdit" | "SafetyEscala
       reason: nodeId,
     });
     const decision = assertHitlDecision(raw, nodeId);
-    const originalGrade = state.learner.last_assessment;
+    const before = state.learner;
     const update = await runWorker(nodeId, state);
+    const booked = update.learner;
     const learner = LearnerStateSchema.parse({
-      ...update.learner,
+      ...before,
+      step: booked.step,
+      cost_usd_session: booked.cost_usd_session,
+      trace_nodes: booked.trace_nodes,
+      path: booked.path,
+      fingerprints: booked.fingerprints,
+      self_prompts: booked.self_prompts,
+      last_edge: booked.last_edge,
+      last_condition: booked.last_condition,
+      edges_taken: booked.edges_taken,
       hitl_pending: null,
       hitl_log: [
-        ...state.learner.hitl_log,
+        ...before.hitl_log,
         { node: nodeId, decision: decision.decision, actor: decision.actor, at: new Date().toISOString() },
       ],
-      last_assessment:
-        nodeId === "GradeDispute" ? (decision.decision === "reject" ? originalGrade : null) : update.learner.last_assessment,
-      disputed: nodeId === "GradeDispute" ? false : update.learner.disputed,
-      skill_map_edit: nodeId === "SkillMapEdit" ? false : update.learner.skill_map_edit,
-      loop_detected: nodeId === "SafetyEscalation" ? false : update.learner.loop_detected,
-      loop_cleared: nodeId === "SafetyEscalation" ? true : update.learner.loop_cleared,
+      last_assessment: nodeId === "GradeDispute" ? (decision.decision === "reject" ? before.last_assessment : null) : before.last_assessment,
+      disputed: nodeId === "GradeDispute" ? false : before.disputed,
+      skill_map_edit: nodeId === "SkillMapEdit" ? false : before.skill_map_edit,
+      loop_detected: nodeId === "SafetyEscalation" ? false : before.loop_detected,
+      loop_cleared: nodeId === "SafetyEscalation" ? true : before.loop_cleared,
     });
     return { learner };
   };

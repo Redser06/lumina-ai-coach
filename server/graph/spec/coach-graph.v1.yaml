@@ -1,5 +1,5 @@
 spec_id: coach-graph
-version: 4.2.0
+version: 4.3.0
 description: >
   Coaching agent graph. The Supervisor owns every conditional edge.
   Workers and HITL nodes return only to the Supervisor. PlanConfirm is intentionally
@@ -276,7 +276,7 @@ edges:
     to: End
     condition_id: hitl.rejected
     condition_expr: "(path[-1] == 'GradeDispute' || path[-1] == 'SkillMapEdit' || path[-1] == 'SafetyEscalation') && hitl_log[-1].decision == 'reject'"
-    priority: 17
+    priority: 96
   - id: e-sup-reflect-dispute
     from: Supervisor
     to: Reflect

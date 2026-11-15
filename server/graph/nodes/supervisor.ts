@@ -6,6 +6,8 @@ import { selectEdge } from "../route.js";
 import { loadSpec } from "../spec/load.js";
 import { LearnerStateSchema, type LearnerState } from "../state.js";
 import { mergeModelOutput, withBookkeeping } from "./merge.js";
+
+const HITL_NODES = new Set(["GradeDispute", "SkillMapEdit", "SafetyEscalation"]);
 import { completeCharged, type GraphUpdate } from "./worker.js";
 
 export async function supervisorNode(state: { learner: LearnerState }): Promise<GraphUpdate> {
@@ -24,7 +26,12 @@ export async function supervisorNode(state: { learner: LearnerState }): Promise<
     edgeTaken: null,
     conditionId: null,
   });
-  const drafted = withBookkeeping(guarded, "Supervisor", call, mergeModelOutput(call.json));
+  const modelJson = { ...call.json };
+  if (HITL_NODES.has(learner.path.at(-1) ?? "")) {
+    delete modelJson.last_assessment;
+    delete modelJson.fatigue;
+  }
+  const drafted = withBookkeeping(guarded, "Supervisor", call, mergeModelOutput(modelJson));
   const edge = selectEdge("Supervisor", drafted);
   // Conditional edges cannot write channels. An empty edge list is how this node
   // was scheduled: the start edge fired, and this commit is the first place that fact can be stored.

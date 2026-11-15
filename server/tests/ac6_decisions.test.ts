@@ -161,6 +161,94 @@ describe("ac6 decisions", { concurrency: false }, () => {
     }
   });
 
+  test("reject_with_model_fatigue_still_ends", async () => {
+    const tired: Provider = {
+      id: "fake",
+      async complete(request) {
+        const payload = request.prompt.includes("node: GradeDispute") ? { fatigue: 0.9, note: "tired" } : { note: "ok" };
+        return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: tired }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-reject-fatigue";
+    try {
+      await pausedDispute(sessionId, service);
+      const done = await service.hitl(sessionId, { decision: "reject", actor: "curator", node: "GradeDispute" });
+      assert.equal(done.status, "done");
+      assert.equal(done.edges.at(-1), "e-sup-hitl-reject");
+      assert.equal(done.edges.includes("e-sup-fatigue"), false);
+      assert.equal(done.state.path.includes("Reflect"), false);
+      assert.equal(done.state.fatigue, 0.1);
+      assert.ok(done.state.step < 20);
+      assert.deepEqual(done.state.last_assessment, ORIGINAL_GRADE);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("reject_keeps_the_grade_when_the_supervisor_model_rewrites_it", async () => {
+    const rewriting: Provider = {
+      id: "fake",
+      async complete(request) {
+        const rewriting = request.prompt.includes("node: Supervisor") && request.prompt.endsWith("path: Assess>GradeDispute");
+        const payload = rewriting
+          ? { last_assessment: { score: 0.95, error_class: null, confidence: 0.9 }, fatigue: 0.9 }
+          : { note: "ok" };
+        return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: rewriting }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-reject-rewrite";
+    try {
+      await pausedDispute(sessionId, service);
+      const done = await service.hitl(sessionId, { decision: "reject", actor: "curator", node: "GradeDispute" });
+      assert.equal(done.edges.at(-1), "e-sup-hitl-reject");
+      assert.equal(done.state.path.includes("Reflect"), false);
+      assert.deepEqual(done.state.last_assessment, ORIGINAL_GRADE);
+      assert.equal(done.state.fatigue, 0.1);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("accept_keeps_the_grade_set_aside_when_the_supervisor_model_rewrites_it", async () => {
+    const rewriting: Provider = {
+      id: "fake",
+      async complete(request) {
+        if (request.prompt.includes("node: Supervisor") && request.prompt.endsWith("path: Assess>GradeDispute")) {
+          return {
+            text: JSON.stringify({ last_assessment: { score: 0.95, error_class: null, confidence: 0.9 } }),
+            tokens_in: 4,
+            tokens_out: 2,
+            latency_ms: 1,
+          };
+        }
+        const payload = request.prompt.includes("node: Reflect") ? { session_complete: true } : { note: "ok" };
+        return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: rewriting }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-accept-rewrite";
+    try {
+      await pausedDispute(sessionId, service);
+      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator", node: "GradeDispute" });
+      assert.equal(done.status, "done");
+      assert.equal(done.state.last_assessment, null);
+      assert.equal(done.edges.includes("e-sup-reflect-dispute"), true);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
   test("invalid_decision_stays_paused", async () => {
     const checkpointer = new MemorySaver();
     const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);

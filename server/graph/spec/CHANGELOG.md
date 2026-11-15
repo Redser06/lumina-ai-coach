@@ -2,6 +2,10 @@
 
 Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
 
+## 4.3.0 - 2026-11-15
+
+- Minor. `e-sup-hitl-reject` priority moves from 17 to 96. It now sits above fatigue (80) and the step bound (90), and below the loop edge (100). A model-set `fatigue` can no longer outrank a human `reject`. The `condition_expr` is unchanged.
+
 ## 4.2.0 - 2026-11-15
 
 - Minor. New edge `e-sup-hitl-reject` (`hitl.rejected`, priority 17). A human `reject` on GradeDispute, SkillMapEdit, or SafetyEscalation ends the session. `accept` still uses the existing return-to-Reflect edges. On GradeDispute, `reject` keeps `last_assessment` and `accept` sets it aside. No existing `condition_expr` changed.
