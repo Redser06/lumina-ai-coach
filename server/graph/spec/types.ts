@@ -18,6 +18,8 @@ export interface GraphNodeSpec {
   max_steps: number;
   type?: "interrupt";
   subgraph?: boolean;
+  /** Self-prompt cycles (draft, critique, revise) allowed for a subgraph. */
+  max_depth?: number;
 }
 
 export interface GraphEdgeSpec {

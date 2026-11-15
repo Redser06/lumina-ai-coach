@@ -37,7 +37,8 @@ for (const edge of spec.edges) {
 }
 for (const id of ["Teach", "Practice", "Remediate"]) {
   const node = spec.nodes.find((item) => item.id === id);
-  if (!node?.subgraph || node.max_steps !== 1) fail(`${id} must be a single-step subgraph stub`);
+  if (!node?.subgraph || node.max_steps !== 1) fail(`${id} must stay a one-step subgraph`);
+  if (!Number.isInteger(node.max_depth) || (node.max_depth ?? 0) < 1) fail(`${id} must declare max_depth >= 1`);
 }
 
 compileCoachGraph({ implementedNodes: Object.keys(NODE_IMPLS), spec });

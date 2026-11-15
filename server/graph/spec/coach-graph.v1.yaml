@@ -1,10 +1,12 @@
 spec_id: coach-graph
-version: 2.0.0
+version: 2.0.1
 description: >
-  Phase 0 coaching agent graph. The Supervisor owns every conditional edge.
+  Coaching agent graph. The Supervisor owns every conditional edge.
   Workers and HITL nodes return only to the Supervisor. PlanConfirm is intentionally
   absent (not in the PRD's named HITL list). Teach, Practice and Remediate are
-  marked subgraph: true with max_steps 1; self-prompting depth is Phase 1 (AC-5).
+  subgraphs (draft, critique, revise, execute, check) bounded by max_depth.
+  max_steps stays 1: the Supervisor still schedules each as one step.
+  No edge or condition changed from 2.0.0.
 nodes:
   - id: __start__
     kind: terminal
@@ -27,11 +29,13 @@ nodes:
     task_type: tutor-chat
     max_steps: 1
     subgraph: true
+    max_depth: 2
   - id: Practice
     kind: worker
     task_type: tutor-chat
     max_steps: 1
     subgraph: true
+    max_depth: 3
   - id: Assess
     kind: worker
     task_type: grading
@@ -41,6 +45,7 @@ nodes:
     task_type: tutor-chat
     max_steps: 1
     subgraph: true
+    max_depth: 1
   - id: Stretch
     kind: worker
     task_type: deep-reasoning

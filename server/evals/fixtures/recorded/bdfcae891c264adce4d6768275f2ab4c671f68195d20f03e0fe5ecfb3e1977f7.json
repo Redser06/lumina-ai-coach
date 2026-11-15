@@ -1,0 +1,6 @@
+{
+  "text": "{\"prompt\":\"Teach draft 1: coach the learner toward Replan after a middling assessment with one checkable step.\"}",
+  "tokens_in": 55,
+  "tokens_out": 28,
+  "latency_ms": 1
+}

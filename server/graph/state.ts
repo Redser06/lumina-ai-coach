@@ -31,6 +31,22 @@ export const HitlRecordSchema = z.object({
   actor: z.string(),
 });
 
+export const SELF_PROMPT_STAGES = ["draft", "critique", "revise", "execute", "check"] as const;
+export const SELF_PROMPT_STATUSES = ["ok", "critique_failed", "malformed_revision", "depth_exhausted"] as const;
+
+/** One self-generated prompt, or the critique/execute/check call that used one. Checkpointed on the learner. */
+export const SelfPromptSchema = z.object({
+  node: z.string().min(1),
+  visit: z.number().int().nonnegative(),
+  depth: z.number().int().positive(),
+  stage: z.enum(SELF_PROMPT_STAGES),
+  prompt: z.string(),
+  output: z.string(),
+  status: z.enum(SELF_PROMPT_STATUSES),
+});
+
+export type SelfPrompt = z.infer<typeof SelfPromptSchema>;
+
 export const LearnerStateSchema = z.object({
   learner_id: z.string().min(1),
   session_id: z.string().min(1),
@@ -46,6 +62,7 @@ export const LearnerStateSchema = z.object({
   path: z.array(z.string()),
   edges_taken: z.array(z.string()),
   trace_nodes: z.array(z.string()),
+  self_prompts: z.array(SelfPromptSchema),
   fingerprints: z.array(z.string()),
   hitl_pending: HitlPendingSchema.nullable(),
   hitl_log: z.array(HitlRecordSchema),
@@ -79,6 +96,7 @@ export function initialLearnerState(partial: Partial<LearnerState> & Pick<Learne
     path: partial.path ?? [],
     edges_taken: partial.edges_taken ?? [],
     trace_nodes: partial.trace_nodes ?? [],
+    self_prompts: partial.self_prompts ?? [],
     fingerprints: partial.fingerprints ?? [],
     hitl_pending: partial.hitl_pending ?? null,
     hitl_log: partial.hitl_log ?? [],

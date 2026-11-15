@@ -15,3 +15,21 @@ export function renderPrompt(nodeId: string, taskType: string, state: LearnerSta
     `path: ${state.path.join(">")}`,
   ].join("\n");
 }
+
+/** Header plus the prompt this stage is writing or executing. `target` is last so one-line fields still parse. */
+export function renderSelfPrompt(args: {
+  nodeId: string;
+  taskType: string;
+  stage: string;
+  state: LearnerState;
+  depth: number;
+  target: string;
+}): string {
+  return [
+    renderPrompt(args.nodeId, args.taskType, args.state),
+    `stage: ${args.stage}`,
+    `depth: ${args.depth}`,
+    "target:",
+    args.target,
+  ].join("\n");
+}

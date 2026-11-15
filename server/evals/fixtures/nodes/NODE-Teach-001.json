@@ -10,5 +10,10 @@
     }
   },
   "expect_edge": "e-ret-teach",
-  "expect_path_tail": "Teach"
+  "expect_path_tail": "Teach",
+  "expect_self_prompt": {
+    "stop": "accepted",
+    "draft_count": 1,
+    "revise_count": 1
+  }
 }

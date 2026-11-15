@@ -15,6 +15,8 @@ export interface Scenario {
   initial?: Partial<LearnerState>;
   hitl?: HitlDecision[];
   script: Record<string, Array<Record<string, unknown>>>;
+  /** When accept is false, that subgraph's critique rejects until max_depth. */
+  self_prompt?: Record<string, { accept?: boolean }>;
   expected_path: string[];
   expected_edges: string[];
 }

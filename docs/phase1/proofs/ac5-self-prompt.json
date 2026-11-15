@@ -1,0 +1,539 @@
+{
+  "ac": "AC-5",
+  "criterion": "Self-prompting subgraphs: Teach/Practice/Remediate generate, critique and revise their own prompts within a declared max depth; the trace shows every self-generated prompt and the depth is never exceeded",
+  "spec": {
+    "fixture_id": "GRAPH-SPEC-coach-graph@2.0.1",
+    "version": "2.0.1",
+    "sha256": "007604ab0057bf05962a15859650d132ced075638c0892be034b66c314375405",
+    "max_depth": {
+      "Teach": 2,
+      "Practice": 3,
+      "Remediate": 1
+    }
+  },
+  "visits": {
+    "endpoint": "POST /sessions",
+    "scenario_id": "SCN-0001",
+    "session_id": "ac5-visits",
+    "status": "done",
+    "path": [
+      "Diagnose",
+      "Plan",
+      "Teach",
+      "Practice",
+      "Assess",
+      "Remediate",
+      "Practice",
+      "Assess",
+      "Stretch",
+      "Reflect"
+    ],
+    "subgraph_visits": [
+      {
+        "node": "Teach",
+        "visit": 0,
+        "max_depth": 2,
+        "depth_used": 1,
+        "depth_exceeded": false,
+        "stop": "accepted",
+        "executed": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "cycles": [
+          {
+            "depth": 1,
+            "draft": "Teach draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+            "critique": "Teach draft 1 names a checkable step.",
+            "revised": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check."
+          }
+        ]
+      },
+      {
+        "node": "Practice",
+        "visit": 0,
+        "max_depth": 3,
+        "depth_used": 1,
+        "depth_exceeded": false,
+        "stop": "accepted",
+        "executed": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "cycles": [
+          {
+            "depth": 1,
+            "draft": "Practice draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+            "critique": "Practice draft 1 names a checkable step.",
+            "revised": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check."
+          }
+        ]
+      },
+      {
+        "node": "Remediate",
+        "visit": 0,
+        "max_depth": 1,
+        "depth_used": 1,
+        "depth_exceeded": false,
+        "stop": "accepted",
+        "executed": "Remediate revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "cycles": [
+          {
+            "depth": 1,
+            "draft": "Remediate draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+            "critique": "Remediate draft 1 names a checkable step.",
+            "revised": "Remediate revised 1: coach the learner toward Write a first useful prompt with one worked example and a check."
+          }
+        ]
+      },
+      {
+        "node": "Practice",
+        "visit": 1,
+        "max_depth": 3,
+        "depth_used": 1,
+        "depth_exceeded": false,
+        "stop": "accepted",
+        "executed": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "cycles": [
+          {
+            "depth": 1,
+            "draft": "Practice draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+            "critique": "Practice draft 1 names a checkable step.",
+            "revised": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check."
+          }
+        ]
+      }
+    ],
+    "self_prompts": [
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "draft",
+        "prompt": "Teach draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+        "output": "{\"prompt\":\"Teach draft 1: coach the learner toward Write a first useful prompt with one checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "critique",
+        "prompt": "Teach draft 1 names a checkable step.",
+        "output": "{\"accept\":true,\"critique\":\"Teach draft 1 names a checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "revise",
+        "prompt": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"prompt\":\"Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "execute",
+        "prompt": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"mastery\":{\"prompting\":0.35}}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "check",
+        "prompt": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"pass\":true,\"note\":\"checked\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 0,
+        "depth": 1,
+        "stage": "draft",
+        "prompt": "Practice draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+        "output": "{\"prompt\":\"Practice draft 1: coach the learner toward Write a first useful prompt with one checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 0,
+        "depth": 1,
+        "stage": "critique",
+        "prompt": "Practice draft 1 names a checkable step.",
+        "output": "{\"accept\":true,\"critique\":\"Practice draft 1 names a checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 0,
+        "depth": 1,
+        "stage": "revise",
+        "prompt": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"prompt\":\"Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 0,
+        "depth": 1,
+        "stage": "execute",
+        "prompt": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"mastery\":{\"prompting\":0.4}}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 0,
+        "depth": 1,
+        "stage": "check",
+        "prompt": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"pass\":true,\"note\":\"checked\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Remediate",
+        "visit": 0,
+        "depth": 1,
+        "stage": "draft",
+        "prompt": "Remediate draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+        "output": "{\"prompt\":\"Remediate draft 1: coach the learner toward Write a first useful prompt with one checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Remediate",
+        "visit": 0,
+        "depth": 1,
+        "stage": "critique",
+        "prompt": "Remediate draft 1 names a checkable step.",
+        "output": "{\"accept\":true,\"critique\":\"Remediate draft 1 names a checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Remediate",
+        "visit": 0,
+        "depth": 1,
+        "stage": "revise",
+        "prompt": "Remediate revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"prompt\":\"Remediate revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Remediate",
+        "visit": 0,
+        "depth": 1,
+        "stage": "execute",
+        "prompt": "Remediate revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"mastery\":{\"prompting\":0.55}}",
+        "status": "ok"
+      },
+      {
+        "node": "Remediate",
+        "visit": 0,
+        "depth": 1,
+        "stage": "check",
+        "prompt": "Remediate revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"pass\":true,\"note\":\"checked\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 1,
+        "depth": 1,
+        "stage": "draft",
+        "prompt": "Practice draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+        "output": "{\"prompt\":\"Practice draft 1: coach the learner toward Write a first useful prompt with one checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 1,
+        "depth": 1,
+        "stage": "critique",
+        "prompt": "Practice draft 1 names a checkable step.",
+        "output": "{\"accept\":true,\"critique\":\"Practice draft 1 names a checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 1,
+        "depth": 1,
+        "stage": "revise",
+        "prompt": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"prompt\":\"Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 1,
+        "depth": 1,
+        "stage": "execute",
+        "prompt": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"mastery\":{\"prompting\":0.7}}",
+        "status": "ok"
+      },
+      {
+        "node": "Practice",
+        "visit": 1,
+        "depth": 1,
+        "stage": "check",
+        "prompt": "Practice revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"pass\":true,\"note\":\"checked\"}",
+        "status": "ok"
+      }
+    ]
+  },
+  "checkpoint": {
+    "endpoint": "GET /sessions/ac5-visits/checkpoints",
+    "checkpoint_id": "1f1e1320-10ad-6ea1-8007-a81d28fc03d5",
+    "path": [
+      "Diagnose",
+      "Plan",
+      "Teach"
+    ],
+    "self_prompts": [
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "draft",
+        "prompt": "Teach draft 1: coach the learner toward Write a first useful prompt with one checkable step.",
+        "output": "{\"prompt\":\"Teach draft 1: coach the learner toward Write a first useful prompt with one checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "critique",
+        "prompt": "Teach draft 1 names a checkable step.",
+        "output": "{\"accept\":true,\"critique\":\"Teach draft 1 names a checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "revise",
+        "prompt": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"prompt\":\"Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "execute",
+        "prompt": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"mastery\":{\"prompting\":0.35}}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "check",
+        "prompt": "Teach revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.",
+        "output": "{\"pass\":true,\"note\":\"checked\"}",
+        "status": "ok"
+      }
+    ]
+  },
+  "max_depth_run": {
+    "endpoint": "POST /sessions",
+    "scenario_id": "SCN-0009",
+    "session_id": "ac5-max-depth",
+    "status": "done",
+    "path": [
+      "Reflect",
+      "Plan",
+      "Teach",
+      "Reflect"
+    ],
+    "node": "Teach",
+    "max_depth": 2,
+    "draft_count": 2,
+    "depth_exceeded": false,
+    "stop": "depth_exhausted",
+    "subgraph_visits": [
+      {
+        "node": "Teach",
+        "visit": 0,
+        "max_depth": 2,
+        "depth_used": 2,
+        "depth_exceeded": false,
+        "stop": "depth_exhausted",
+        "executed": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+        "cycles": [
+          {
+            "depth": 1,
+            "draft": "Teach draft 1: coach the learner toward Keep going after a short reflection with one checkable step.",
+            "critique": "Teach draft 1 has no checkable outcome.",
+            "revised": "Teach revised 1: coach the learner toward Keep going after a short reflection with one worked example and a check."
+          },
+          {
+            "depth": 2,
+            "draft": "Teach draft 2: coach the learner toward Keep going after a short reflection with one checkable step.",
+            "critique": "Teach draft 2 has no checkable outcome.",
+            "revised": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check."
+          }
+        ]
+      }
+    ],
+    "self_prompts": [
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "draft",
+        "prompt": "Teach draft 1: coach the learner toward Keep going after a short reflection with one checkable step.",
+        "output": "{\"prompt\":\"Teach draft 1: coach the learner toward Keep going after a short reflection with one checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "critique",
+        "prompt": "Teach draft 1 has no checkable outcome.",
+        "output": "{\"accept\":false,\"critique\":\"Teach draft 1 has no checkable outcome.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 1,
+        "stage": "revise",
+        "prompt": "Teach revised 1: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+        "output": "{\"prompt\":\"Teach revised 1: coach the learner toward Keep going after a short reflection with one worked example and a check.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 2,
+        "stage": "draft",
+        "prompt": "Teach draft 2: coach the learner toward Keep going after a short reflection with one checkable step.",
+        "output": "{\"prompt\":\"Teach draft 2: coach the learner toward Keep going after a short reflection with one checkable step.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 2,
+        "stage": "critique",
+        "prompt": "Teach draft 2 has no checkable outcome.",
+        "output": "{\"accept\":false,\"critique\":\"Teach draft 2 has no checkable outcome.\"}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 2,
+        "stage": "revise",
+        "prompt": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+        "output": "{\"prompt\":\"Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.\"}",
+        "status": "depth_exhausted"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 2,
+        "stage": "execute",
+        "prompt": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+        "output": "{\"fatigue\":0.92}",
+        "status": "ok"
+      },
+      {
+        "node": "Teach",
+        "visit": 0,
+        "depth": 2,
+        "stage": "check",
+        "prompt": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+        "output": "{\"pass\":true,\"note\":\"checked\"}",
+        "status": "ok"
+      }
+    ],
+    "checkpoint": {
+      "endpoint": "GET /sessions/ac5-max-depth/checkpoints",
+      "checkpoint_id": "1f1e1320-1239-66c0-8007-60fa19d1440a",
+      "path": [
+        "Reflect",
+        "Plan",
+        "Teach"
+      ],
+      "self_prompts": [
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 1,
+          "stage": "draft",
+          "prompt": "Teach draft 1: coach the learner toward Keep going after a short reflection with one checkable step.",
+          "output": "{\"prompt\":\"Teach draft 1: coach the learner toward Keep going after a short reflection with one checkable step.\"}",
+          "status": "ok"
+        },
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 1,
+          "stage": "critique",
+          "prompt": "Teach draft 1 has no checkable outcome.",
+          "output": "{\"accept\":false,\"critique\":\"Teach draft 1 has no checkable outcome.\"}",
+          "status": "ok"
+        },
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 1,
+          "stage": "revise",
+          "prompt": "Teach revised 1: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+          "output": "{\"prompt\":\"Teach revised 1: coach the learner toward Keep going after a short reflection with one worked example and a check.\"}",
+          "status": "ok"
+        },
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 2,
+          "stage": "draft",
+          "prompt": "Teach draft 2: coach the learner toward Keep going after a short reflection with one checkable step.",
+          "output": "{\"prompt\":\"Teach draft 2: coach the learner toward Keep going after a short reflection with one checkable step.\"}",
+          "status": "ok"
+        },
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 2,
+          "stage": "critique",
+          "prompt": "Teach draft 2 has no checkable outcome.",
+          "output": "{\"accept\":false,\"critique\":\"Teach draft 2 has no checkable outcome.\"}",
+          "status": "ok"
+        },
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 2,
+          "stage": "revise",
+          "prompt": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+          "output": "{\"prompt\":\"Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.\"}",
+          "status": "depth_exhausted"
+        },
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 2,
+          "stage": "execute",
+          "prompt": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+          "output": "{\"fatigue\":0.92}",
+          "status": "ok"
+        },
+        {
+          "node": "Teach",
+          "visit": 0,
+          "depth": 2,
+          "stage": "check",
+          "prompt": "Teach revised 2: coach the learner toward Keep going after a short reflection with one worked example and a check.",
+          "output": "{\"pass\":true,\"note\":\"checked\"}",
+          "status": "ok"
+        }
+      ]
+    }
+  }
+}

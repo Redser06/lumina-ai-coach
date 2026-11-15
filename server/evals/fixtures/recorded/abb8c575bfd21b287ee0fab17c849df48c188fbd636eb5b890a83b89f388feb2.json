@@ -1,0 +1,6 @@
+{
+  "text": "{\"accept\":true,\"critique\":\"Remediate draft 1 names a checkable step.\"}",
+  "tokens_in": 101,
+  "tokens_out": 18,
+  "latency_ms": 1
+}

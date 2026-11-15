@@ -1,0 +1,25 @@
+{
+  "id": "NODE-Practice-002",
+  "node": "Practice",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.51
+    }
+  },
+  "stages": {
+    "critique": {
+      "accept": false,
+      "critique": "The drill does not say what a correct answer looks like."
+    }
+  },
+  "expect_edge": "e-ret-practice",
+  "expect_path_tail": "Practice",
+  "expect_self_prompt": {
+    "stop": "depth_exhausted",
+    "draft_count": 3,
+    "revise_count": 3
+  }
+}
