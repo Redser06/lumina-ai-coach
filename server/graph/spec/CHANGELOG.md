@@ -1,6 +1,6 @@
 # coach-graph changelog
 
-Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
+Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A priority change that alters which edge wins is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
 
 ## 4.3.0 - 2026-11-15
 

@@ -4,6 +4,7 @@ import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { compileCoachGraph } from "../graph/build.js";
 import { SessionService } from "../graph/session.js";
 import { initialLearnerState } from "../graph/state.js";
+import { promptField } from "../router/providers/fake.js";
 import { createRouter, useRouterForTests } from "../router/router.js";
 import type { Provider } from "../router/types.js";
 
@@ -447,6 +448,75 @@ describe("ac6 decisions", { concurrency: false }, () => {
       assert.equal(accepted.status, "done");
       assert.equal(accepted.state.path.includes("Reflect"), true);
       assert.equal(accepted.state.last_assessment, null);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  function coachAfterDispute(assessment: Record<string, unknown>): Provider {
+    return {
+      id: "fake",
+      async complete(request) {
+        const stage = promptField(request.prompt, "stage");
+        const node = promptField(request.prompt, "node") ?? "";
+        if (stage === "draft" || stage === "revise") {
+          return { text: JSON.stringify({ prompt: `${node} ${stage} for the learner.` }), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+        }
+        if (stage === "critique") {
+          return { text: JSON.stringify({ accept: true, critique: "names a check." }), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+        }
+        if (stage === "check") {
+          return { text: JSON.stringify({ pass: true }), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+        }
+        let payload: Record<string, unknown> = { note: "ok", fatigue: 0.2 };
+        if (node === "Assess") payload = { ...assessment, fatigue: 0.2 };
+        if (node === "Reflect" && request.prompt.includes("visit: 1")) payload = { session_complete: true, fatigue: 0.2 };
+        if (node === "Supervisor" && request.prompt.endsWith(">Remediate")) payload = { fatigue: 0.9 };
+        return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+  }
+
+  async function acceptDispute(sessionId: string, service: SessionService) {
+    const paused = await service.run(
+      learner({ session_id: sessionId, path: ["Assess"], disputed: true, fingerprints: ["once"], step: 1 }),
+      [],
+      sessionId,
+    );
+    assert.equal(paused.next[0], "GradeDispute");
+    return service.hitl(sessionId, { decision: "accept", actor: "curator", node: "GradeDispute" });
+  }
+
+  test("post_accept_assess_can_reach_stretch", async () => {
+    useRouterForTests(createRouter({ provider: coachAfterDispute({
+      last_assessment: { score: 0.9, error_class: null, confidence: 0.9 },
+      mastery: { evals: 0.9 },
+    }) }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    try {
+      const done = await acceptDispute("ac6-post-stretch", service);
+      assert.equal(done.status, "done");
+      assert.equal(done.state.path.includes("Stretch"), true);
+      assert.equal(done.edges.includes("e-sup-fast"), true);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("post_accept_assess_can_reach_remediate", async () => {
+    useRouterForTests(createRouter({ provider: coachAfterDispute({
+      last_assessment: { score: 0.42, error_class: "misconception", confidence: 0.35 },
+    }) }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    try {
+      const done = await acceptDispute("ac6-post-remediate", service);
+      assert.equal(done.status, "done");
+      assert.equal(done.state.path.includes("Remediate"), true);
+      assert.equal(done.edges.includes("e-sup-misconception"), true);
     } finally {
       useRouterForTests(null);
       service.close();
