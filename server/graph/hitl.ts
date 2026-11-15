@@ -7,9 +7,14 @@ export interface HitlDecision {
   actor: string;
 }
 
-const HITL_ACTORS = new Set(["learner", "curator", "safety-lead"]);
+/** Who may decide a paused node. PRD r2 §5 names the humans; the map assigns the declared nodes. */
+export const HITL_ACTORS_BY_NODE: Record<string, string> = {
+  GradeDispute: "curator",
+  SkillMapEdit: "curator",
+  SafetyEscalation: "safety-lead",
+};
 
-export function assertHitlDecision(value: unknown): HitlDecision {
+export function parseHitlDecision(value: unknown): HitlDecision {
   if (!value || typeof value !== "object") {
     throw new Error("HITL resume requires {decision, actor}");
   }
@@ -20,10 +25,15 @@ export function assertHitlDecision(value: unknown): HitlDecision {
   if (typeof record.actor !== "string" || record.actor.length === 0) {
     throw new Error("HITL resume requires {decision, actor}");
   }
-  if (!HITL_ACTORS.has(record.actor)) {
-    throw new Error(`HITL actor is not allowed: ${record.actor}`);
-  }
   return { decision: record.decision, actor: record.actor };
+}
+
+export function assertHitlDecision(value: unknown, nodeId: string): HitlDecision {
+  const decision = parseHitlDecision(value);
+  if (HITL_ACTORS_BY_NODE[nodeId] !== decision.actor) {
+    throw new Error(`HITL actor is not allowed for ${nodeId}: ${decision.actor}`);
+  }
+  return decision;
 }
 
 export function makeHitl(nodeId: "GradeDispute" | "SkillMapEdit" | "SafetyEscalation") {
@@ -33,7 +43,7 @@ export function makeHitl(nodeId: "GradeDispute" | "SkillMapEdit" | "SafetyEscala
       session_id: state.learner.session_id,
       reason: nodeId,
     });
-    const decision = assertHitlDecision(raw);
+    const decision = assertHitlDecision(raw, nodeId);
     const update = await runWorker(nodeId, state);
     const learner = LearnerStateSchema.parse({
       ...update.learner,

@@ -125,18 +125,18 @@ describe("ac6 hitl", { concurrency: false }, () => {
       });
       const paused = await service.run(initial, [], sessionId);
       assert.equal(paused.status, "interrupted");
-      const done = await service.hitl(sessionId, { decision: "accept", actor: "learner" });
+      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator" });
       assert.equal(done.status, "done");
       const entry = done.state.hitl_log.at(-1);
       assert.equal(entry?.node, "GradeDispute");
       assert.equal(entry?.decision, "accept");
-      assert.equal(entry?.actor, "learner");
+      assert.equal(entry?.actor, "curator");
       assert.match(entry?.at ?? "", /^\d{4}-\d{2}-\d{2}T/);
       assert.equal(done.state.path.at(-1), "Reflect");
       assert.equal(done.edges.includes("e-sup-reflect-dispute"), true);
       const history = await service.history(sessionId);
       const recorded = history.map((item) => item.state?.hitl_log.at(-1)).find((row) => row?.decision === "accept");
-      assert.equal(recorded?.actor, "learner");
+      assert.equal(recorded?.actor, "curator");
       assert.equal(recorded?.at, entry?.at);
     } finally {
       useRouterForTests(null);
@@ -159,8 +159,8 @@ describe("ac6 hitl", { concurrency: false }, () => {
       assert.equal(paused.status, "interrupted");
       await assert.rejects(() => service.resume(sessionId, []), /human decision/);
       await assert.rejects(() => service.hitl(sessionId, { decision: "", actor: "learner" }), /decision, actor/);
-      await assert.rejects(() => service.hitl(sessionId, { decision: "accept", actor: "stranger" }), /not allowed/);
-      assert.throws(() => assertHitlDecision({ decision: "accept" }), /decision, actor/);
+      await assert.rejects(() => service.hitl(sessionId, { decision: "accept", actor: "stranger" }), /not allowed for GradeDispute/);
+      assert.throws(() => assertHitlDecision({ decision: "accept" }, "GradeDispute"), /decision, actor/);
       const still = await service.step(sessionId);
       assert.equal(still.status, "interrupted");
       assert.equal(still.state.hitl_log.length, 0);
@@ -169,6 +169,77 @@ describe("ac6 hitl", { concurrency: false }, () => {
       service.close();
     }
   });
+
+  test("learner_cannot_decide_their_own_grade_dispute", async () => {
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-learner-dispute";
+    try {
+      const paused = await service.run(
+        learner({ session_id: sessionId, path: ["Assess"], disputed: true, fingerprints: ["once"] }),
+        [],
+        sessionId,
+      );
+      assert.equal(paused.status, "interrupted");
+      assert.equal(paused.next[0], "GradeDispute");
+      await assert.rejects(() => service.hitl(sessionId, { decision: "accept", actor: "learner" }), /not allowed for GradeDispute/);
+      const still = await service.step(sessionId);
+      assert.equal(still.status, "interrupted");
+      assert.equal(still.state.hitl_log.length, 0);
+      assert.equal(still.state.path.includes("GradeDispute"), false);
+    } finally {
+      service.close();
+    }
+  });
+
+  for (const item of [
+    { node: "GradeDispute", flag: "disputed", wrong: "learner", right: "curator" },
+    { node: "SkillMapEdit", flag: "skill_map_edit", wrong: "safety-lead", right: "curator" },
+    { node: "SafetyEscalation", flag: "loop_detected", wrong: "curator", right: "safety-lead" },
+  ] as const) {
+    test(`${item.node}_rejects_${item.wrong}_and_accepts_${item.right}`, async () => {
+      const finishing: Provider = {
+        id: "fake",
+        async complete(request) {
+          const payload = request.prompt.includes("node: Reflect") ? { session_complete: true } : { note: "ok" };
+          return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+        },
+      };
+      useRouterForTests(createRouter({ provider: finishing }));
+      const checkpointer = new MemorySaver();
+      const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+      const sessionId = `ac6-actor-${item.node}`;
+      try {
+        const paused = await service.run(
+          learner({
+            session_id: sessionId,
+            path: ["Assess"],
+            fingerprints: ["once"],
+            [item.flag]: true,
+            ...(item.node === "SafetyEscalation" ? { loop_cleared: false } : {}),
+          }),
+          [],
+          sessionId,
+        );
+        assert.equal(paused.next[0], item.node);
+        await assert.rejects(
+          () => service.hitl(sessionId, { decision: "accept", actor: item.wrong }),
+          new RegExp(`not allowed for ${item.node}`),
+        );
+        const still = await service.step(sessionId);
+        assert.equal(still.status, "interrupted");
+        assert.equal(still.state.hitl_log.length, 0);
+        const done = await service.hitl(sessionId, { decision: "accept", actor: item.right });
+        assert.equal(done.state.hitl_log.at(-1)?.actor, item.right);
+        assert.equal(done.state.hitl_log.at(-1)?.node, item.node);
+        assert.equal(done.state.path.includes(item.node), true);
+        assert.notEqual(done.status, "interrupted");
+      } finally {
+        useRouterForTests(null);
+        service.close();
+      }
+    });
+  }
 
   test("repeated_dispute_cycle_ends_within_the_bound", async () => {
     const echoing: Provider = {
@@ -196,7 +267,7 @@ describe("ac6 hitl", { concurrency: false }, () => {
       });
       const paused = await service.run(initial, [], sessionId);
       assert.equal(paused.status, "interrupted");
-      const done = await service.hitl(sessionId, { decision: "accept", actor: "learner" });
+      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator" });
       assert.equal(done.status, "done");
       assert.equal(done.state.path.filter((node) => node === "GradeDispute").length, DISPUTE_VISIT_BOUND);
       assert.ok(done.state.step <= 43);

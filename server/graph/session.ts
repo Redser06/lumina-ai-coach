@@ -107,6 +107,7 @@ export class SessionService {
       if (snap.interrupts.length > 0) {
         const decision = queue.shift();
         if (!decision) return this.toResult(threadId, snap, "interrupted", resumedNode, sessionId);
+        assertHitlDecision(decision, snap.next[0] ?? "");
         await this.invoke(threadId, new Command({ resume: decision }));
         const after = await this.readSnap(threadId);
         stampCheckpoint(sessionId, after.checkpoint_id ?? "unknown");
@@ -135,10 +136,10 @@ export class SessionService {
   }
 
   async hitl(threadId: string, decision: HitlDecision): Promise<RunResult> {
-    assertHitlDecision(decision);
     const before = await this.readSnap(threadId);
     if (!before.learner) throw new Error(`session not found: ${threadId}`);
     if (before.interrupts.length === 0) throw new Error("session is not waiting on a human decision");
+    assertHitlDecision(decision, before.next[0] ?? "");
     return runContext.run({ runId: randomUUID() }, () =>
       this.continueUntil(threadId, [decision], null, before.learner!.session_id),
     );

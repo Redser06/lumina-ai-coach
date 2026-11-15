@@ -8,7 +8,7 @@ import { loadScenario, stateFromScenario } from "../evals/scenarios.js";
 
 describe("hitl", { concurrency: false }, () => {
   test("graph_pauses_at_interrupt_and_resumes_only_with_decision", async () => {
-    assert.throws(() => assertHitlDecision({}), /decision, actor/);
+    assert.throws(() => assertHitlDecision({}, "GradeDispute"), /decision, actor/);
     const checkpointer = new MemorySaver();
     const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
     const scenario = loadScenario("SCN-0005");
@@ -24,7 +24,7 @@ describe("hitl", { concurrency: false }, () => {
 
     await assert.rejects(() => service.resume(sessionId), /human decision/);
 
-    const done = await service.hitl(sessionId, { decision: "accept", actor: "learner" });
+    const done = await service.hitl(sessionId, { decision: "accept", actor: "curator" });
     assert.equal(done.status, "done");
     assert.deepEqual(done.state.path, scenario.expected_path);
     assert.equal(done.state.hitl_log.at(-1)?.decision, "accept");

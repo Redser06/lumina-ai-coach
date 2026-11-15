@@ -16,7 +16,7 @@
   "hitl": [
     {
       "decision": "accept",
-      "actor": "learner"
+      "actor": "curator"
     }
   ],
   "script": {

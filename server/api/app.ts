@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { createCheckpointer } from "../checkpoint/index.js";
 import { loadScenario, stateFromScenario } from "../evals/scenarios.js";
-import { assertHitlDecision } from "../graph/hitl.js";
+import { parseHitlDecision } from "../graph/hitl.js";
 import { SessionService } from "../graph/session.js";
 import { loadSpecWithHash } from "../graph/spec/load.js";
 import { logsForSession } from "../telemetry/node_log.js";
@@ -57,14 +57,14 @@ export function createApp(options: AppOptions = {}): Hono {
 
   app.post("/sessions/:id/resume", async (c) => {
     const body = await readJson(c);
-    const decisions = Array.isArray(body.decisions) ? body.decisions.map((item) => assertHitlDecision(item)) : [];
+    const decisions = Array.isArray(body.decisions) ? body.decisions.map((item) => parseHitlDecision(item)) : [];
     return c.json(await service.resume(c.req.param("id"), decisions));
   });
 
   app.post("/sessions/:id/replay", async (c) => {
     const body = await readJson(c);
     if (typeof body.from !== "string" || body.from.length === 0) return c.json({ error: "from is required" }, 400);
-    const decisions = Array.isArray(body.decisions) ? body.decisions.map((item) => assertHitlDecision(item)) : [];
+    const decisions = Array.isArray(body.decisions) ? body.decisions.map((item) => parseHitlDecision(item)) : [];
     return c.json(await service.replay(c.req.param("id"), body.from, decisions));
   });
 
@@ -76,7 +76,7 @@ export function createApp(options: AppOptions = {}): Hono {
   });
 
   app.post("/sessions/:id/hitl", async (c) => {
-    const decision = assertHitlDecision(await c.req.json());
+    const decision = parseHitlDecision(await c.req.json());
     return c.json(await service.hitl(c.req.param("id"), decision));
   });
 

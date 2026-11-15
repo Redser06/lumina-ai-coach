@@ -4,6 +4,6 @@
   "kind": "hitl",
   "expect_decision": {
     "decision": "accept",
-    "actor": "learner"
+    "actor": "curator"
   }
 }

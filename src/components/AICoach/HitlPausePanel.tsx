@@ -3,6 +3,16 @@ import React, { useEffect, useState } from "react";
 const API = "/api";
 const SESSION_ID = `ac6-panel-${Math.random().toString(36).slice(2, 8)}`;
 
+const PERMITTED_ACTORS: Record<string, readonly string[]> = {
+  GradeDispute: ["curator"],
+  SkillMapEdit: ["curator"],
+  SafetyEscalation: ["safety-lead"],
+};
+
+function actorsFor(node: string | undefined): readonly string[] {
+  return (node && PERMITTED_ACTORS[node]) || [];
+}
+
 interface PausedSession {
   status: string;
   session_id: string;
@@ -48,7 +58,7 @@ function openPausedSession(): Promise<PausedSession> {
 export const HitlPausePanel: React.FC = () => {
   const [paused, setPaused] = useState<PausedSession | null>(null);
   const [decision, setDecision] = useState("accept");
-  const [actor, setActor] = useState("learner");
+  const [actor, setActor] = useState("curator");
   const [entry, setEntry] = useState<CheckpointEntry | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -57,7 +67,10 @@ export const HitlPausePanel: React.FC = () => {
     let live = true;
     openPausedSession()
       .then((session) => {
-        if (live) setPaused(session);
+        if (!live) return;
+        setPaused(session);
+        const allowed = actorsFor(session.next[0]);
+        if (allowed[0]) setActor(allowed[0]);
       })
       .catch((reason: unknown) => {
         if (live) setError(reason instanceof Error ? reason.message : String(reason));
@@ -78,8 +91,9 @@ export const HitlPausePanel: React.FC = () => {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ decision, actor }),
       });
-      const body = (await response.json()) as { error?: string };
+      const body = (await response.json()) as PausedSession & { error?: string };
       if (!response.ok) throw new Error(body.error ?? `decision rejected (${response.status})`);
+      setPaused(body);
       const history = (await (await fetch(`${API}/sessions/${paused.session_id}/checkpoints`)).json()) as CheckpointRow[];
       const recorded = history.map((row) => row.state?.hitl_log.at(-1)).find((row) => row?.decision === decision);
       if (!recorded) throw new Error("checkpoint has no decision entry");
@@ -91,19 +105,26 @@ export const HitlPausePanel: React.FC = () => {
     }
   };
 
+  const waitingOn = paused?.status === "interrupted" ? paused.next[0] : undefined;
+  const actorChoices = actorsFor(waitingOn ?? entry?.node ?? paused?.next[0]);
+
   return (
     <section className="h-full overflow-y-auto bg-surface p-6 md:p-10" data-testid="hitl-panel">
       <header className="mb-6 max-w-3xl">
         <p className="text-xs font-bold uppercase tracking-wider text-primary">Human review</p>
-        <h2 className="mt-1 text-2xl font-bold text-on-surface">Grade dispute is paused</h2>
+        <h2 className="mt-1 text-2xl font-bold text-on-surface">
+          {waitingOn ? `${waitingOn} is paused` : "Session continued"}
+        </h2>
         <p className="mt-2 text-sm text-on-surface-variant">
-          The graph stays here until a learner, curator, or safety lead records a decision.
+          {waitingOn
+            ? `The graph stays here until a ${actorChoices.join(" or ")} records a decision.`
+            : "The decision was recorded and the graph continued."}
         </p>
       </header>
 
       <div className="grid max-w-3xl gap-4">
         <article className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5" data-testid="paused-session">
-          <h3 className="text-sm font-bold text-on-surface">Paused session</h3>
+          <h3 className="text-sm font-bold text-on-surface">{waitingOn ? "Paused session" : "Session"}</h3>
           {paused ? (
             <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
               <dt className="text-on-surface-variant">Session</dt>
@@ -134,9 +155,11 @@ export const HitlPausePanel: React.FC = () => {
             onChange={(event) => setActor(event.target.value)}
             disabled={Boolean(entry)}
           >
-            <option value="learner">learner</option>
-            <option value="curator">curator</option>
-            <option value="safety-lead">safety-lead</option>
+            {actorChoices.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
           </select>
           <label className="mt-3 block text-xs font-bold uppercase tracking-wider text-on-surface-variant" htmlFor="hitl-decision">
             Decision
