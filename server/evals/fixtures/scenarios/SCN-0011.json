@@ -1,0 +1,24 @@
+{
+  "id": "SCN-0011",
+  "persona": "P1",
+  "title": "Diagnose without a placement is a dead end",
+  "learner_id": "nia",
+  "goal": "Find a starting point",
+  "initial": {
+    "path": ["Diagnose"],
+    "diagnosis": { "placed": false, "tier": "novice" },
+    "fatigue": 0.1,
+    "step": 2
+  },
+  "hitl": [],
+  "script": {
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": ["Diagnose", "Reflect"],
+  "expected_edges": ["e-start", "e-sup-dead", "e-ret-reflect", "e-sup-end"]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "SCN-0012",
+  "persona": "P1",
+  "title": "A placed learner with no plan is ready for one",
+  "learner_id": "nia",
+  "goal": "Get a first plan",
+  "initial": {
+    "path": [],
+    "diagnosis": { "placed": true, "tier": "novice" },
+    "plan": null,
+    "fatigue": 0.1,
+    "step": 1
+  },
+  "hitl": [],
+  "script": {
+    "Plan": [
+      {
+        "plan": { "skill": "prompting", "rationale": "first plan" },
+        "fatigue": 0.91
+      }
+    ],
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": ["Plan", "Reflect"],
+  "expected_edges": ["e-start", "e-sup-ready", "e-ret-plan", "e-sup-fatigue", "e-ret-reflect", "e-sup-end"]
+}

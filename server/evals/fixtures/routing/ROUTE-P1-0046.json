@@ -1,0 +1,28 @@
+{
+  "id": "ROUTE-P1-0046",
+  "fixture_set": "ROUTE-P1",
+  "branch": "dead_end",
+  "expect_node": "Reflect",
+  "expect_edge": "e-sup-dead",
+  "why": "Unknown node, already placed, and a plan skill exists, so this is not ready-for-plan.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "builder"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Mystery"
+    ]
+  }
+}

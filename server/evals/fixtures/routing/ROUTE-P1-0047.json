@@ -1,0 +1,22 @@
+{
+  "id": "ROUTE-P1-0047",
+  "fixture_set": "ROUTE-P1",
+  "branch": "dead_end",
+  "expect_node": "Reflect",
+  "expect_edge": "e-sup-dead",
+  "why": "Diagnose returned with no diagnosis object.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": null,
+    "plan": null,
+    "path": [
+      "Diagnose"
+    ]
+  }
+}

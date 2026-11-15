@@ -17,6 +17,30 @@ function isFastMastery(state: LearnerState): boolean {
   );
 }
 
+const PIPELINE = new Set([
+  "Diagnose",
+  "Plan",
+  "Teach",
+  "Practice",
+  "Assess",
+  "Remediate",
+  "Stretch",
+  "Reflect",
+  "GradeDispute",
+  "SkillMapEdit",
+  "SafetyEscalation",
+]);
+
+function emptyPlan(state: LearnerState): boolean {
+  const skill = state.plan?.skill;
+  return state.plan == null || skill == null || skill === "";
+}
+
+function offPipeline(state: LearnerState): boolean {
+  const tail = last(state);
+  return tail != null && !PIPELINE.has(tail);
+}
+
 /**
  * Pure functions of LearnerState. No I/O. Workers never call each other;
  * the Supervisor evaluates these and is the only node that branches.
@@ -37,11 +61,20 @@ export const CONDITIONS: Record<string, ConditionFn> = {
     !state.disputed &&
     state.last_assessment?.error_class === "misconception",
   "assess.fast_mastery": (state) => last(state) === "Assess" && !state.disputed && isFastMastery(state),
+  "assess.slip": (state) =>
+    last(state) === "Assess" && !state.disputed && state.last_assessment?.error_class === "slip",
   "assess.replan": (state) =>
     last(state) === "Assess" &&
     !state.disputed &&
     state.last_assessment?.error_class !== "misconception" &&
+    state.last_assessment?.error_class !== "slip" &&
     !isFastMastery(state),
+  "session.ready": (state) =>
+    state.diagnosis?.placed === true && emptyPlan(state) && !PIPELINE.has(last(state) ?? ""),
+  "any.dead_end": (state) =>
+    (last(state) === "Diagnose" && state.diagnosis?.placed !== true) ||
+    (last(state) === "Plan" && state.diagnosis?.placed === true && emptyPlan(state)) ||
+    (state.diagnosis?.placed === true && !emptyPlan(state) && offPipeline(state)),
   "diagnose.needed": (state) =>
     !state.session_complete && !state.diagnosis?.placed && last(state) !== "Diagnose",
   "diagnose.complete": (state) => last(state) === "Diagnose" && state.diagnosis?.placed === true,

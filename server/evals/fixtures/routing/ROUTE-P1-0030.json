@@ -1,0 +1,28 @@
+{
+  "id": "ROUTE-P1-0030",
+  "fixture_set": "ROUTE-P1",
+  "branch": "ready",
+  "expect_node": "Plan",
+  "expect_edge": "e-sup-plan-reflect",
+  "why": "Reflection finished and the session is not complete, so the learner is ready for the next plan.",
+  "state": {
+    "fatigue": 0.15,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Reflect"
+    ]
+  }
+}

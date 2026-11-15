@@ -1,0 +1,37 @@
+{
+  "id": "ROUTE-P1-0033",
+  "fixture_set": "ROUTE-P1",
+  "branch": "ready",
+  "expect_node": "Plan",
+  "expect_edge": "e-sup-replan",
+  "why": "Confidence 0.79 is under fast mastery. Null error class means ready to replan.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Diagnose",
+      "Plan",
+      "Teach",
+      "Practice",
+      "Assess"
+    ],
+    "last_assessment": {
+      "score": 0.85,
+      "error_class": null,
+      "confidence": 0.79
+    }
+  }
+}
