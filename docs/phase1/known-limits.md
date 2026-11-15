@@ -10,4 +10,4 @@ Until then the role is checked against the paused node's allowlist, which is not
 
 A role that is not on that list is rejected. The decision itself is `accept` or `reject`, and the body must name the paused node.
 
-The PRD does not say what those two words do. In Phase 1, `reject` ends the session on GradeDispute, SkillMapEdit, and SafetyEscalation. An accepted GradeDispute sets `last_assessment` to null, which sets the disputed grade aside. A model reply cannot put that grade back or raise fatigue enough to outrank the reject.
+The PRD does not say what those two words do. This is a fail-closed default, and the product decision is still pending with PM. `reject` ends the session on GradeDispute, SkillMapEdit, and SafetyEscalation. An accepted GradeDispute clears `last_assessment` to null. It does not re-grade the work. There is no declared non-model reassessment after that, so the grade stays pinned for the rest of the session and later model merges cannot change it.

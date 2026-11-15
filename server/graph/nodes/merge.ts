@@ -23,9 +23,11 @@ export function mergeModelOutput(json: Record<string, unknown>): LearnerPatch {
 }
 
 export function withBookkeeping(state: LearnerState, nodeId: string, call: ModelCall, patch: LearnerPatch): LearnerState {
+  const gradePinned = state.hitl_log.some((entry) => entry.node === "GradeDispute");
   const merged: LearnerState = {
     ...state,
     ...patch,
+    ...(gradePinned ? { last_assessment: state.last_assessment } : {}),
     step: state.step + 1,
     cost_usd_session: call.session_spent_usd,
     trace_nodes: [...state.trace_nodes, nodeId],

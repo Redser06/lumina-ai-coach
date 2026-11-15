@@ -210,7 +210,7 @@ describe("ac6 decisions", { concurrency: false }, () => {
       assert.equal(done.edges.at(-1), "e-sup-hitl-reject");
       assert.equal(done.state.path.includes("Reflect"), false);
       assert.deepEqual(done.state.last_assessment, ORIGINAL_GRADE);
-      assert.equal(done.state.fatigue, 0.1);
+      assert.equal(done.state.fatigue, 0.9);
     } finally {
       useRouterForTests(null);
       service.close();
@@ -323,6 +323,130 @@ describe("ac6 decisions", { concurrency: false }, () => {
       assert.equal(still.next[0], "SkillMapEdit");
       assert.equal(still.state.path.includes("SkillMapEdit"), false);
       assert.equal(still.state.hitl_log.length, 1);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("reject_near_the_step_bound_with_fatigue_ends_on_the_reject_edge", async () => {
+    const tired: Provider = {
+      id: "fake",
+      async complete(request) {
+        const deciding = request.prompt.includes("node: Supervisor") && request.prompt.endsWith("path: Assess>GradeDispute");
+        const payload = deciding || request.prompt.includes("node: GradeDispute") ? { fatigue: 0.9, note: "tired" } : { note: "ok" };
+        return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: tired }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-reject-bound";
+    try {
+      const paused = await service.run(
+        learner({ session_id: sessionId, path: ["Assess"], disputed: true, fingerprints: ["once"], step: 37 }),
+        [],
+        sessionId,
+      );
+      assert.equal(paused.next[0], "GradeDispute");
+      const done = await service.hitl(sessionId, { decision: "reject", actor: "curator", node: "GradeDispute" });
+      assert.equal(done.status, "done");
+      assert.equal(done.edges.at(-1), "e-sup-hitl-reject");
+      assert.equal(done.edges.includes("e-sup-fatigue"), false);
+      assert.equal(done.edges.includes("e-sup-step"), false);
+      assert.deepEqual(done.state.path, ["Assess", "GradeDispute"]);
+      assert.equal(done.state.step, 40);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("hitl_worker_result_does_not_apply_model_fields", async () => {
+    const noisy: Provider = {
+      id: "fake",
+      async complete(request) {
+        if (request.prompt.includes("node: SkillMapEdit")) {
+          return {
+            text: JSON.stringify({
+              fatigue: 0.9,
+              last_assessment: { score: 0.99, error_class: null, confidence: 0.9 },
+              disputed: true,
+              plan: { skill: "hijacked", rationale: "from the model" },
+            }),
+            tokens_in: 4,
+            tokens_out: 2,
+            latency_ms: 1,
+          };
+        }
+        const payload = request.prompt.includes("node: Reflect") ? { session_complete: true } : { note: "ok" };
+        return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: noisy }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac6-bookkeeping";
+    try {
+      const paused = await service.run(
+        learner({ session_id: sessionId, path: ["Assess"], skill_map_edit: true, fingerprints: ["once"] }),
+        [],
+        sessionId,
+      );
+      assert.equal(paused.next[0], "SkillMapEdit");
+      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator", node: "SkillMapEdit" });
+      assert.equal(done.state.fatigue, 0.1);
+      assert.deepEqual(done.state.last_assessment, ORIGINAL_GRADE);
+      assert.equal(done.state.disputed, false);
+      assert.deepEqual(done.state.plan, { skill: "evals", rationale: "grade the lab" });
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
+  test("grade_stays_pinned_after_accept_and_reject", async () => {
+    const rewritten = { score: 0.95, error_class: null, confidence: 0.9 };
+    const later: Provider = {
+      id: "fake",
+      async complete(request) {
+        const afterDecision =
+          request.prompt.includes("node: Reflect") ||
+          request.prompt.includes("node: Plan") ||
+          (request.prompt.includes("node: Supervisor") && request.prompt.includes("GradeDispute"));
+        if (!afterDecision) {
+          return { text: JSON.stringify({ note: "ok" }), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+        }
+        const payload: Record<string, unknown> = { last_assessment: rewritten };
+        if (request.prompt.includes("node: Reflect")) payload.session_complete = true;
+        if (request.prompt.includes("node: Supervisor") && request.prompt.endsWith("path: Assess>GradeDispute")) payload.fatigue = 0.9;
+        return { text: JSON.stringify(payload), tokens_in: 4, tokens_out: 2, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider: later }));
+    const checkpointer = new MemorySaver();
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    try {
+      const rejectedId = "ac6-pin-reject";
+      await service.run(
+        learner({ session_id: rejectedId, path: ["Assess"], disputed: true, fingerprints: ["once"] }),
+        [],
+        rejectedId,
+      );
+      const rejected = await service.hitl(rejectedId, { decision: "reject", actor: "curator", node: "GradeDispute" });
+      assert.equal(rejected.edges.at(-1), "e-sup-hitl-reject");
+      assert.deepEqual(rejected.state.last_assessment, ORIGINAL_GRADE);
+
+      const acceptedId = "ac6-pin-accept";
+      await service.run(
+        learner({ session_id: acceptedId, path: ["Assess"], disputed: true, fingerprints: ["once"] }),
+        [],
+        acceptedId,
+      );
+      const accepted = await service.hitl(acceptedId, { decision: "accept", actor: "grader", node: "GradeDispute" });
+      assert.equal(accepted.status, "done");
+      assert.equal(accepted.state.path.includes("Reflect"), true);
+      assert.equal(accepted.state.last_assessment, null);
     } finally {
       useRouterForTests(null);
       service.close();

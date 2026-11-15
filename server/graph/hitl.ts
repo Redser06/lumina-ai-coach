@@ -61,6 +61,8 @@ export function makeHitl(nodeId: "GradeDispute" | "SkillMapEdit" | "SafetyEscala
     const decision = assertHitlDecision(raw, nodeId);
     const before = state.learner;
     const update = await runWorker(nodeId, state);
+    // Bookkeeping kept from the worker: step, cost, trace, path, fingerprints, self_prompts, last_edge, last_condition, edges_taken.
+    // hitl_log and hitl_pending are written here. Model fields (fatigue, last_assessment, disputed, plan, and the rest) are not.
     const booked = update.learner;
     const learner = LearnerStateSchema.parse({
       ...before,
