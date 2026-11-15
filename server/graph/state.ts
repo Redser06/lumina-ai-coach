@@ -32,7 +32,7 @@ export const HitlRecordSchema = z.object({
 });
 
 export const SELF_PROMPT_STAGES = ["draft", "critique", "revise", "execute", "check"] as const;
-export const SELF_PROMPT_STATUSES = ["ok", "critique_failed", "malformed_revision", "depth_exhausted"] as const;
+export const SELF_PROMPT_STATUSES = ["ok", "critique_failed", "malformed_revision", "malformed_draft", "depth_exhausted"] as const;
 
 /** One self-generated prompt, or the critique/execute/check call that used one. Checkpointed on the learner. */
 export const SelfPromptSchema = z.object({
@@ -62,7 +62,7 @@ export const LearnerStateSchema = z.object({
   path: z.array(z.string()),
   edges_taken: z.array(z.string()),
   trace_nodes: z.array(z.string()),
-  self_prompts: z.array(SelfPromptSchema),
+  self_prompts: z.array(SelfPromptSchema).default([]),
   fingerprints: z.array(z.string()),
   hitl_pending: HitlPendingSchema.nullable(),
   hitl_log: z.array(HitlRecordSchema),

@@ -11,10 +11,11 @@ import { selfPromptStop, subgraphVisits } from "../graph/nodes/self_prompt.js";
 import { runWorker } from "../graph/nodes/worker.js";
 import { SessionService } from "../graph/session.js";
 import { loadSpec, loadSpecWithHash } from "../graph/spec/load.js";
-import { initialLearnerState, type LearnerState, type SelfPrompt } from "../graph/state.js";
+import { initialLearnerState, LearnerStateSchema, type LearnerState, type SelfPrompt } from "../graph/state.js";
+import { CostCapExceeded, PRICE_PER_MILLION, type ModelPrice } from "../router/pricing.js";
 import { createRouter, useRouterForTests } from "../router/router.js";
 import { promptField } from "../router/providers/fake.js";
-import type { Provider, ProviderRequest } from "../router/types.js";
+import { RealProviderDisabled, type Provider, type ProviderRequest } from "../router/types.js";
 
 function stageOf(request: ProviderRequest): string {
   return promptField(request.prompt, "stage") ?? "execute";
@@ -207,5 +208,132 @@ describe("self prompting", { concurrency: false }, () => {
       state: LearnerState | null;
     }>;
     assert.ok(cappedHistory.some((row) => JSON.stringify(row.state?.self_prompts) === JSON.stringify(proof.max_depth_run.checkpoint.self_prompts)));
+  });
+
+  test("cap_at_execute_checkpoints_visit_spend_and_resume_does_not_double_count", async () => {
+    const previous = process.env.COST_BUDGET_USD;
+    process.env.COST_BUDGET_USD = "0.01";
+    const prices: Record<string, ModelPrice> = {
+      ...PRICE_PER_MILLION,
+      "primary-tutor": { input_per_million: 10, output_per_million: 0.01 },
+      "fallback-tutor": { input_per_million: 10, output_per_million: 0.01 },
+      "primary-critic": { input_per_million: 10, output_per_million: 0.01 },
+      "fallback-critic": { input_per_million: 10, output_per_million: 0.01 },
+    };
+    const stages: string[] = [];
+    const provider: Provider = {
+      id: "fake",
+      async complete(request) {
+        const stage = promptField(request.prompt, "stage") ?? request.taskType;
+        stages.push(stage);
+        const payload =
+          stage === "draft"
+            ? { prompt: "Teach draft 1" }
+            : stage === "critique"
+              ? { accept: true, critique: "specific enough" }
+              : stage === "revise"
+                ? { prompt: "x".repeat(20_000) }
+                : { note: "ok" };
+        return { text: JSON.stringify(payload), tokens_in: 8, tokens_out: 4, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider, prices }));
+    const dir = mkdtempSync(join(tmpdir(), "ac5-cap-"));
+    const checkpointer = SqliteSaver.fromConnString(join(dir, "checkpoints.sqlite"));
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac5-cap-execute";
+    const initial = initialLearnerState({
+      learner_id: "nia",
+      session_id: sessionId,
+      goal: "keep the cap honest",
+      scenario_id: null,
+      path: ["Plan"],
+      diagnosis: { placed: true, tier: "novice" },
+      plan: { skill: "prompting", rationale: "ready" },
+    });
+    try {
+      await assert.rejects(() => service.run(initial, [], sessionId), CostCapExceeded);
+      const tripped = await service.readSnap(sessionId);
+      const trippedCost = tripped.learner?.cost_usd_session ?? 0;
+      const prompts = tripped.learner?.self_prompts ?? [];
+      assert.ok(prompts.some((row) => row.stage === "draft" && row.status === "ok" && row.prompt.length > 0));
+      assert.ok(prompts.some((row) => row.stage === "critique" && row.status === "ok"));
+      assert.ok(prompts.some((row) => row.stage === "revise" && row.status === "ok" && row.prompt.length > 0));
+      assert.equal(prompts.some((row) => row.stage === "execute"), false);
+      assert.ok(trippedCost > 0);
+      const callsAtTrip = stages.length;
+      await assert.rejects(() => service.resume(sessionId), CostCapExceeded);
+      const resumed = await service.readSnap(sessionId);
+      assert.equal(resumed.learner?.cost_usd_session, trippedCost);
+      assert.equal(stages.length, callsAtTrip);
+      assert.deepEqual(resumed.learner?.self_prompts, prompts);
+      assert.deepEqual(resumed.learner?.mastery, tripped.learner?.mastery);
+    } finally {
+      useRouterForTests(null);
+      service.close();
+      if (previous === undefined) delete process.env.COST_BUDGET_USD;
+      else process.env.COST_BUDGET_USD = previous;
+    }
+  });
+
+  test("malformed_draft_does_not_execute_or_merge", async () => {
+    let executed = 0;
+    await assert.rejects(
+      () =>
+        runNode(
+          "Teach",
+          scripted((stage) => {
+            if (stage === "execute" || stage === "check") {
+              executed += 1;
+              return { mastery: { prompting: 0.99 } };
+            }
+            if (stage === "draft") return { note: "not a prompt" };
+            return { prompt: "unused", accept: true, critique: "unused" };
+          }),
+        ),
+      (error: unknown) => {
+        assert.equal(error instanceof Error ? error.name : "", "MalformedDraft");
+        const prompts = (error as { selfPrompts?: SelfPrompt[] }).selfPrompts ?? [];
+        assert.equal(prompts.some((row) => row.stage === "draft" && row.status === "malformed_draft"), true);
+        assert.equal(prompts.some((row) => row.stage === "execute"), false);
+        return true;
+      },
+    );
+    assert.equal(executed, 0);
+  });
+
+  test("v2_checkpoint_without_self_prompts_parses", () => {
+    const raw = initialLearnerState({ learner_id: "old", session_id: "old", goal: "resume" });
+    const stored = { ...raw } as Partial<LearnerState>;
+    delete stored.self_prompts;
+    const parsed = LearnerStateSchema.parse(stored);
+    assert.deepEqual(parsed.self_prompts, []);
+  });
+
+  test("disabled_provider_and_network_block_are_not_swallowed", async () => {
+    await assert.rejects(
+      () =>
+        runNode(
+          "Practice",
+          scripted((stage) => {
+            if (stage === "critique") throw new RealProviderDisabled();
+            if (stage === "draft") return { prompt: "Practice draft 1" };
+            return { note: "ok" };
+          }),
+        ),
+      /real provider disabled/,
+    );
+    await assert.rejects(
+      () =>
+        runNode(
+          "Practice",
+          scripted((stage) => {
+            if (stage === "critique") throw new Error("network blocked: example.com");
+            if (stage === "draft") return { prompt: "Practice draft 1" };
+            return { note: "ok" };
+          }),
+        ),
+      /network blocked/,
+    );
   });
 });

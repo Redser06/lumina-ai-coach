@@ -13,10 +13,15 @@ const LOOP = new Set<SelfPrompt["stage"]>(["draft", "critique", "revise"]);
 
 export function selfPromptStop(
   rows: SelfPrompt[],
-): "accepted" | "depth_exhausted" | "critique_failed" | "malformed_revision" | "incomplete" {
+): "accepted" | "depth_exhausted" | "critique_failed" | "malformed_revision" | "malformed_draft" | "incomplete" {
   const last = [...rows].reverse().find((row) => LOOP.has(row.stage));
   if (!last) return "incomplete";
-  if (last.status === "critique_failed" || last.status === "malformed_revision" || last.status === "depth_exhausted") {
+  if (
+    last.status === "critique_failed" ||
+    last.status === "malformed_revision" ||
+    last.status === "malformed_draft" ||
+    last.status === "depth_exhausted"
+  ) {
     return last.status;
   }
   if (last.stage === "revise" && last.status === "ok") return "accepted";
@@ -89,20 +94,35 @@ export function subgraphVisits(prompts: SelfPrompt[], maxDepthOf: (node: string)
  * A cycle counts as one depth. The loop stops on accept, a failed critique,
  * a revision that is not a prompt, or when depth reaches max_depth.
  * Execute keeps the last good prompt (revised, otherwise the draft).
+ * A draft that is not a prompt, with no earlier good prompt, fails the visit closed:
+ * no execute call and no learner-state merge.
  */
 export async function runSelfPrompt(node: GraphNodeSpec, learner: LearnerState): Promise<{ learner: LearnerState }> {
   const maxDepth = node.max_depth;
   if (!Number.isInteger(maxDepth) || (maxDepth ?? 0) < 1) throw new Error(`${node.id} missing max_depth`);
   const bound = maxDepth as number;
   const visit = learner.path.filter((entry) => entry === node.id).length;
-  const prompts: SelfPrompt[] = [...learner.self_prompts];
+  const prompts: SelfPrompt[] = [...(learner.self_prompts ?? [])];
   let spent = learner.cost_usd_session;
   let instruction = "";
 
-  const push = (entry: SelfPrompt): void => {
-    if (entry.depth > bound) throw new Error(`${node.id} depth ${entry.depth} exceeded max_depth ${bound}`);
-    prompts.push(entry);
+  const push = (row: SelfPrompt): void => {
+    if (row.depth > bound) throw new Error(`${node.id} depth ${row.depth} exceeded max_depth ${bound}`);
+    prompts.push(row);
   };
+
+  const chargeError = (error: unknown): never => {
+    if (error && typeof error === "object") {
+      const record = error as { sessionSpentUsd?: number; chargedNode?: string; selfPrompts?: SelfPrompt[] };
+      if (typeof record.sessionSpentUsd !== "number") record.sessionSpentUsd = spent;
+      if (!record.chargedNode) record.chargedNode = node.id;
+      record.selfPrompts = prompts;
+    }
+    throw error;
+  };
+
+  const saved = (depth: number, stage: SelfPrompt["stage"]): SelfPrompt | undefined =>
+    prompts.find((row) => row.node === node.id && row.visit === visit && row.depth === depth && row.stage === stage);
 
   const call = async (stage: SelfPrompt["stage"], taskType: string, depth: number, target: string): Promise<ModelCall> => {
     const result = await completeCharged(node.id, {
@@ -120,43 +140,84 @@ export async function runSelfPrompt(node: GraphNodeSpec, learner: LearnerState):
     return result;
   };
 
-  for (let depth = 1; depth <= bound; depth += 1) {
-    const draftCall = await call("draft", node.task_type, depth, instruction);
-    const drafted = readField(draftCall.json, "prompt");
-    if (!drafted) {
-      push(entry(node.id, visit, depth, "draft", "", draftCall.text, "malformed_revision"));
-      break;
-    }
-    push(entry(node.id, visit, depth, "draft", drafted, draftCall.text, "ok"));
-    instruction = drafted;
-
-    let critiqueCall: ModelCall;
+  const callOrCharge = async (
+    stage: SelfPrompt["stage"],
+    taskType: string,
+    depth: number,
+    target: string,
+  ): Promise<ModelCall> => {
     try {
-      critiqueCall = await call("critique", "self-critique", depth, instruction);
+      return await call(stage, taskType, depth, target);
     } catch (error) {
-      if (!stoppable(error)) throw error;
-      spent = spentAfter(error, spent);
-      push(entry(node.id, visit, depth, "critique", "", errorText(error), "critique_failed"));
-      break;
+      chargeError(error);
+      throw error;
     }
-    const accepted = critiqueCall.json.accept === true;
-    push(
-      entry(
-        node.id,
-        visit,
-        depth,
-        "critique",
-        readField(critiqueCall.json, "critique") ?? critiqueCall.text,
-        critiqueCall.text,
-        "ok",
-      ),
-    );
+  };
+
+  for (let depth = 1; depth <= bound; depth += 1) {
+    const priorDraft = saved(depth, "draft");
+    if (priorDraft?.status === "ok" && priorDraft.prompt.length > 0) {
+      instruction = priorDraft.prompt;
+    } else if (priorDraft?.status === "malformed_draft") {
+      break;
+    } else {
+      const draftCall = await callOrCharge("draft", node.task_type, depth, instruction);
+      const drafted = readField(draftCall.json, "prompt");
+      if (!drafted) {
+        push(entry(node.id, visit, depth, "draft", "", draftCall.text, "malformed_draft"));
+        break;
+      }
+      push(entry(node.id, visit, depth, "draft", drafted, draftCall.text, "ok"));
+      instruction = drafted;
+    }
+
+    const priorCritique = saved(depth, "critique");
+    let accepted = false;
+    if (priorCritique?.status === "ok") {
+      accepted = acceptedFrom(priorCritique);
+    } else if (priorCritique?.status === "critique_failed") {
+      break;
+    } else {
+      let critiqueCall: ModelCall;
+      try {
+        critiqueCall = await call("critique", "self-critique", depth, instruction);
+      } catch (error) {
+        if (!stoppable(error)) chargeError(error);
+        spent = spentAfter(error, spent);
+        push(entry(node.id, visit, depth, "critique", "", errorText(error), "critique_failed"));
+        break;
+      }
+      accepted = critiqueCall.json.accept === true;
+      push(
+        entry(
+          node.id,
+          visit,
+          depth,
+          "critique",
+          readField(critiqueCall.json, "critique") ?? critiqueCall.text,
+          critiqueCall.text,
+          "ok",
+        ),
+      );
+    }
+
+    const priorRevise = saved(depth, "revise");
+    if (
+      priorRevise &&
+      (priorRevise.status === "ok" || priorRevise.status === "depth_exhausted") &&
+      priorRevise.prompt.length > 0
+    ) {
+      instruction = priorRevise.prompt;
+      if (accepted || priorRevise.status === "depth_exhausted" || depth === bound) break;
+      continue;
+    }
+    if (priorRevise?.status === "malformed_revision") break;
 
     let reviseCall: ModelCall;
     try {
       reviseCall = await call("revise", node.task_type, depth, instruction);
     } catch (error) {
-      if (!stoppable(error)) throw error;
+      if (!stoppable(error)) chargeError(error);
       spent = spentAfter(error, spent);
       push(entry(node.id, visit, depth, "revise", "", errorText(error), "malformed_revision"));
       break;
@@ -172,11 +233,15 @@ export async function runSelfPrompt(node: GraphNodeSpec, learner: LearnerState):
     if (accepted || depth === bound) break;
   }
 
+  if (!instruction.trim()) {
+    chargeError(Object.assign(new Error("malformed draft"), { name: "MalformedDraft" }));
+  }
+
   const mine = prompts.filter((row) => row.node === node.id && row.visit === visit);
   const depthUsed = mine.reduce((max, row) => Math.max(max, row.depth), 1);
-  const executeCall = await call("execute", node.task_type, depthUsed, instruction);
+  const executeCall = await callOrCharge("execute", node.task_type, depthUsed, instruction);
   push(entry(node.id, visit, depthUsed, "execute", instruction, executeCall.text, "ok"));
-  const checkCall = await call("check", "self-critique", depthUsed, instruction);
+  const checkCall = await callOrCharge("check", "self-critique", depthUsed, instruction);
   push(entry(node.id, visit, depthUsed, "check", instruction, checkCall.text, "ok"));
 
   const patched = withBookkeeping(
@@ -216,10 +281,21 @@ function readField(json: Record<string, unknown>, key: string): string | null {
   return text.length > 0 ? text : null;
 }
 
+function acceptedFrom(row: SelfPrompt): boolean {
+  try {
+    const value = JSON.parse(row.output) as { accept?: unknown };
+    return value.accept === true;
+  } catch {
+    return false;
+  }
+}
+
 function stoppable(error: unknown): boolean {
   if (error instanceof CostCapExceeded || error instanceof PricingRejected) return false;
   const text = errorText(error);
   if (text.includes("recorded fixture missing")) return false;
+  if (text.includes("network blocked")) return false;
+  if (text.includes("RealProviderDisabled") || text.includes("real provider disabled")) return false;
   return true;
 }
 

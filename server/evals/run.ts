@@ -51,6 +51,7 @@ interface NodeFixture {
   expect_decision?: { decision: string; actor: string };
   stages?: Record<string, Record<string, unknown>>;
   fail_stages?: string[];
+  expect_error?: string;
   expect_self_prompt?: {
     stop?: "accepted" | "depth_exhausted" | "critique_failed" | "malformed_revision";
     draft_count?: number;
@@ -172,6 +173,21 @@ async function runNodeFixtures(): Promise<{ pass: number; total: number; failure
         goal: "fixture",
         ...fixture.state,
       });
+      if (fixture.expect_error) {
+        let thrown: unknown;
+        try {
+          await runWorker(fixture.node, { learner: state });
+        } catch (error) {
+          thrown = error;
+        }
+        if (!(thrown instanceof Error) || thrown.name !== fixture.expect_error) {
+          throw new Error(`error ${thrown instanceof Error ? thrown.name : "none"} != ${fixture.expect_error}`);
+        }
+        const prompts = (thrown as { selfPrompts?: SelfPrompt[] }).selfPrompts ?? [];
+        if (!prompts.some((row) => row.status === "malformed_draft")) throw new Error("trace missing malformed_draft");
+        if (prompts.some((row) => row.stage === "execute")) throw new Error("executed a malformed draft");
+        continue;
+      }
       const update =
         fixture.node === "Supervisor"
           ? await supervisorNode({ learner: state })

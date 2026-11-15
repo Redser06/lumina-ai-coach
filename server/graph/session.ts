@@ -8,7 +8,7 @@ import { runContext } from "../runtime/context.js";
 import { logsForSession, stampCheckpoint, type NodeLog } from "../telemetry/node_log.js";
 import { compileCoachGraph, type CompiledCoachGraph } from "./build.js";
 import type { HitlDecision } from "./hitl.js";
-import { applyPatch, LearnerStateSchema, type LearnerState } from "./state.js";
+import { applyPatch, LearnerStateSchema, type LearnerState, type SelfPrompt } from "./state.js";
 
 const STEP_CAP = 80;
 
@@ -270,7 +270,11 @@ export class SessionService {
   private async persistChargedSpend(threadId: string, error: unknown): Promise<void> {
     const spent = sessionSpentUsd(error);
     if (spent === undefined) return;
-    const wrote = await writeSessionCost(this.checkpointer, threadId, spent);
+    const wrote = await writeSessionCost(this.checkpointer, threadId, spent, selfPromptsFrom(error));
+    if (wrote) {
+      const snap = await this.readSnap(threadId);
+      if (snap.learner && snap.checkpoint_id) stampCheckpoint(snap.learner.session_id, snap.checkpoint_id);
+    }
     if (wrote && process.env.CRASH_AFTER_SPEND === "1") {
       process.kill(process.pid, "SIGKILL");
     }
@@ -278,3 +282,9 @@ export class SessionService {
 }
 
 export { applyPatch };
+
+function selfPromptsFrom(error: unknown): SelfPrompt[] | undefined {
+  if (!error || typeof error !== "object") return undefined;
+  const value = (error as { selfPrompts?: unknown }).selfPrompts;
+  return Array.isArray(value) ? (value as SelfPrompt[]) : undefined;
+}
