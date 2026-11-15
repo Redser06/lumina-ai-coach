@@ -99,17 +99,10 @@ export function subgraphVisits(prompts: SelfPrompt[], maxDepthOf: (node: string)
  */
 export async function runSelfPrompt(node: GraphNodeSpec, learner: LearnerState): Promise<{ learner: LearnerState }> {
   const maxDepth = node.max_depth;
-  if (!Number.isInteger(maxDepth) || (maxDepth ?? 0) < 1) throw new Error(`${node.id} missing max_depth`);
-  const bound = maxDepth as number;
   const visit = learner.path.filter((entry) => entry === node.id).length;
   const prompts: SelfPrompt[] = [...(learner.self_prompts ?? [])];
   let spent = learner.cost_usd_session;
   let instruction = "";
-
-  const push = (row: SelfPrompt): void => {
-    if (row.depth > bound) throw new Error(`${node.id} depth ${row.depth} exceeded max_depth ${bound}`);
-    prompts.push(row);
-  };
 
   const chargeError = (error: unknown): never => {
     if (error && typeof error === "object") {
@@ -119,6 +112,16 @@ export async function runSelfPrompt(node: GraphNodeSpec, learner: LearnerState):
       record.selfPrompts = prompts;
     }
     throw error;
+  };
+
+  if (!Number.isInteger(maxDepth) || (maxDepth ?? 0) < 1) {
+    chargeError(new Error(`${node.id} missing max_depth`));
+  }
+  const bound = maxDepth as number;
+
+  const push = (row: SelfPrompt): void => {
+    if (row.depth > bound) chargeError(new Error(`${node.id} depth ${row.depth} exceeded max_depth ${bound}`));
+    prompts.push(row);
   };
 
   const saved = (depth: number, stage: SelfPrompt["stage"]): SelfPrompt | undefined =>
