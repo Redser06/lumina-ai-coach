@@ -255,6 +255,10 @@ const PATHS: string[][] = [
   ["SkillMapEdit"],
   ["SafetyEscalation"],
   ["Other"],
+  ["GradeDispute", "Reflect"],
+  ["SkillMapEdit", "Reflect"],
+  ["Plan", "Reflect"],
+  ["Diagnose", "Reflect"],
 ];
 
 const ASSESSMENTS: LearnerState["last_assessment"][] = [null];

@@ -1,6 +1,7 @@
 import type { ModelCall } from "../../router/types.js";
 import { fingerprintState, type LearnerPatch, type LearnerState } from "../state.js";
 
+/** Learner flags a human or the loop detector owns. Model JSON cannot set these. */
 const MODEL_KEYS = [
   "mastery",
   "last_assessment",
@@ -9,9 +10,6 @@ const MODEL_KEYS = [
   "goal",
   "diagnosis",
   "plan",
-  "disputed",
-  "skill_map_edit",
-  "loop_detected",
   "session_complete",
   "hitl_pending",
 ] as const;

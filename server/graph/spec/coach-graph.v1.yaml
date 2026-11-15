@@ -1,5 +1,5 @@
 spec_id: coach-graph
-version: 4.0.0
+version: 4.1.0
 description: >
   Coaching agent graph. The Supervisor owns every conditional edge.
   Workers and HITL nodes return only to the Supervisor. PlanConfirm is intentionally
@@ -175,6 +175,12 @@ edges:
     condition_id: any.fatigue
     condition_expr: "fatigue >= 0.8 && session_complete == false && path[-1] != 'Reflect'"
     priority: 80
+  - id: e-sup-hitl-repeat
+    from: Supervisor
+    to: End
+    condition_id: any.hitl_repeat
+    condition_expr: "(disputed == true && path[-1] == 'Reflect' && path[-2] == 'GradeDispute') || (skill_map_edit == true && path[-1] == 'Reflect' && path[-2] == 'SkillMapEdit')"
+    priority: 72
   - id: e-sup-dispute
     from: Supervisor
     to: GradeDispute

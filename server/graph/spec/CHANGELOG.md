@@ -2,6 +2,10 @@
 
 Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
 
+## 4.1.0 - 2026-11-15
+
+- Minor. New edge `e-sup-hitl-repeat` (`any.hitl_repeat`, priority 72): a second dispute or skill-map request, once the path is Reflect immediately after that HITL node, ends the session. One visit is the bound. Model output cannot set `disputed`, `skill_map_edit`, or `loop_detected`.
+
 ## 4.0.0 - 2026-11-15
 
 - Major, because `reflect.continue`'s `condition_expr` changed. An unfinished Reflect continues to Plan only when the step is under 40, the learner is placed, and the previous node was not a Plan with an empty skill.

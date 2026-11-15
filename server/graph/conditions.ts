@@ -105,5 +105,8 @@ export const CONDITIONS: Record<string, ConditionFn> = {
     last(state) === "Reflect" &&
     !state.session_complete &&
     (state.step >= SESSION_STEP_BOUND || state.diagnosis?.placed !== true || failedPlan(state)),
+  "any.hitl_repeat": (state) =>
+    (state.disputed && last(state) === "Reflect" && previous(state) === "GradeDispute") ||
+    (state.skill_map_edit && last(state) === "Reflect" && previous(state) === "SkillMapEdit"),
   "reflect.done": (state) => last(state) === "Reflect" && state.session_complete,
 };

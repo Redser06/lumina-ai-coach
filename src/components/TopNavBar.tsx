@@ -16,6 +16,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
 }) => {
   const tabs = [
     { id: 'coach', label: 'Coach' },
+    { id: 'hitl', label: 'Review' },
     { id: 'paths', label: 'Paths' },
     { id: 'news', label: 'News' },
     { id: 'deep_dives', label: 'Deep-Dives' },

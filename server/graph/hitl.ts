@@ -7,6 +7,8 @@ export interface HitlDecision {
   actor: string;
 }
 
+const HITL_ACTORS = new Set(["learner", "curator", "safety-lead"]);
+
 export function assertHitlDecision(value: unknown): HitlDecision {
   if (!value || typeof value !== "object") {
     throw new Error("HITL resume requires {decision, actor}");
@@ -17,6 +19,9 @@ export function assertHitlDecision(value: unknown): HitlDecision {
   }
   if (typeof record.actor !== "string" || record.actor.length === 0) {
     throw new Error("HITL resume requires {decision, actor}");
+  }
+  if (!HITL_ACTORS.has(record.actor)) {
+    throw new Error(`HITL actor is not allowed: ${record.actor}`);
   }
   return { decision: record.decision, actor: record.actor };
 }
@@ -33,7 +38,10 @@ export function makeHitl(nodeId: "GradeDispute" | "SkillMapEdit" | "SafetyEscala
     const learner = LearnerStateSchema.parse({
       ...update.learner,
       hitl_pending: null,
-      hitl_log: [...state.learner.hitl_log, { node: nodeId, decision: decision.decision, actor: decision.actor }],
+      hitl_log: [
+        ...state.learner.hitl_log,
+        { node: nodeId, decision: decision.decision, actor: decision.actor, at: new Date().toISOString() },
+      ],
       disputed: nodeId === "GradeDispute" ? false : update.learner.disputed,
       skill_map_edit: nodeId === "SkillMapEdit" ? false : update.learner.skill_map_edit,
       loop_detected: nodeId === "SafetyEscalation" ? false : update.learner.loop_detected,

@@ -7,7 +7,7 @@ import { sessionSpentUsd } from "../router/router.js";
 import { runContext } from "../runtime/context.js";
 import { logsForSession, stampCheckpoint, type NodeLog } from "../telemetry/node_log.js";
 import { compileCoachGraph, type CompiledCoachGraph } from "./build.js";
-import type { HitlDecision } from "./hitl.js";
+import { assertHitlDecision, type HitlDecision } from "./hitl.js";
 import { applyPatch, LearnerStateSchema, type LearnerState, type SelfPrompt } from "./state.js";
 
 const STEP_CAP = 80;
@@ -135,6 +135,7 @@ export class SessionService {
   }
 
   async hitl(threadId: string, decision: HitlDecision): Promise<RunResult> {
+    assertHitlDecision(decision);
     const before = await this.readSnap(threadId);
     if (!before.learner) throw new Error(`session not found: ${threadId}`);
     if (before.interrupts.length === 0) throw new Error("session is not waiting on a human decision");

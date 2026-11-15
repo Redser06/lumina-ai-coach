@@ -42,11 +42,12 @@ export function createApp(options: AppOptions = {}): Hono {
   });
 
   app.post("/sessions", async (c) => {
-    const body = (await c.req.json()) as { scenario_id?: string; session_id?: string };
+    const body = (await c.req.json()) as { scenario_id?: string; session_id?: string; hold?: boolean };
     if (!body.scenario_id) return c.json({ error: "scenario_id is required" }, 400);
     const scenario = loadScenario(body.scenario_id);
     const sessionId = body.session_id ?? randomUUID();
-    const result = await service.run(stateFromScenario(scenario, sessionId), scenario.hitl ?? [], sessionId);
+    const decisions = body.hold ? [] : (scenario.hitl ?? []);
+    const result = await service.run(stateFromScenario(scenario, sessionId), decisions, sessionId);
     return c.json(result);
   });
 

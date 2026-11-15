@@ -29,6 +29,7 @@ export const HitlRecordSchema = z.object({
   node: z.string(),
   decision: z.string(),
   actor: z.string(),
+  at: z.string().min(1),
 });
 
 export const SELF_PROMPT_STAGES = ["draft", "critique", "revise", "execute", "check"] as const;

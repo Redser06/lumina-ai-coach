@@ -1,0 +1,19 @@
+{
+  "id": "SCN-0017",
+  "persona": "P2",
+  "title": "A second dispute ends the session",
+  "learner_id": "pat",
+  "goal": "Stop repeating a grade dispute",
+  "initial": {
+    "path": ["GradeDispute", "Reflect"],
+    "disputed": true,
+    "fingerprints": ["dispute", "reflect"],
+    "step": 10,
+    "diagnosis": { "placed": true, "tier": "practitioner" },
+    "plan": { "skill": "evals", "rationale": "review" }
+  },
+  "hitl": [],
+  "script": {},
+  "expected_path": ["GradeDispute", "Reflect"],
+  "expected_edges": ["e-start", "e-sup-hitl-repeat"]
+}
