@@ -316,6 +316,15 @@ export function conditionBoundaries(): LearnerState[] {
       }
     }
   }
+  for (const decision of ["accept", "reject"]) {
+    for (const node of ["GradeDispute", "SkillMapEdit", "SafetyEscalation"]) {
+      states.push({
+        ...base,
+        path: [node],
+        hitl_log: [{ node, decision, actor: "curator", at: "2026-11-15T00:00:00.000Z" }],
+      });
+    }
+  }
   states.push({ ...base, session_id: "" });
   states.push({ ...base, session_id: "session" });
   boundaryStates = states;

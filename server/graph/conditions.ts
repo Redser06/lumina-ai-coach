@@ -64,6 +64,11 @@ export const CONDITIONS: Record<string, ConditionFn> = {
   "any.fatigue": (state) =>
     state.fatigue >= FATIGUE_THRESHOLD && !state.session_complete && last(state) !== "Reflect",
   "assess.disputed": (state) => state.disputed && last(state) !== "GradeDispute",
+  "hitl.rejected": (state) => {
+    const tail = last(state);
+    const onHitl = tail === "GradeDispute" || tail === "SkillMapEdit" || tail === "SafetyEscalation";
+    return onHitl && state.hitl_log.at(-1)?.decision === "reject";
+  },
   "any.skill_map_edit": (state) => state.skill_map_edit && last(state) !== "SkillMapEdit",
   "assess.misconception": (state) =>
     last(state) === "Assess" &&

@@ -2,9 +2,9 @@
   "ac": "AC-5",
   "criterion": "Self-prompting subgraphs: Teach/Practice/Remediate generate, critique and revise their own prompts within a declared max depth; the trace shows every self-generated prompt and the depth is never exceeded",
   "spec": {
-    "fixture_id": "GRAPH-SPEC-coach-graph@4.1.0",
-    "version": "4.1.0",
-    "sha256": "aa5d18286b7ba94ae134a1d6ac7cf59f8ff090a358e0f01cd91719566c10111a",
+    "fixture_id": "GRAPH-SPEC-coach-graph@4.2.0",
+    "version": "4.2.0",
+    "sha256": "9c48c051f3626e67bd0dc09829a9615839b4f5000212e61cf9c3a22da911f502",
     "max_depth": {
       "Teach": 2,
       "Practice": 3,

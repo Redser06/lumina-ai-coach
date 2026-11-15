@@ -24,7 +24,7 @@ describe("hitl", { concurrency: false }, () => {
 
     await assert.rejects(() => service.resume(sessionId), /human decision/);
 
-    const done = await service.hitl(sessionId, { decision: "accept", actor: "curator" });
+    const done = await service.hitl(sessionId, { decision: "accept", actor: "curator", node: "GradeDispute" });
     assert.equal(done.status, "done");
     assert.deepEqual(done.state.path, scenario.expected_path);
     assert.equal(done.state.hitl_log.at(-1)?.decision, "accept");

@@ -4,10 +4,12 @@ const API = "/api";
 const SESSION_ID = `ac6-panel-${Math.random().toString(36).slice(2, 8)}`;
 
 const PERMITTED_ACTORS: Record<string, readonly string[]> = {
-  GradeDispute: ["curator"],
+  GradeDispute: ["curator", "grader"],
   SkillMapEdit: ["curator"],
   SafetyEscalation: ["safety-lead"],
 };
+
+const DECISIONS = ["accept", "reject"] as const;
 
 function actorsFor(node: string | undefined): readonly string[] {
   return (node && PERMITTED_ACTORS[node]) || [];
@@ -86,10 +88,11 @@ export const HitlPausePanel: React.FC = () => {
     setBusy(true);
     setError(null);
     try {
+      const node = paused.next[0];
       const response = await fetch(`${API}/sessions/${paused.session_id}/hitl`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ decision, actor }),
+        body: JSON.stringify({ decision, actor, node }),
       });
       const body = (await response.json()) as PausedSession & { error?: string };
       if (!response.ok) throw new Error(body.error ?? `decision rejected (${response.status})`);
@@ -164,13 +167,19 @@ export const HitlPausePanel: React.FC = () => {
           <label className="mt-3 block text-xs font-bold uppercase tracking-wider text-on-surface-variant" htmlFor="hitl-decision">
             Decision
           </label>
-          <input
+          <select
             id="hitl-decision"
             className="mt-1 w-full rounded-xl border border-outline-variant/40 bg-surface px-3 py-2 text-sm text-on-surface"
             value={decision}
             onChange={(event) => setDecision(event.target.value)}
             disabled={Boolean(entry)}
-          />
+          >
+            {DECISIONS.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
           <button
             type="submit"
             className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-on-primary disabled:opacity-50"

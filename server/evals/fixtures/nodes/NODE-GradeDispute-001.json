@@ -4,6 +4,7 @@
   "kind": "hitl",
   "expect_decision": {
     "decision": "accept",
-    "actor": "curator"
+    "actor": "curator",
+    "node": "GradeDispute"
   }
 }

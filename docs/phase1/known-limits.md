@@ -1,5 +1,11 @@
 # Phase 1 known limits
 
-In Phase 1 the HITL actor is self-asserted in the request body and is not authenticated. AC-11 will add authentication.
+In Phase 1 the HITL actor is a self-asserted role string in the request body. `POST /sessions/:id/hitl` does not authenticate the caller. AC-11 will add authentication.
 
-The per-node actors are still checked. A learner cannot decide their own grade dispute. GradeDispute and SkillMapEdit accept a curator. SafetyEscalation accepts a safety lead. The check is the actor string on the decision, not a signed-in user.
+Until then the role is checked against the paused node's allowlist, which is not a login check:
+
+- GradeDispute: `curator` or `grader`
+- SkillMapEdit: `curator`
+- SafetyEscalation: `safety-lead`
+
+A role that is not on that list is rejected. The decision itself is `accept` or `reject`, and the body must name the paused node.

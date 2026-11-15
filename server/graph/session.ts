@@ -135,13 +135,13 @@ export class SessionService {
     });
   }
 
-  async hitl(threadId: string, decision: HitlDecision): Promise<RunResult> {
+  async hitl(threadId: string, decision: unknown): Promise<RunResult> {
     const before = await this.readSnap(threadId);
     if (!before.learner) throw new Error(`session not found: ${threadId}`);
     if (before.interrupts.length === 0) throw new Error("session is not waiting on a human decision");
-    assertHitlDecision(decision, before.next[0] ?? "");
+    const checked = assertHitlDecision(decision, before.next[0] ?? "");
     return runContext.run({ runId: randomUUID() }, () =>
-      this.continueUntil(threadId, [decision], null, before.learner!.session_id),
+      this.continueUntil(threadId, [checked], null, before.learner!.session_id),
     );
   }
 

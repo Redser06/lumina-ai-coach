@@ -16,7 +16,8 @@
   "hitl": [
     {
       "decision": "accept",
-      "actor": "curator"
+      "actor": "curator",
+      "node": "GradeDispute"
     }
   ],
   "script": {

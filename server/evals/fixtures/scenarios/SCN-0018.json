@@ -1,0 +1,32 @@
+{
+  "id": "SCN-0018",
+  "persona": "P2",
+  "title": "A rejected grade dispute keeps the grade",
+  "learner_id": "pat",
+  "goal": "Keep the original lab grade",
+  "initial": {
+    "path": ["Assess"],
+    "disputed": true,
+    "fingerprints": ["assess-once"],
+    "step": 6,
+    "diagnosis": { "placed": true, "tier": "practitioner" },
+    "plan": { "skill": "evals", "rationale": "Grade the lab" },
+    "last_assessment": { "score": 0.48, "error_class": "misconception", "confidence": 0.4 }
+  },
+  "hitl": [
+    {
+      "decision": "reject",
+      "actor": "grader",
+      "node": "GradeDispute"
+    }
+  ],
+  "script": {
+    "GradeDispute": [
+      {
+        "note": "keep the grade"
+      }
+    ]
+  },
+  "expected_path": ["Assess", "GradeDispute"],
+  "expected_edges": ["e-start", "e-sup-dispute", "e-ret-dispute", "e-sup-hitl-reject"]
+}

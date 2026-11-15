@@ -48,7 +48,7 @@ interface NodeFixture {
   expect_edge?: string;
   expect_path_tail?: string;
   expect?: Record<string, unknown>;
-  expect_decision?: { decision: string; actor: string };
+  expect_decision?: { decision: string; actor: string; node: string };
   stages?: Record<string, Record<string, unknown>>;
   fail_stages?: string[];
   expect_error?: string;

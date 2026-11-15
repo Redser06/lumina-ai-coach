@@ -125,7 +125,7 @@ describe("ac6 hitl", { concurrency: false }, () => {
       });
       const paused = await service.run(initial, [], sessionId);
       assert.equal(paused.status, "interrupted");
-      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator" });
+      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator", node: "GradeDispute" });
       assert.equal(done.status, "done");
       const entry = done.state.hitl_log.at(-1);
       assert.equal(entry?.node, "GradeDispute");
@@ -144,7 +144,7 @@ describe("ac6 hitl", { concurrency: false }, () => {
     }
   });
 
-  test("missing_malformed_and_unauthorised_decisions_stay_paused", async () => {
+  test("actor_role_is_checked_against_the_node_allowlist", async () => {
     const checkpointer = new MemorySaver();
     const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
     const sessionId = "ac6-reject";
@@ -158,8 +158,11 @@ describe("ac6 hitl", { concurrency: false }, () => {
       const paused = await service.run(initial, [], sessionId);
       assert.equal(paused.status, "interrupted");
       await assert.rejects(() => service.resume(sessionId, []), /human decision/);
-      await assert.rejects(() => service.hitl(sessionId, { decision: "", actor: "learner" }), /decision, actor/);
-      await assert.rejects(() => service.hitl(sessionId, { decision: "accept", actor: "stranger" }), /not allowed for GradeDispute/);
+      await assert.rejects(() => service.hitl(sessionId, { decision: "", actor: "learner", node: "GradeDispute" }), /decision, actor/);
+      await assert.rejects(
+        () => service.hitl(sessionId, { decision: "accept", actor: "stranger", node: "GradeDispute" }),
+        /not allowed for GradeDispute/,
+      );
       assert.throws(() => assertHitlDecision({ decision: "accept" }, "GradeDispute"), /decision, actor/);
       const still = await service.step(sessionId);
       assert.equal(still.status, "interrupted");
@@ -182,7 +185,10 @@ describe("ac6 hitl", { concurrency: false }, () => {
       );
       assert.equal(paused.status, "interrupted");
       assert.equal(paused.next[0], "GradeDispute");
-      await assert.rejects(() => service.hitl(sessionId, { decision: "accept", actor: "learner" }), /not allowed for GradeDispute/);
+      await assert.rejects(
+        () => service.hitl(sessionId, { decision: "accept", actor: "learner", node: "GradeDispute" }),
+        /not allowed for GradeDispute/,
+      );
       const still = await service.step(sessionId);
       assert.equal(still.status, "interrupted");
       assert.equal(still.state.hitl_log.length, 0);
@@ -223,13 +229,13 @@ describe("ac6 hitl", { concurrency: false }, () => {
         );
         assert.equal(paused.next[0], item.node);
         await assert.rejects(
-          () => service.hitl(sessionId, { decision: "accept", actor: item.wrong }),
+          () => service.hitl(sessionId, { decision: "accept", actor: item.wrong, node: item.node }),
           new RegExp(`not allowed for ${item.node}`),
         );
         const still = await service.step(sessionId);
         assert.equal(still.status, "interrupted");
         assert.equal(still.state.hitl_log.length, 0);
-        const done = await service.hitl(sessionId, { decision: "accept", actor: item.right });
+        const done = await service.hitl(sessionId, { decision: "accept", actor: item.right, node: item.node });
         assert.equal(done.state.hitl_log.at(-1)?.actor, item.right);
         assert.equal(done.state.hitl_log.at(-1)?.node, item.node);
         assert.equal(done.state.path.includes(item.node), true);
@@ -267,7 +273,7 @@ describe("ac6 hitl", { concurrency: false }, () => {
       });
       const paused = await service.run(initial, [], sessionId);
       assert.equal(paused.status, "interrupted");
-      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator" });
+      const done = await service.hitl(sessionId, { decision: "accept", actor: "curator", node: "GradeDispute" });
       assert.equal(done.status, "done");
       assert.equal(done.state.path.filter((node) => node === "GradeDispute").length, DISPUTE_VISIT_BOUND);
       assert.ok(done.state.step <= 43);

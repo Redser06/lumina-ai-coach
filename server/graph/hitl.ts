@@ -2,35 +2,50 @@ import { interrupt } from "@langchain/langgraph";
 import { LearnerStateSchema, type LearnerState } from "./state.js";
 import { runWorker, type GraphUpdate } from "./nodes/worker.js";
 
+/** The PRD names who may speak, not the words. accept sets a disputed grade aside. reject keeps it. */
+export const HITL_DECISIONS = ["accept", "reject"] as const;
+export type HitlDecisionValue = (typeof HITL_DECISIONS)[number];
+
 export interface HitlDecision {
-  decision: string;
+  decision: HitlDecisionValue;
   actor: string;
+  node: string;
 }
 
-/** Who may decide a paused node. PRD r2 §5 names the humans; the map assigns the declared nodes. */
-export const HITL_ACTORS_BY_NODE: Record<string, string> = {
-  GradeDispute: "curator",
-  SkillMapEdit: "curator",
-  SafetyEscalation: "safety-lead",
+/** PRD r2 §5: a curator, a grader, or the learner confirming a plan. The learner does not decide a grade. */
+export const HITL_ACTORS_BY_NODE: Record<string, readonly string[]> = {
+  GradeDispute: ["curator", "grader"],
+  SkillMapEdit: ["curator"],
+  SafetyEscalation: ["safety-lead"],
 };
 
 export function parseHitlDecision(value: unknown): HitlDecision {
   if (!value || typeof value !== "object") {
-    throw new Error("HITL resume requires {decision, actor}");
+    throw new Error("HITL resume requires {decision, actor, node}");
   }
-  const record = value as { decision?: unknown; actor?: unknown };
+  const record = value as { decision?: unknown; actor?: unknown; node?: unknown };
   if (typeof record.decision !== "string" || record.decision.length === 0) {
-    throw new Error("HITL resume requires {decision, actor}");
+    throw new Error("HITL resume requires {decision, actor, node}");
   }
   if (typeof record.actor !== "string" || record.actor.length === 0) {
-    throw new Error("HITL resume requires {decision, actor}");
+    throw new Error("HITL resume requires {decision, actor, node}");
   }
-  return { decision: record.decision, actor: record.actor };
+  if (typeof record.node !== "string" || record.node.length === 0) {
+    throw new Error("HITL resume requires {decision, actor, node}");
+  }
+  if (!HITL_DECISIONS.includes(record.decision as HitlDecisionValue)) {
+    throw new Error("HITL decision must be accept or reject");
+  }
+  return { decision: record.decision as HitlDecisionValue, actor: record.actor, node: record.node };
 }
 
 export function assertHitlDecision(value: unknown, nodeId: string): HitlDecision {
   const decision = parseHitlDecision(value);
-  if (HITL_ACTORS_BY_NODE[nodeId] !== decision.actor) {
+  if (decision.node !== nodeId) {
+    throw new Error(`HITL decision node does not match the paused node: ${decision.node}`);
+  }
+  const allowed = HITL_ACTORS_BY_NODE[nodeId] ?? [];
+  if (!allowed.includes(decision.actor)) {
     throw new Error(`HITL actor is not allowed for ${nodeId}: ${decision.actor}`);
   }
   return decision;
@@ -44,6 +59,7 @@ export function makeHitl(nodeId: "GradeDispute" | "SkillMapEdit" | "SafetyEscala
       reason: nodeId,
     });
     const decision = assertHitlDecision(raw, nodeId);
+    const originalGrade = state.learner.last_assessment;
     const update = await runWorker(nodeId, state);
     const learner = LearnerStateSchema.parse({
       ...update.learner,
@@ -52,6 +68,8 @@ export function makeHitl(nodeId: "GradeDispute" | "SkillMapEdit" | "SafetyEscala
         ...state.learner.hitl_log,
         { node: nodeId, decision: decision.decision, actor: decision.actor, at: new Date().toISOString() },
       ],
+      last_assessment:
+        nodeId === "GradeDispute" ? (decision.decision === "reject" ? originalGrade : null) : update.learner.last_assessment,
       disputed: nodeId === "GradeDispute" ? false : update.learner.disputed,
       skill_map_edit: nodeId === "SkillMapEdit" ? false : update.learner.skill_map_edit,
       loop_detected: nodeId === "SafetyEscalation" ? false : update.learner.loop_detected,

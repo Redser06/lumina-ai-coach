@@ -2,9 +2,13 @@
 
 Spec id: `coach-graph`. Semver: adding or removing an edge is a minor bump. A change to condition semantics (`condition_expr` or the pure function it names) is a major bump. A spec-field change that does not touch edges or conditions is a patch.
 
+## 4.2.0 - 2026-11-15
+
+- Minor. New edge `e-sup-hitl-reject` (`hitl.rejected`, priority 17). A human `reject` on GradeDispute, SkillMapEdit, or SafetyEscalation ends the session. `accept` still uses the existing return-to-Reflect edges. On GradeDispute, `reject` keeps `last_assessment` and `accept` sets it aside. No existing `condition_expr` changed.
+
 ## 4.1.0 - 2026-11-15
 
-- Minor. New edge `e-sup-hitl-repeat` (`any.hitl_repeat`, priority 72): a second dispute or skill-map request, once the path is Reflect immediately after that HITL node, ends the session. One visit is the bound. Model output cannot set `disputed`, `skill_map_edit`, or `loop_detected`.
+- Minor. New edge `e-sup-hitl-repeat` (`any.hitl_repeat`, priority 72) is a backstop for seeded or forked state: a second dispute or skill-map request, once the path is Reflect immediately after that HITL node, ends the session. The live Reflect ↔ GradeDispute cycle is closed because model output cannot set `disputed`, `skill_map_edit`, or `loop_detected`. The edge is not what closes that cycle.
 
 ## 4.0.0 - 2026-11-15
 
