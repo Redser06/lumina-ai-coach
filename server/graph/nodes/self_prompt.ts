@@ -239,27 +239,63 @@ export async function runSelfPrompt(node: GraphNodeSpec, learner: LearnerState):
 
   const mine = prompts.filter((row) => row.node === node.id && row.visit === visit);
   const depthUsed = mine.reduce((max, row) => Math.max(max, row.depth), 1);
-  const executeCall = await callOrCharge("execute", node.task_type, depthUsed, instruction);
-  push(entry(node.id, visit, depthUsed, "execute", instruction, executeCall.text, "ok"));
-  const checkCall = await callOrCharge("check", "self-critique", depthUsed, instruction);
-  push(entry(node.id, visit, depthUsed, "check", instruction, checkCall.text, "ok"));
+  const priorExecute = saved(depthUsed, "execute");
+  const priorCheck = saved(depthUsed, "check");
+  let executeCall: ModelCall;
+  let checkCall: ModelCall;
+  if (priorExecute?.status === "ok" && priorCheck?.status === "ok") {
+    executeCall = replayedCall(priorExecute.output, spent);
+    checkCall = replayedCall(priorCheck.output, spent);
+  } else {
+    executeCall = await callOrCharge("execute", node.task_type, depthUsed, instruction);
+    push(entry(node.id, visit, depthUsed, "execute", instruction, executeCall.text, "ok"));
+    checkCall = await callOrCharge("check", "self-critique", depthUsed, instruction);
+    push(entry(node.id, visit, depthUsed, "check", instruction, checkCall.text, "ok"));
+  }
 
-  const patched = withBookkeeping(
-    { ...learner, self_prompts: prompts },
-    node.id,
-    checkCall,
-    mergeModelOutput(executeCall.json),
-  );
-  const edge = selectEdge(node.id, patched);
-  const finished = LearnerStateSchema.parse({
-    ...patched,
-    self_prompts: prompts,
-    last_edge: edge.id,
-    last_condition: edge.condition_id,
-    edges_taken: [...learner.edges_taken, edge.id],
-  });
-  attachEdge(learner.session_id, node.id, edge.id, edge.condition_id);
-  return { learner: finished };
+  try {
+    const patched = withBookkeeping(
+      { ...learner, self_prompts: prompts },
+      node.id,
+      checkCall,
+      mergeModelOutput(executeCall.json),
+    );
+    const edge = selectEdge(node.id, patched);
+    const finished = LearnerStateSchema.parse({
+      ...patched,
+      self_prompts: prompts,
+      last_edge: edge.id,
+      last_condition: edge.condition_id,
+      edges_taken: [...learner.edges_taken, edge.id],
+    });
+    attachEdge(learner.session_id, node.id, edge.id, edge.condition_id);
+    return { learner: finished };
+  } catch (error) {
+    chargeError(error);
+    throw error;
+  }
+}
+
+function replayedCall(text: string, spent: number): ModelCall {
+  let json: Record<string, unknown> = {};
+  try {
+    const value = JSON.parse(text) as unknown;
+    if (value && typeof value === "object" && !Array.isArray(value)) json = value as Record<string, unknown>;
+  } catch {
+    json = {};
+  }
+  return {
+    provider: "checkpoint",
+    model: "checkpoint",
+    fallback_from: null,
+    text,
+    json,
+    tokens_in: 0,
+    tokens_out: 0,
+    cost_usd: 0,
+    session_spent_usd: spent,
+    latency_ms: 0,
+  };
 }
 
 function entry(

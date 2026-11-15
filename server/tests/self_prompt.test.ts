@@ -310,6 +310,62 @@ describe("self prompting", { concurrency: false }, () => {
     assert.deepEqual(parsed.self_prompts, []);
   });
 
+  test("schema_failure_after_check_checkpoints_visit_spend", async () => {
+    const stages: string[] = [];
+    const provider: Provider = {
+      id: "fake",
+      async complete(request) {
+        const stage = promptField(request.prompt, "stage") ?? request.taskType;
+        stages.push(stage);
+        const payload =
+          stage === "draft"
+            ? { prompt: "Teach draft 1" }
+            : stage === "critique"
+              ? { accept: true, critique: "specific enough" }
+              : stage === "revise"
+                ? { prompt: "Teach revised 1" }
+                : stage === "execute"
+                  ? { mastery: { prompting: 1.5 } }
+                  : { pass: true };
+        return { text: JSON.stringify(payload), tokens_in: 8, tokens_out: 4, latency_ms: 1 };
+      },
+    };
+    useRouterForTests(createRouter({ provider }));
+    const dir = mkdtempSync(join(tmpdir(), "ac5-schema-"));
+    const checkpointer = SqliteSaver.fromConnString(join(dir, "checkpoints.sqlite"));
+    const service = new SessionService(compileCoachGraph({ checkpointer }), checkpointer);
+    const sessionId = "ac5-schema-execute";
+    const initial = initialLearnerState({
+      learner_id: "nia",
+      session_id: sessionId,
+      goal: "keep a bad mastery out",
+      scenario_id: null,
+      path: ["Plan"],
+      diagnosis: { placed: true, tier: "novice" },
+      plan: { skill: "prompting", rationale: "ready" },
+    });
+    try {
+      await assert.rejects(() => service.run(initial, [], sessionId));
+      const tripped = await service.readSnap(sessionId);
+      const trippedCost = tripped.learner?.cost_usd_session ?? 0;
+      const prompts = tripped.learner?.self_prompts ?? [];
+      assert.ok(prompts.some((row) => row.stage === "execute" && row.status === "ok"));
+      assert.ok(prompts.some((row) => row.stage === "check" && row.status === "ok"));
+      assert.ok(trippedCost > 0);
+      assert.deepEqual(tripped.learner?.mastery, {});
+      const callsAtTrip = stages.length;
+      await assert.rejects(() => service.resume(sessionId));
+      const resumed = await service.readSnap(sessionId);
+      assert.equal(resumed.learner?.cost_usd_session, trippedCost);
+      assert.equal(stages.length, callsAtTrip);
+      assert.deepEqual(resumed.learner?.self_prompts, prompts);
+      assert.deepEqual(resumed.learner?.mastery, {});
+    } finally {
+      useRouterForTests(null);
+      service.close();
+    }
+  });
+
   test("disabled_provider_and_network_block_are_not_swallowed", async () => {
     await assert.rejects(
       () =>
