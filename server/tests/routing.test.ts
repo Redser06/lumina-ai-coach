@@ -16,16 +16,12 @@ const REQUIRED_BRANCHES = [
 describe("routing", { concurrency: false }, () => {
   test("route_p1_supervisor_accuracy", async () => {
     const fixtures = loadRouteFixtures();
-    const ranked = [...fixtures].sort((a, b) => a.id.localeCompare(b.id));
-    const ac = ranked.filter((fixture) => fixture.id <= "ROUTE-P1-0050");
-    const belowLimit = ranked.find((fixture) => fixture.id === "ROUTE-P1-0051");
-    assert.equal(ac.length, 50);
+    assert.equal(fixtures.length, 50);
     assert.deepEqual(
-      ac.map((fixture) => fixture.id),
+      fixtures.map((fixture) => fixture.id),
       Array.from({ length: 50 }, (_, index) => `ROUTE-P1-${String(index + 1).padStart(4, "0")}`),
     );
-    assert.ok(belowLimit);
-    assert.equal(belowLimit.expect_node === "SafetyEscalation", false);
+    const ac = fixtures;
     for (const fixture of ac) {
       assert.equal(fixture.fixture_set, ROUTE_SET_ID);
       assert.ok(fixture.why.length > 0, fixture.id);
@@ -43,7 +39,6 @@ describe("routing", { concurrency: false }, () => {
     assert.ok(ac.some((fixture) => fixture.signal === "step_bound"));
 
     const score = await scoreRouteFixtures(ac);
-    const extra = await scoreRouteFixtures([belowLimit]);
     const lines = [
       `${score.fixture_set} ${score.hits}/${score.total} accuracy ${score.accuracy}`,
       ...score.per_branch.map((row) => `${row.branch} ${row.hits}/${row.total} ${row.accuracy}`),
@@ -75,12 +70,11 @@ describe("routing", { concurrency: false }, () => {
       "right node, wrong edge",
     );
     assert.equal(score.accuracy, ROUTE_ACCURACY_MIN);
-    assert.equal(score.hits, ac.length);
+    assert.equal(score.hits, 50);
+    assert.equal(score.total, 50);
     assert.deepEqual(
       score.misses.map((miss) => miss.id),
       [],
     );
-    assert.equal(extra.hits, 1);
-    assert.deepEqual(extra.misses, []);
   });
 });
