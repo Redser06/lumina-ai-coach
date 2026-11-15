@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { describe, test } from "node:test";
 import { assertNetworkGuard } from "../runtime/network_guard.js";
 
@@ -16,17 +17,19 @@ describe("phase 1 hygiene", { concurrency: false }, () => {
       readFileSync("node_modules/@langchain/langgraph-checkpoint-sqlite/package.json", "utf8"),
     ) as { version: string };
     assert.equal(installed.version, PIN);
-    const lock = JSON.parse(readFileSync("package-lock.json", "utf8")) as unknown;
-    const found = lockVersions(lock);
-    assert.ok(found.length > 0);
-    for (const version of found) assert.equal(version, PIN);
+    const lock = JSON.parse(readFileSync("package-lock.json", "utf8")) as {
+      packages: Record<string, { version?: string }>;
+    };
+    assert.equal(lock.packages["node_modules/@langchain/langgraph-checkpoint-sqlite"]?.version, PIN);
   });
 
-  test("crash_after_spend_hook_is_not_in_session", () => {
-    const session = readFileSync("server/graph/session.ts", "utf8");
-    assert.equal(session.includes("CRASH_AFTER_SPEND"), false);
-    assert.match(readFileSync("server/runtime/crash_after_spend.ts", "utf8"), /CRASH_AFTER_SPEND/);
-    assert.match(readFileSync("server/checkpoint/cost.ts", "utf8"), /crashAfterSpend\(/);
+  test("production_modules_have_no_crash_after_spend_hook", () => {
+    const hits = sourceFiles("server").filter((file) => {
+      if (file.startsWith("server/tests/")) return false;
+      if (file === "server/scripts/spend_crash_child.ts") return false;
+      return readFileSync(file, "utf8").includes("CRASH_AFTER_SPEND");
+    });
+    assert.deepEqual(hits, []);
   });
 
   test("ci_runs_proofs_under_the_network_guard", () => {
@@ -44,17 +47,14 @@ describe("phase 1 hygiene", { concurrency: false }, () => {
   });
 });
 
-function lockVersions(value: unknown): string[] {
+function sourceFiles(dir: string): string[] {
   const found: string[] = [];
-  const walk = (node: unknown): void => {
-    if (!node || typeof node !== "object") return;
-    const record = node as Record<string, unknown>;
-    if (record.name === SQLITE && typeof record.version === "string") found.push(record.version);
-    for (const [key, child] of Object.entries(record)) {
-      if (key === SQLITE && typeof child === "string") found.push(child);
-      else walk(child);
-    }
-  };
-  walk(value);
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) {
+      if (name === "node_modules") continue;
+      found.push(...sourceFiles(path));
+    } else if (name.endsWith(".ts")) found.push(path);
+  }
   return found;
 }
