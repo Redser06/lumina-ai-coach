@@ -1,0 +1,31 @@
+{
+  "id": "SCN-0015",
+  "persona": "P2",
+  "title": "Placed practitioner with an empty plan skill is ready",
+  "learner_id": "pat",
+  "goal": "Replace an empty plan",
+  "initial": {
+    "path": [],
+    "diagnosis": { "placed": true, "tier": "practitioner" },
+    "plan": { "skill": "", "rationale": "" },
+    "fatigue": 0.15,
+    "step": 0
+  },
+  "hitl": [],
+  "script": {
+    "Plan": [
+      {
+        "plan": { "skill": "evals", "rationale": "first real skill" },
+        "fatigue": 0.9
+      }
+    ],
+    "Reflect": [
+      {
+        "session_complete": true,
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": ["Plan", "Reflect"],
+  "expected_edges": ["e-start", "e-sup-ready", "e-ret-plan", "e-sup-fatigue", "e-ret-reflect", "e-sup-end"]
+}
