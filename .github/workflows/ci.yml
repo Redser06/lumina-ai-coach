@@ -37,9 +37,9 @@ jobs:
       - name: E4 crash resume replay fork
         run: |
           CHECKPOINTER=sqlite LLM_PROVIDER=recorded npx tsx server/scripts/crash_drill.ts --scenario SCN-0001 --kill-after Practice
-          npx tsx server/scripts/proofs.ts --out proofs/phase0
+          node --import tsx --import ./server/runtime/network_guard.ts server/scripts/proofs.ts --out proofs/phase0
       - name: E5 router proof
-        run: FAKE_FAIL=primary-tutor LLM_PROVIDER=fake npx tsx server/scripts/proofs.ts --only router --out proofs/phase0
+        run: FAKE_FAIL=primary-tutor LLM_PROVIDER=fake node --import tsx --import ./server/runtime/network_guard.ts server/scripts/proofs.ts --only router --out proofs/phase0
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,5 +1,15 @@
 import { Socket } from "node:net";
 
+const GUARD = Symbol.for("lumina.networkGuard");
+
+export function networkGuardInstalled(): boolean {
+  return (globalThis as typeof globalThis & { [GUARD]?: boolean })[GUARD] === true;
+}
+
+export function assertNetworkGuard(): void {
+  if (!networkGuardInstalled()) throw new Error("network guard is not installed");
+}
+
 function isLoopback(host: string): boolean {
   const bare = host.trim().toLowerCase().replace(/^\[|\]$/g, "");
   return bare === "localhost" || bare === "127.0.0.1" || bare === "::1" || bare === "::ffff:127.0.0.1" || bare === "";
@@ -26,6 +36,7 @@ function hostFrom(args: unknown[]): string {
  * Set NO_NETWORK=0 only for a script that must call a non-loopback host.
  */
 if (process.env.NO_NETWORK !== "0") {
+  (globalThis as typeof globalThis & { [GUARD]?: boolean })[GUARD] = true;
   const original = Socket.prototype.connect;
   Socket.prototype.connect = function connect(this: Socket, ...args: unknown[]) {
     const host = hostFrom(args);

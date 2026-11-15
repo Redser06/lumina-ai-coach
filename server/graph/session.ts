@@ -270,10 +270,7 @@ export class SessionService {
   private async persistChargedSpend(threadId: string, error: unknown): Promise<void> {
     const spent = sessionSpentUsd(error);
     if (spent === undefined) return;
-    const wrote = await writeSessionCost(this.checkpointer, threadId, spent);
-    if (wrote && process.env.CRASH_AFTER_SPEND === "1") {
-      process.kill(process.pid, "SIGKILL");
-    }
+    await writeSessionCost(this.checkpointer, threadId, spent);
   }
 }
 

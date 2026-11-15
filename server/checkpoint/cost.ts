@@ -2,6 +2,7 @@ import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import type { BaseCheckpointSaver, Checkpoint } from "@langchain/langgraph-checkpoint";
 import { SqliteSaver } from "@langchain/langgraph-checkpoint-sqlite";
 import { LearnerStateSchema, type LearnerState } from "../graph/state.js";
+import { crashAfterSpend } from "../runtime/crash_after_spend.js";
 
 /**
  * Replace `cost_usd_session` on the current checkpoint row.
@@ -35,12 +36,14 @@ export async function writeSessionCost(
     if (result.changes !== 1) {
       throw new Error(`session cost update changed ${result.changes} rows`);
     }
+    crashAfterSpend();
     return true;
   }
   if (checkpointer instanceof MemorySaver) {
     const row = checkpointer.storage[threadId]?.[ns]?.[checkpointId];
     if (!row) throw new Error("session cost update missed the memory checkpoint");
     checkpointer.storage[threadId]![ns]![checkpointId] = [serialized, row[1], row[2]];
+    crashAfterSpend();
     return true;
   }
   throw new Error("session cost update needs a sqlite or memory checkpointer");
