@@ -1,0 +1,6 @@
+{
+  "text": "{\"accept\":true,\"critique\":\"Teach draft 1 names a checkable step.\"}",
+  "tokens_in": 77,
+  "tokens_out": 17,
+  "latency_ms": 1
+}

@@ -34,8 +34,18 @@
         },
         "max_steps": { "type": "integer", "minimum": 0 },
         "type": { "type": "string", "enum": ["interrupt"] },
-        "subgraph": { "type": "boolean" }
-      }
+        "subgraph": { "type": "boolean" },
+        "max_depth": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "subgraph": { "const": true } },
+            "required": ["subgraph"]
+          },
+          "then": { "required": ["max_depth"] }
+        }
+      ]
     },
     "edge": {
       "type": "object",

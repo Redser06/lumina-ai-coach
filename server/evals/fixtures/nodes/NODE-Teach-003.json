@@ -1,0 +1,18 @@
+{
+  "id": "NODE-Teach-003",
+  "node": "Teach",
+  "state": {
+    "scenario_id": null
+  },
+  "stages": {
+    "draft": {
+      "note": "not a prompt"
+    }
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.99
+    }
+  },
+  "expect_error": "MalformedDraft"
+}

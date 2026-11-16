@@ -1,0 +1,6 @@
+{
+  "text": "{\"prompt\":\"Practice revised 1: coach the learner toward Replan after a middling assessment with one worked example and a check.\"}",
+  "tokens_in": 83,
+  "tokens_out": 33,
+  "latency_ms": 1
+}

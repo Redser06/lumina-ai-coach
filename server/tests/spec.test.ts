@@ -13,9 +13,9 @@ describe("spec", { concurrency: false }, () => {
     const validated = validateSpec(spec);
     assert.equal(validated.ok, true);
     assert.equal(spec.spec_id, "coach-graph");
-    assert.equal(spec.version, "2.0.0");
+    assert.equal(spec.version, "2.0.1");
     assert.match(sha256, /^[a-f0-9]{64}$/);
-    assert.equal(`GRAPH-SPEC-${spec.spec_id}@${spec.version}`, "GRAPH-SPEC-coach-graph@2.0.0");
+    assert.equal(`GRAPH-SPEC-${spec.spec_id}@${spec.version}`, "GRAPH-SPEC-coach-graph@2.0.1");
   });
 
   test("spec_declares_all_8_coaching_nodes_and_3_hitl", () => {
@@ -30,6 +30,9 @@ describe("spec", { concurrency: false }, () => {
     }
     assert.equal(spec.nodes.some((node) => node.id === "PlanConfirm"), false);
     assert.equal(spec.nodes.some((node) => node.id === "Supervisor"), true);
+    assert.equal(spec.nodes.find((node) => node.id === "Teach")?.max_depth, 2);
+    assert.equal(spec.nodes.find((node) => node.id === "Practice")?.max_depth, 3);
+    assert.equal(spec.nodes.find((node) => node.id === "Remediate")?.max_depth, 1);
   });
 
   test("every_edge_has_learner_state_condition", () => {
