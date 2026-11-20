@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { SideNavBar } from './components/SideNavBar.tsx';
 import { TopNavBar } from './components/TopNavBar.tsx';
 import { CoachDashboardView } from './components/AICoach/CoachDashboardView.tsx';
+import { HitlPausePanel } from './components/AICoach/HitlPausePanel.tsx';
 import { TrainingPathsView } from './components/Curriculum/TrainingPathsView.tsx';
 import { NewsFeedView } from './components/NewsFeed/NewsFeedView.tsx';
 import { TechnicalDeepDivesView } from './components/Simulators/TechnicalDeepDivesView.tsx';
@@ -33,7 +34,7 @@ export function App() {
     }
   });
 
-  const [activeTab, setActiveTab] = useState<string>('coach');
+  const [activeTab, setActiveTab] = useState<string>(() => (window.location.hash === "#hitl" ? "hitl" : "coach"));
   const [activeLabId, setActiveLabId] = useState<string | null>(null);
   const [initialCoachQuery, setInitialCoachQuery] = useState<string | null>(null);
   const [isDiagnosticOpen, setIsDiagnosticOpen] = useState(false);
@@ -85,6 +86,8 @@ export function App() {
             onClearInitialQuery={() => setInitialCoachQuery(null)}
           />
         )}
+
+        {activeTab === 'hitl' && <HitlPausePanel />}
 
         {activeTab === 'paths' && (
           <TrainingPathsView

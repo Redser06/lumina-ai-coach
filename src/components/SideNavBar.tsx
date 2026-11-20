@@ -29,6 +29,7 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
 
   const navItems = [
     { id: 'coach', label: 'Coach', icon: 'psychology' },
+    { id: 'hitl', label: 'Review', icon: 'fact_check' },
     { id: 'paths', label: 'Paths', icon: 'route' },
     { id: 'news', label: 'News', icon: 'rss_feed' },
     { id: 'deep_dives', label: 'Deep-Dives', icon: 'terminal' },

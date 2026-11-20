@@ -29,8 +29,9 @@
   },
   "hitl": [
     {
-      "decision": "continue",
-      "actor": "safety-lead"
+      "decision": "accept",
+      "actor": "safety-lead",
+      "node": "SafetyEscalation"
     }
   ],
   "script": {

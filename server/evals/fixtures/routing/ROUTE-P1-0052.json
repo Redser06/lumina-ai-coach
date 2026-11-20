@@ -1,0 +1,41 @@
+{
+  "id": "ROUTE-P1-0052",
+  "fixture_set": "ROUTE-P1",
+  "branch": "ready",
+  "expect_node": "Plan",
+  "expect_edge": "e-sup-ready",
+  "why": "Seeded returning-learner start from SCN-0015. Path is empty, step is 0, diagnosis.placed is true and plan.skill is empty. The next checkpoint takes e-sup-ready.",
+  "state": {
+    "learner_id": "pat",
+    "scenario_id": "SCN-0015",
+    "goal": "Replace an empty plan",
+    "mastery": {},
+    "last_assessment": null,
+    "time_on_task_s": 0,
+    "fatigue": 0.15,
+    "step": 0,
+    "cost_usd_session": 0,
+    "path": [],
+    "edges_taken": [],
+    "trace_nodes": [],
+    "self_prompts": [],
+    "fingerprints": [],
+    "hitl_pending": null,
+    "hitl_log": [],
+    "loop_detected": false,
+    "loop_cleared": false,
+    "disputed": false,
+    "skill_map_edit": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "practitioner"
+    },
+    "plan": {
+      "skill": "",
+      "rationale": ""
+    },
+    "last_edge": null,
+    "last_condition": null
+  }
+}

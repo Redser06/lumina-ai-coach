@@ -48,7 +48,7 @@ interface NodeFixture {
   expect_edge?: string;
   expect_path_tail?: string;
   expect?: Record<string, unknown>;
-  expect_decision?: { decision: string; actor: string };
+  expect_decision?: { decision: string; actor: string; node: string };
   stages?: Record<string, Record<string, unknown>>;
   fail_stages?: string[];
   expect_error?: string;
@@ -153,7 +153,7 @@ async function runNodeFixtures(): Promise<{ pass: number; total: number; failure
         const node = spec.nodes.find((item) => item.id === fixture.node);
         if (!node || node.kind !== "hitl" || node.type !== "interrupt") throw new Error(`${fixture.node} is not an interrupt`);
         if (!NODE_IMPLS[fixture.node]) throw new Error(`missing impl ${fixture.node}`);
-        if (fixture.expect_decision) assertHitlDecision(fixture.expect_decision);
+        if (fixture.expect_decision) assertHitlDecision(fixture.expect_decision, fixture.node);
         continue;
       }
       const provider: Provider = {

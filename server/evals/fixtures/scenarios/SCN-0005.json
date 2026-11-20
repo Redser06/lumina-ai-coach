@@ -4,56 +4,23 @@
   "title": "Practitioner disputes a grade",
   "learner_id": "pat",
   "goal": "Get the lab grade reviewed",
+  "initial": {
+    "path": ["Assess"],
+    "disputed": true,
+    "fingerprints": ["assess-once"],
+    "step": 6,
+    "diagnosis": { "placed": true, "tier": "practitioner" },
+    "plan": { "skill": "evals", "rationale": "Grade the lab" },
+    "last_assessment": { "score": 0.48, "error_class": "misconception", "confidence": 0.4 }
+  },
   "hitl": [
     {
       "decision": "accept",
-      "actor": "learner"
+      "actor": "curator",
+      "node": "GradeDispute"
     }
   ],
   "script": {
-    "Diagnose": [
-      {
-        "diagnosis": {
-          "placed": true,
-          "tier": "practitioner"
-        },
-        "mastery": {
-          "evals": 0.45
-        }
-      }
-    ],
-    "Plan": [
-      {
-        "plan": {
-          "skill": "evals",
-          "rationale": "Grade the lab"
-        }
-      }
-    ],
-    "Teach": [
-      {
-        "mastery": {
-          "evals": 0.5
-        }
-      }
-    ],
-    "Practice": [
-      {
-        "mastery": {
-          "evals": 0.55
-        }
-      }
-    ],
-    "Assess": [
-      {
-        "last_assessment": {
-          "score": 0.48,
-          "error_class": "misconception",
-          "confidence": 0.4
-        },
-        "disputed": true
-      }
-    ],
     "GradeDispute": [
       {
         "note": "ask"
@@ -66,27 +33,9 @@
       }
     ]
   },
-  "expected_path": [
-    "Diagnose",
-    "Plan",
-    "Teach",
-    "Practice",
-    "Assess",
-    "GradeDispute",
-    "Reflect"
-  ],
+  "expected_path": ["Assess", "GradeDispute", "Reflect"],
   "expected_edges": [
     "e-start",
-    "e-sup-diagnose",
-    "e-ret-diagnose",
-    "e-sup-plan",
-    "e-ret-plan",
-    "e-sup-teach",
-    "e-ret-teach",
-    "e-sup-practice",
-    "e-ret-practice",
-    "e-sup-assess",
-    "e-ret-assess",
     "e-sup-dispute",
     "e-ret-dispute",
     "e-sup-reflect-dispute",

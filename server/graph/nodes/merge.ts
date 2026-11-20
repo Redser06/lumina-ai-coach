@@ -1,6 +1,7 @@
 import type { ModelCall } from "../../router/types.js";
 import { fingerprintState, type LearnerPatch, type LearnerState } from "../state.js";
 
+/** Learner flags a human or the loop detector owns. Model JSON cannot set these. */
 const MODEL_KEYS = [
   "mastery",
   "last_assessment",
@@ -9,11 +10,7 @@ const MODEL_KEYS = [
   "goal",
   "diagnosis",
   "plan",
-  "disputed",
-  "skill_map_edit",
-  "loop_detected",
   "session_complete",
-  "hitl_pending",
 ] as const;
 
 export function mergeModelOutput(json: Record<string, unknown>): LearnerPatch {
@@ -28,6 +25,9 @@ export function withBookkeeping(state: LearnerState, nodeId: string, call: Model
   const merged: LearnerState = {
     ...state,
     ...patch,
+    // Only Assess records a grade. A GradeDispute decision sets last_assessment itself;
+    // Supervisor and the other workers cannot put that grade back or replace it.
+    ...(nodeId === "Assess" ? {} : { last_assessment: state.last_assessment }),
     step: state.step + 1,
     cost_usd_session: call.session_spent_usd,
     trace_nodes: [...state.trace_nodes, nodeId],

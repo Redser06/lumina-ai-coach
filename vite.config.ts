@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: true
+    host: true,
+    proxy: {
+      "/api": {
+        target: process.env.LUMINA_API ?? "http://127.0.0.1:8787",
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   }
 });

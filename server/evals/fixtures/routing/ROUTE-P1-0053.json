@@ -1,0 +1,49 @@
+{
+  "id": "ROUTE-P1-0053",
+  "fixture_set": "ROUTE-P1",
+  "branch": "dead_end",
+  "expect_node": "Reflect",
+  "expect_edge": "e-sup-dead",
+  "why": "Reachable. SCN-0016 checkpoint after Diagnose returned placed false (path [Diagnose], step 2, last_edge e-ret-diagnose). The next checkpoint takes e-sup-dead.",
+  "state": {
+    "learner_id": "nia",
+    "scenario_id": "SCN-0016",
+    "goal": "Stop when the diagnostic does not place",
+    "mastery": {},
+    "last_assessment": null,
+    "time_on_task_s": 0,
+    "fatigue": 0.1,
+    "step": 2,
+    "cost_usd_session": 0.00000765,
+    "path": [
+      "Diagnose"
+    ],
+    "edges_taken": [
+      "e-start",
+      "e-sup-diagnose",
+      "e-ret-diagnose"
+    ],
+    "trace_nodes": [
+      "Supervisor",
+      "Diagnose"
+    ],
+    "self_prompts": [],
+    "fingerprints": [
+      "{\"mastery\":{},\"last_assessment\":null,\"fatigue\":0.1,\"goal\":\"Stop when the diagnostic does not place\",\"diagnosis\":{\"placed\":false,\"tier\":\"novice\"},\"plan\":null,\"disputed\":false,\"skill_map_edit\":false,\"session_complete\":false}"
+    ],
+    "hitl_pending": null,
+    "hitl_log": [],
+    "loop_detected": false,
+    "loop_cleared": false,
+    "disputed": false,
+    "skill_map_edit": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": false,
+      "tier": "novice"
+    },
+    "plan": null,
+    "last_edge": "e-ret-diagnose",
+    "last_condition": "worker.return"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "ROUTE-P1-0013",
+  "fixture_set": "ROUTE-P1",
+  "branch": "fast_mastery",
+  "expect_node": "Stretch",
+  "expect_edge": "e-sup-fast",
+  "why": "Step 10 is far from the session bound.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 10,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Diagnose",
+      "Plan",
+      "Teach",
+      "Practice",
+      "Assess"
+    ],
+    "last_assessment": {
+      "score": 0.87,
+      "error_class": null,
+      "confidence": 0.81
+    }
+  }
+}

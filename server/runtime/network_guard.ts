@@ -1,20 +1,47 @@
 import { Socket } from "node:net";
 
+const GUARD = Symbol.for("lumina.networkGuard");
+
+export function networkGuardInstalled(): boolean {
+  return (globalThis as typeof globalThis & { [GUARD]?: boolean })[GUARD] === true;
+}
+
+export function assertNetworkGuard(): void {
+  if (!networkGuardInstalled()) throw new Error("network guard is not installed");
+}
+
 function isLoopback(host: string): boolean {
   const bare = host.trim().toLowerCase().replace(/^\[|\]$/g, "");
   return bare === "localhost" || bare === "127.0.0.1" || bare === "::1" || bare === "::ffff:127.0.0.1" || bare === "";
 }
 
-function hostFrom(args: unknown[]): string {
-  const first = args[0];
-  if (typeof first === "number") return typeof args[1] === "string" ? args[1] : "127.0.0.1";
-  if (typeof first === "string") return first;
-  if (first && typeof first === "object") {
-    const record = first as { host?: string; hostname?: string; path?: string; port?: number };
-    if (record.path && record.port === undefined && !record.host && !record.hostname) return "";
-    return record.host ?? record.hostname ?? "127.0.0.1";
+/** Null means the host could not be read. Callers must fail closed. "" is a local IPC path. */
+function hostFrom(args: unknown[]): string | null {
+  const raw = Array.isArray(args[0]) ? (args[0] as unknown[])[0] : args[0];
+  if (typeof raw === "number") return typeof args[1] === "string" ? args[1] : null;
+  if (typeof raw === "string") return raw.length > 0 ? hostOnly(raw) : null;
+  if (!raw || typeof raw !== "object") return null;
+  const record = raw as { host?: unknown; hostname?: unknown; path?: unknown; port?: unknown };
+  const named = typeof record.host === "string" && record.host.length > 0
+    ? record.host
+    : typeof record.hostname === "string" && record.hostname.length > 0
+      ? record.hostname
+      : null;
+  if (named) return hostOnly(named);
+  if (typeof record.path === "string" && record.path.length > 0 && record.port === undefined) return "";
+  return null;
+}
+
+function hostOnly(host: string): string {
+  if (host.startsWith("[")) {
+    const end = host.indexOf("]");
+    return end >= 0 ? host.slice(1, end) : host;
   }
-  return "127.0.0.1";
+  const colon = host.indexOf(":");
+  if (colon > 0 && host.indexOf(":", colon + 1) === -1 && /^\d+$/.test(host.slice(colon + 1))) {
+    return host.slice(0, colon);
+  }
+  return host;
 }
 
 /**
@@ -26,11 +53,12 @@ function hostFrom(args: unknown[]): string {
  * Set NO_NETWORK=0 only for a script that must call a non-loopback host.
  */
 if (process.env.NO_NETWORK !== "0") {
+  (globalThis as typeof globalThis & { [GUARD]?: boolean })[GUARD] = true;
   const original = Socket.prototype.connect;
   Socket.prototype.connect = function connect(this: Socket, ...args: unknown[]) {
     const host = hostFrom(args);
-    if (!isLoopback(host)) {
-      throw new Error(`network blocked: ${host}`);
+    if (host === null || !isLoopback(host)) {
+      throw new Error(`network blocked: ${host ?? "unknown"}`);
     }
     return original.apply(this, args as never);
   } as typeof Socket.prototype.connect;

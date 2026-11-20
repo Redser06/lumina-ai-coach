@@ -7,7 +7,7 @@ import { sessionSpentUsd } from "../router/router.js";
 import { runContext } from "../runtime/context.js";
 import { logsForSession, stampCheckpoint, type NodeLog } from "../telemetry/node_log.js";
 import { compileCoachGraph, type CompiledCoachGraph } from "./build.js";
-import type { HitlDecision } from "./hitl.js";
+import { assertHitlDecision, type HitlDecision } from "./hitl.js";
 import { applyPatch, LearnerStateSchema, type LearnerState, type SelfPrompt } from "./state.js";
 
 const STEP_CAP = 80;
@@ -107,6 +107,7 @@ export class SessionService {
       if (snap.interrupts.length > 0) {
         const decision = queue.shift();
         if (!decision) return this.toResult(threadId, snap, "interrupted", resumedNode, sessionId);
+        assertHitlDecision(decision, snap.next[0] ?? "");
         await this.invoke(threadId, new Command({ resume: decision }));
         const after = await this.readSnap(threadId);
         stampCheckpoint(sessionId, after.checkpoint_id ?? "unknown");
@@ -134,12 +135,13 @@ export class SessionService {
     });
   }
 
-  async hitl(threadId: string, decision: HitlDecision): Promise<RunResult> {
+  async hitl(threadId: string, decision: unknown): Promise<RunResult> {
     const before = await this.readSnap(threadId);
     if (!before.learner) throw new Error(`session not found: ${threadId}`);
     if (before.interrupts.length === 0) throw new Error("session is not waiting on a human decision");
+    const checked = assertHitlDecision(decision, before.next[0] ?? "");
     return runContext.run({ runId: randomUUID() }, () =>
-      this.continueUntil(threadId, [decision], null, before.learner!.session_id),
+      this.continueUntil(threadId, [checked], null, before.learner!.session_id),
     );
   }
 
@@ -274,9 +276,6 @@ export class SessionService {
     if (wrote) {
       const snap = await this.readSnap(threadId);
       if (snap.learner && snap.checkpoint_id) stampCheckpoint(snap.learner.session_id, snap.checkpoint_id);
-    }
-    if (wrote && process.env.CRASH_AFTER_SPEND === "1") {
-      process.kill(process.pid, "SIGKILL");
     }
   }
 }

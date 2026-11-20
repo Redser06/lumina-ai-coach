@@ -4,6 +4,7 @@
   "kind": "hitl",
   "expect_decision": {
     "decision": "accept",
-    "actor": "learner"
+    "actor": "safety-lead",
+    "node": "SafetyEscalation"
   }
 }

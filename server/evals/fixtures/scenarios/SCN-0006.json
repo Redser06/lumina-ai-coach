@@ -17,8 +17,9 @@
   },
   "hitl": [
     {
-      "decision": "approve",
-      "actor": "curator"
+      "decision": "accept",
+      "actor": "curator",
+      "node": "SkillMapEdit"
     }
   ],
   "script": {
