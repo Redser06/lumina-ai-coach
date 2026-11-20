@@ -24,9 +24,15 @@ export function promptField(prompt: string, key: string): string | null {
 }
 
 function scriptedOutput(prompt: string): string {
+  const stage = promptField(prompt, "stage");
   const scenarioId = promptField(prompt, "scenario");
   const node = promptField(prompt, "node");
   const visit = Number(promptField(prompt, "visit") ?? "0");
+  const depth = promptField(prompt, "depth") ?? "1";
+  const goal = promptField(prompt, "goal") ?? "";
+  if (stage === "draft" || stage === "critique" || stage === "revise" || stage === "check") {
+    return stagedOutput(stage, node ?? "node", depth, goal, scenarioId);
+  }
   if (!scenarioId || scenarioId === "none" || !node) {
     return JSON.stringify({ note: "ok" });
   }
@@ -47,6 +53,40 @@ function scriptedOutput(prompt: string): string {
     return JSON.stringify(output);
   }
   return JSON.stringify({ note: "ok" });
+}
+
+function stagedOutput(stage: string, node: string, depth: string, goal: string, scenarioId: string | null): string {
+  if (stage === "draft") {
+    return JSON.stringify({ prompt: `${node} draft ${depth}: coach the learner toward ${goal} with one checkable step.` });
+  }
+  if (stage === "revise") {
+    return JSON.stringify({ prompt: `${node} revised ${depth}: coach the learner toward ${goal} with one worked example and a check.` });
+  }
+  if (stage === "check") return JSON.stringify({ pass: true, note: "checked" });
+  const accept = critiqueAccepts(scenarioId, node);
+  return JSON.stringify({
+    accept,
+    critique: accept ? `${node} draft ${depth} names a checkable step.` : `${node} draft ${depth} has no checkable outcome.`,
+  });
+}
+
+function critiqueAccepts(scenarioId: string | null, node: string): boolean {
+  if (!scenarioId || scenarioId === "none") return true;
+  let files: string[] = [];
+  try {
+    files = readdirSync(SCENARIO_DIR).filter((name) => name.endsWith(".json"));
+  } catch {
+    return true;
+  }
+  for (const file of files) {
+    const scenario = JSON.parse(readFileSync(join(SCENARIO_DIR, file), "utf8")) as {
+      id: string;
+      self_prompt?: Record<string, { accept?: boolean }>;
+    };
+    if (scenario.id !== scenarioId) continue;
+    return scenario.self_prompt?.[node]?.accept !== false;
+  }
+  return true;
 }
 
 export const fakeProvider: Provider = {

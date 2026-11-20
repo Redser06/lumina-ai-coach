@@ -9,7 +9,9 @@ import { NODE_IMPLS } from "../graph/nodes/registry.js";
 import { supervisorNode } from "../graph/nodes/supervisor.js";
 import { runWorker } from "../graph/nodes/worker.js";
 import { loadSpec } from "../graph/spec/load.js";
-import { initialLearnerState, type LearnerState } from "../graph/state.js";
+import { selfPromptStop } from "../graph/nodes/self_prompt.js";
+import { initialLearnerState, type LearnerState, type SelfPrompt } from "../graph/state.js";
+import { promptField } from "../router/providers/fake.js";
 import { loadScenarios } from "./scenarios.js";
 import { createRouter, useRouterForTests } from "../router/router.js";
 import type { Provider } from "../router/types.js";
@@ -47,6 +49,14 @@ interface NodeFixture {
   expect_path_tail?: string;
   expect?: Record<string, unknown>;
   expect_decision?: { decision: string; actor: string };
+  stages?: Record<string, Record<string, unknown>>;
+  fail_stages?: string[];
+  expect_error?: string;
+  expect_self_prompt?: {
+    stop?: "accepted" | "depth_exhausted" | "critique_failed" | "malformed_revision";
+    draft_count?: number;
+    revise_count?: number;
+  };
 }
 
 export function loadThresholds(path = THRESHOLDS_PATH): Thresholds {
@@ -73,6 +83,49 @@ export function judge(
     path_failures.length === 0 &&
     (thresholds.node_coverage < 1 || uncovered.length === 0);
   return { ...metrics, node_failures, path_failures, uncovered, ok };
+}
+
+function stagePayload(fixture: NodeFixture, stage: string, prompt: string): Record<string, unknown> {
+  if (fixture.stages?.[stage]) return fixture.stages[stage];
+  const depth = promptField(prompt, "depth") ?? "1";
+  if (stage === "draft") return { prompt: `${fixture.node} draft ${depth} for the learner goal.` };
+  if (stage === "critique") return { accept: true, critique: `${fixture.node} draft ${depth} names a checkable outcome.` };
+  if (stage === "revise") return { prompt: `${fixture.node} revised ${depth} with a worked example.` };
+  if (stage === "check") return { pass: true };
+  return fixture.model_output ?? { note: "ok" };
+}
+
+function assertSubgraph(spec: ReturnType<typeof loadSpec>, fixture: NodeFixture, before: LearnerState, after: LearnerState): void {
+  const node = spec.nodes.find((item) => item.id === fixture.node);
+  if (!node?.subgraph) return;
+  const visit = (before.path ?? []).filter((id) => id === fixture.node).length;
+  const rows = after.self_prompts.filter((row) => row.node === fixture.node && row.visit === visit);
+  const maxDepth = node.max_depth ?? 0;
+  if (rows.some((row) => row.depth > maxDepth)) throw new Error(`depth exceeded ${maxDepth}`);
+  if (rows.filter((row) => row.stage === "draft").length > maxDepth) throw new Error(`draft cycles exceeded ${maxDepth}`);
+  const executed = rows.find((row) => row.stage === "execute")?.prompt ?? "";
+  const stop = selfPromptStop(rows);
+  if (stop === "accepted" || stop === "depth_exhausted") {
+    const revised = [...rows].reverse().find((row) => row.stage === "revise" && row.prompt.length > 0)?.prompt;
+    if (!revised || executed !== revised) throw new Error("execute did not use the revised prompt");
+  }
+  if (stop === "critique_failed" || stop === "malformed_revision") {
+    const draft = rows.find((row) => row.stage === "draft" && row.status === "ok")?.prompt;
+    if (!draft || executed !== draft) throw new Error("execute did not keep the draft");
+  }
+  const expect = fixture.expect_self_prompt;
+  if (!expect) return;
+  if (expect.stop && stop !== expect.stop) throw new Error(`stop ${stop} != ${expect.stop}`);
+  if (expect.draft_count !== undefined && countPrompts(rows, "draft") !== expect.draft_count) {
+    throw new Error(`drafts ${countPrompts(rows, "draft")} != ${expect.draft_count}`);
+  }
+  if (expect.revise_count !== undefined && countPrompts(rows, "revise") !== expect.revise_count) {
+    throw new Error(`revisions ${countPrompts(rows, "revise")} != ${expect.revise_count}`);
+  }
+}
+
+function countPrompts(rows: SelfPrompt[], stage: "draft" | "revise"): number {
+  return rows.filter((row) => row.stage === stage && row.prompt.length > 0 && row.status !== "malformed_revision" && row.status !== "critique_failed").length;
 }
 
 function loadNodeFixtures(): NodeFixture[] {
@@ -105,8 +158,11 @@ async function runNodeFixtures(): Promise<{ pass: number; total: number; failure
       }
       const provider: Provider = {
         id: "fake",
-        async complete() {
-          const text = JSON.stringify(fixture.model_output ?? { note: "ok" });
+        async complete(request) {
+          const stage = promptField(request.prompt, "stage");
+          if (stage && fixture.fail_stages?.includes(stage)) throw new Error(`injected failure ${stage}`);
+          const payload = stage ? stagePayload(fixture, stage, request.prompt) : (fixture.model_output ?? { note: "ok" });
+          const text = JSON.stringify(payload);
           return { text, tokens_in: 8, tokens_out: 4, latency_ms: 1 };
         },
       };
@@ -117,6 +173,21 @@ async function runNodeFixtures(): Promise<{ pass: number; total: number; failure
         goal: "fixture",
         ...fixture.state,
       });
+      if (fixture.expect_error) {
+        let thrown: unknown;
+        try {
+          await runWorker(fixture.node, { learner: state });
+        } catch (error) {
+          thrown = error;
+        }
+        if (!(thrown instanceof Error) || thrown.name !== fixture.expect_error) {
+          throw new Error(`error ${thrown instanceof Error ? thrown.name : "none"} != ${fixture.expect_error}`);
+        }
+        const prompts = (thrown as { selfPrompts?: SelfPrompt[] }).selfPrompts ?? [];
+        if (!prompts.some((row) => row.status === "malformed_draft")) throw new Error("trace missing malformed_draft");
+        if (prompts.some((row) => row.stage === "execute")) throw new Error("executed a malformed draft");
+        continue;
+      }
       const update =
         fixture.node === "Supervisor"
           ? await supervisorNode({ learner: state })
@@ -134,6 +205,7 @@ async function runNodeFixtures(): Promise<{ pass: number; total: number; failure
           }
         }
       }
+      assertSubgraph(spec, fixture, state, update.learner);
     } catch (error) {
       failures.push(`${fixture.id}: ${error instanceof Error ? error.message : String(error)}`);
     } finally {

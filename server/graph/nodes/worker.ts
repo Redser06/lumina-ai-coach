@@ -7,6 +7,7 @@ import { selectEdge } from "../route.js";
 import { LearnerStateSchema, type LearnerState } from "../state.js";
 import { maybeCrash } from "./crash.js";
 import { mergeModelOutput, withBookkeeping } from "./merge.js";
+import { runSelfPrompt } from "./self_prompt.js";
 
 export interface GraphUpdate {
   learner: LearnerState;
@@ -17,6 +18,7 @@ export async function runWorker(nodeId: string, state: { learner: LearnerState }
   const learner = state.learner;
   const node = loadSpec().nodes.find((item) => item.id === nodeId);
   if (!node) throw new Error(`unknown node ${nodeId}`);
+  if (node.subgraph) return runSelfPrompt(node, learner);
   const prompt = renderPrompt(nodeId, node.task_type, learner);
   const call = await completeCharged(nodeId, {
     node: nodeId,

@@ -1,0 +1,6 @@
+{
+  "text": "{\"prompt\":\"Teach revised 1: coach the learner toward Get the lab grade reviewed with one worked example and a check.\"}",
+  "tokens_in": 76,
+  "tokens_out": 30,
+  "latency_ms": 1
+}

@@ -1,0 +1,6 @@
+{
+  "text": "{\"prompt\":\"Remediate revised 1: coach the learner toward Write a first useful prompt with one worked example and a check.\"}",
+  "tokens_in": 99,
+  "tokens_out": 31,
+  "latency_ms": 1
+}

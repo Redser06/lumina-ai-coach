@@ -1,0 +1,25 @@
+{
+  "id": "NODE-Remediate-003",
+  "node": "Remediate",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.57
+    }
+  },
+  "stages": {
+    "critique": {
+      "accept": false,
+      "critique": "The repair still names the misconception as the answer."
+    }
+  },
+  "expect_edge": "e-ret-remediate",
+  "expect_path_tail": "Remediate",
+  "expect_self_prompt": {
+    "stop": "depth_exhausted",
+    "draft_count": 1,
+    "revise_count": 1
+  }
+}

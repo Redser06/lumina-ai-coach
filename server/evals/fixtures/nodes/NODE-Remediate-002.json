@@ -1,0 +1,24 @@
+{
+  "id": "NODE-Remediate-002",
+  "node": "Remediate",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.56
+    }
+  },
+  "stages": {
+    "revise": {
+      "note": "not a prompt"
+    }
+  },
+  "expect_edge": "e-ret-remediate",
+  "expect_path_tail": "Remediate",
+  "expect_self_prompt": {
+    "stop": "malformed_revision",
+    "draft_count": 1,
+    "revise_count": 0
+  }
+}

@@ -17,6 +17,7 @@ const STATE_FIELDS = new Set([
   "path",
   "edges_taken",
   "trace_nodes",
+  "self_prompts",
   "fingerprints",
   "hitl_pending",
   "hitl_log",

@@ -12,14 +12,21 @@ export async function writeSessionCost(
   checkpointer: BaseCheckpointSaver,
   threadId: string,
   spentUsd: number,
+  selfPrompts?: LearnerState["self_prompts"],
 ): Promise<boolean> {
   const tuple = await checkpointer.getTuple({ configurable: { thread_id: threadId } });
   const checkpointId = tuple?.config.configurable?.checkpoint_id;
   const learner = tuple?.checkpoint.channel_values.learner;
   if (!tuple || !checkpointId || !learner || typeof learner !== "object") return false;
   const current = learner as LearnerState;
-  if (current.cost_usd_session === spentUsd) return false;
-  const nextLearner = LearnerStateSchema.parse({ ...current, cost_usd_session: spentUsd });
+  const nextLearner = LearnerStateSchema.parse({
+    ...current,
+    cost_usd_session: spentUsd,
+    ...(selfPrompts ? { self_prompts: selfPrompts } : {}),
+  });
+  const sameCost = current.cost_usd_session === spentUsd;
+  const samePrompts = JSON.stringify(current.self_prompts ?? []) === JSON.stringify(nextLearner.self_prompts);
+  if (sameCost && samePrompts) return false;
   const checkpoint: Checkpoint = {
     ...tuple.checkpoint,
     channel_values: { ...tuple.checkpoint.channel_values, learner: nextLearner },

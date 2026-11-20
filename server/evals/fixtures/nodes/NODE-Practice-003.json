@@ -1,0 +1,20 @@
+{
+  "id": "NODE-Practice-003",
+  "node": "Practice",
+  "state": {
+    "scenario_id": null
+  },
+  "model_output": {
+    "mastery": {
+      "prompting": 0.46
+    }
+  },
+  "fail_stages": ["critique"],
+  "expect_edge": "e-ret-practice",
+  "expect_path_tail": "Practice",
+  "expect_self_prompt": {
+    "stop": "critique_failed",
+    "draft_count": 1,
+    "revise_count": 0
+  }
+}

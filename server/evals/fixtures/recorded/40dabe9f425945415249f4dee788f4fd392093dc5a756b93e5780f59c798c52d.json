@@ -1,0 +1,6 @@
+{
+  "text": "{\"prompt\":\"Teach draft 1: coach the learner toward Get the lab grade reviewed with one checkable step.\"}",
+  "tokens_in": 53,
+  "tokens_out": 26,
+  "latency_ms": 1
+}
