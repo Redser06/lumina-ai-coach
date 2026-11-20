@@ -4,7 +4,7 @@
   "branch": "ready",
   "expect_node": "Plan",
   "expect_edge": "e-sup-ready",
-  "why": "Reachable. SCN-0015 checkpoint where next is Supervisor, path is empty, step is 0, diagnosis.placed is true and plan.skill is empty. The next checkpoint takes e-sup-ready.",
+  "why": "Seeded returning-learner start from SCN-0015. Path is empty, step is 0, diagnosis.placed is true and plan.skill is empty. The next checkpoint takes e-sup-ready.",
   "state": {
     "learner_id": "pat",
     "scenario_id": "SCN-0015",
