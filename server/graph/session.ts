@@ -275,9 +275,6 @@ export class SessionService {
       const snap = await this.readSnap(threadId);
       if (snap.learner && snap.checkpoint_id) stampCheckpoint(snap.learner.session_id, snap.checkpoint_id);
     }
-    if (wrote && process.env.CRASH_AFTER_SPEND === "1") {
-      process.kill(process.pid, "SIGKILL");
-    }
   }
 }
 

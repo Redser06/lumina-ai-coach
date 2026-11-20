@@ -1,4 +1,4 @@
-import "../runtime/network_guard.js";
+import { assertNetworkGuard } from "../runtime/network_guard.js";
 import { spawn, type ChildProcess } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -22,7 +22,7 @@ function hasFlag(name: string): boolean {
 }
 
 function startServer(env: NodeJS.ProcessEnv): Promise<{ proc: ChildProcess; port: number }> {
-  const proc = spawn(process.execPath, ["--import", "tsx", "server/api/node.ts"], {
+  const proc = spawn(process.execPath, ["--import", "tsx", "--import", "./server/runtime/network_guard.ts", "server/api/node.ts"], {
     env,
     cwd: process.cwd(),
     stdio: ["ignore", "pipe", "pipe"],
@@ -63,6 +63,7 @@ async function get(port: number, path: string): Promise<unknown> {
 }
 
 async function main(): Promise<void> {
+  assertNetworkGuard();
   const outDir = resolve(arg("--out", "proofs/phase0"));
   const onlyRouter = hasFlag("--only") && arg("--only", "") === "router";
   mkdirSync(outDir, { recursive: true });
@@ -95,7 +96,7 @@ async function main(): Promise<void> {
         throw new Error(`router proof incomplete fallback=${fallback.length} priced=${priced}`);
       }
       writeFileSync(resolve(outDir, "ac7-router.json"), `${JSON.stringify({ session_id: sessionId, ...logs }, null, 2)}\n`);
-      console.log(`router logs=${logs.logs.length} fallback=${fallback.length}`);
+      console.log(`router logs=${logs.logs.length} fallback=${fallback.length} network_guard=on`);
       return;
     }
 
@@ -145,7 +146,7 @@ async function main(): Promise<void> {
       resolve(outDir, "ac4-fork.json"),
       `${JSON.stringify({ session_id: sessionId, from: forkFrom.checkpoint_id, fork, parent_checkpoint: forkFrom }, null, 2)}\n`,
     );
-    console.log("replay identical; fork routed_to=Remediate");
+    console.log("replay identical; fork routed_to=Remediate network_guard=on");
   } finally {
     server.proc.kill("SIGTERM");
   }
