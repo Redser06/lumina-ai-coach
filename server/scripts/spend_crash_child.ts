@@ -33,6 +33,9 @@ try {
   console.error("expected a charged failure");
   process.exit(1);
 } catch (error) {
+  if (process.env.CRASH_AFTER_SPEND === "1") {
+    process.kill(process.pid, "SIGKILL");
+  }
   console.error(error instanceof Error ? error.message : String(error));
   process.exit(1);
 }
