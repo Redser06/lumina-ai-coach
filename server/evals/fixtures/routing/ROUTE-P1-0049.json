@@ -1,0 +1,23 @@
+{
+  "id": "ROUTE-P1-0049",
+  "fixture_set": "ROUTE-P1",
+  "branch": "skill_map_edit",
+  "expect_node": "SkillMapEdit",
+  "expect_edge": "e-sup-skill",
+  "why": "A skill-map edit outranks ready-for-plan.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": true,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "expert"
+    },
+    "plan": null,
+    "path": []
+  }
+}

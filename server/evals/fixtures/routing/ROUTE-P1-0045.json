@@ -1,0 +1,28 @@
+{
+  "id": "ROUTE-P1-0045",
+  "fixture_set": "ROUTE-P1",
+  "branch": "dead_end",
+  "expect_node": "Reflect",
+  "expect_edge": "e-sup-dead",
+  "why": "Plan returned with an empty skill after placement. There is no next lesson.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "",
+      "rationale": ""
+    },
+    "path": [
+      "Plan"
+    ]
+  }
+}

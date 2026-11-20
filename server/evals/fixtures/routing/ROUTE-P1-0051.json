@@ -1,0 +1,38 @@
+{
+  "id": "ROUTE-P1-0051",
+  "fixture_set": "ROUTE-P1",
+  "branch": "ready",
+  "expect_node": "Plan",
+  "expect_edge": "e-sup-ready",
+  "why": "Seeded returning-learner start from SCN-0012. Path is empty, step is 1, diagnosis.placed is true and plan is null. The next checkpoint takes e-sup-ready.",
+  "state": {
+    "learner_id": "nia",
+    "scenario_id": "SCN-0012",
+    "goal": "Get a first plan",
+    "mastery": {},
+    "last_assessment": null,
+    "time_on_task_s": 0,
+    "fatigue": 0.1,
+    "step": 1,
+    "cost_usd_session": 0,
+    "path": [],
+    "edges_taken": [],
+    "trace_nodes": [],
+    "self_prompts": [],
+    "fingerprints": [],
+    "hitl_pending": null,
+    "hitl_log": [],
+    "loop_detected": false,
+    "loop_cleared": false,
+    "disputed": false,
+    "skill_map_edit": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": null,
+    "last_edge": null,
+    "last_condition": null
+  }
+}

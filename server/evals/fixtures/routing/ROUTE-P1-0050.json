@@ -1,0 +1,28 @@
+{
+  "id": "ROUTE-P1-0050",
+  "fixture_set": "ROUTE-P1",
+  "branch": "session_complete",
+  "expect_node": "End",
+  "expect_edge": "e-sup-end",
+  "why": "Reflection with session_complete ends, even when fatigue is high. Fatigue does not match once the path is already Reflect.",
+  "state": {
+    "fatigue": 0.9,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": true,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Reflect"
+    ]
+  }
+}

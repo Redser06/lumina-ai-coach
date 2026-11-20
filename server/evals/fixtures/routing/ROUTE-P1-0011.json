@@ -1,0 +1,36 @@
+{
+  "id": "ROUTE-P1-0011",
+  "fixture_set": "ROUTE-P1",
+  "branch": "fast_mastery",
+  "expect_node": "Stretch",
+  "expect_edge": "e-sup-fast",
+  "why": "Comfortably above both fast-mastery bounds.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Assess"
+    ],
+    "last_assessment": {
+      "score": 0.9,
+      "error_class": null,
+      "confidence": 0.85
+    },
+    "mastery": {
+      "prompting": 0.9
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "SCN-0016",
+  "persona": "P1",
+  "title": "Diagnose returns unplaced and the graph reflects",
+  "learner_id": "nia",
+  "goal": "Stop when the diagnostic does not place",
+  "initial": {
+    "fatigue": 0.1,
+    "step": 0
+  },
+  "hitl": [],
+  "script": {
+    "Diagnose": [
+      {
+        "diagnosis": { "placed": false, "tier": "novice" }
+      }
+    ],
+    "Reflect": [
+      {
+        "fatigue": 0.15
+      }
+    ]
+  },
+  "expected_path": ["Diagnose", "Reflect"],
+  "expected_edges": ["e-start", "e-sup-diagnose", "e-ret-diagnose", "e-sup-dead", "e-ret-reflect", "e-sup-reflect-stop"]
+}

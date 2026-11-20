@@ -1,0 +1,33 @@
+{
+  "id": "ROUTE-P1-0040",
+  "fixture_set": "ROUTE-P1",
+  "branch": "loop",
+  "expect_node": "SafetyEscalation",
+  "expect_edge": "e-sup-loop",
+  "why": "A detected loop outranks the step bound and fast mastery.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 40,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": true,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Assess"
+    ],
+    "last_assessment": {
+      "score": 0.95,
+      "error_class": null,
+      "confidence": 0.95
+    }
+  }
+}

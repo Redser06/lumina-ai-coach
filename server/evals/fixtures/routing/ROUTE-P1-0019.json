@@ -1,0 +1,28 @@
+{
+  "id": "ROUTE-P1-0019",
+  "fixture_set": "ROUTE-P1",
+  "branch": "fatigue",
+  "expect_node": "Reflect",
+  "expect_edge": "e-sup-fatigue",
+  "why": "Fatigue outranks plan.ready, which would otherwise go to Teach.",
+  "state": {
+    "fatigue": 1,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Plan"
+    ]
+  }
+}

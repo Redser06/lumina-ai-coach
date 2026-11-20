@@ -1,0 +1,36 @@
+{
+  "id": "ROUTE-P1-0038",
+  "fixture_set": "ROUTE-P1",
+  "branch": "loop",
+  "expect_node": "SafetyEscalation",
+  "expect_edge": "e-sup-loop",
+  "signal": "loop_detector",
+  "why": "Three identical fingerprints on Teach. The flag starts false; the detector must set it.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": {
+      "skill": "prompting",
+      "rationale": "because the diagnostic placed them"
+    },
+    "path": [
+      "Teach",
+      "Teach",
+      "Teach"
+    ],
+    "fingerprints": [
+      "same-teach",
+      "same-teach",
+      "same-teach"
+    ]
+  }
+}

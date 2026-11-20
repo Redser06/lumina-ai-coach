@@ -1,0 +1,25 @@
+{
+  "id": "ROUTE-P1-0029",
+  "fixture_set": "ROUTE-P1",
+  "branch": "ready",
+  "expect_node": "Plan",
+  "expect_edge": "e-sup-plan",
+  "why": "Diagnosis just placed. Ready for a plan.",
+  "state": {
+    "fatigue": 0.2,
+    "step": 4,
+    "disputed": false,
+    "skill_map_edit": false,
+    "loop_detected": false,
+    "loop_cleared": false,
+    "session_complete": false,
+    "diagnosis": {
+      "placed": true,
+      "tier": "novice"
+    },
+    "plan": null,
+    "path": [
+      "Diagnose"
+    ]
+  }
+}

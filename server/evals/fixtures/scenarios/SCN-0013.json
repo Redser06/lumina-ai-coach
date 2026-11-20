@@ -1,0 +1,23 @@
+{
+  "id": "SCN-0013",
+  "persona": "P1",
+  "title": "Unplaced diagnose reflects and ends without looping",
+  "learner_id": "nia",
+  "goal": "Stop when diagnosis never places",
+  "initial": {
+    "path": ["Diagnose"],
+    "diagnosis": { "placed": false, "tier": "novice" },
+    "fatigue": 0.1,
+    "step": 2
+  },
+  "hitl": [],
+  "script": {
+    "Reflect": [
+      {
+        "fatigue": 0.2
+      }
+    ]
+  },
+  "expected_path": ["Diagnose", "Reflect"],
+  "expected_edges": ["e-start", "e-sup-dead", "e-ret-reflect", "e-sup-reflect-stop"]
+}

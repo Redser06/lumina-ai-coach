@@ -1,12 +1,17 @@
 spec_id: coach-graph
-version: 2.0.1
+version: 4.0.0
 description: >
   Coaching agent graph. The Supervisor owns every conditional edge.
   Workers and HITL nodes return only to the Supervisor. PlanConfirm is intentionally
   absent (not in the PRD's named HITL list). Teach, Practice and Remediate are
   subgraphs (draft, critique, revise, execute, check) bounded by max_depth.
   max_steps stays 1: the Supervisor still schedules each as one step.
-  No edge or condition changed from 2.0.0.
+  A slip after Assess goes to Practice. A placed learner with no plan who is
+  not already on a pipeline node goes to Plan. Diagnose without a placement,
+  Plan without a skill, or an unknown node that already has a plan goes to Reflect.
+  Reflect continues to Plan only when the learner is placed, under the step bound,
+  and the previous node was not a Plan that produced no skill. Otherwise an
+  unfinished Reflect ends the session.
 nodes:
   - id: __start__
     kind: terminal
@@ -186,8 +191,14 @@ edges:
     from: Supervisor
     to: Plan
     condition_id: reflect.continue
-    condition_expr: "path[-1] == 'Reflect' && session_complete == false"
+    condition_expr: "path[-1] == 'Reflect' && session_complete == false && step < 40 && diagnosis.placed == true && !(path[-2] == 'Plan' && (plan == null || plan.skill == null || plan.skill == ''))"
     priority: 56
+  - id: e-sup-reflect-stop
+    from: Supervisor
+    to: End
+    condition_id: reflect.stop
+    condition_expr: "path[-1] == 'Reflect' && session_complete == false && (step >= 40 || diagnosis.placed != true || (path[-2] == 'Plan' && (plan == null || plan.skill == null || plan.skill == '')))"
+    priority: 55
   - id: e-sup-misconception
     from: Supervisor
     to: Remediate
@@ -204,8 +215,14 @@ edges:
     from: Supervisor
     to: Plan
     condition_id: assess.replan
-    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class != 'misconception' && !(last_assessment.error_class == null && last_assessment.score >= 0.85 && last_assessment.confidence >= 0.8)"
+    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class != 'misconception' && last_assessment.error_class != 'slip' && !(last_assessment.error_class == null && last_assessment.score >= 0.85 && last_assessment.confidence >= 0.8)"
     priority: 30
+  - id: e-sup-slip
+    from: Supervisor
+    to: Practice
+    condition_id: assess.slip
+    condition_expr: "path[-1] == 'Assess' && disputed == false && last_assessment.error_class == 'slip'"
+    priority: 35
   - id: e-sup-diagnose
     from: Supervisor
     to: Diagnose
@@ -266,3 +283,15 @@ edges:
     condition_id: safety.resolved
     condition_expr: "path[-1] == 'SafetyEscalation'"
     priority: 13
+  - id: e-sup-ready
+    from: Supervisor
+    to: Plan
+    condition_id: session.ready
+    condition_expr: "diagnosis.placed == true && (plan == null || plan.skill == null || plan.skill == '') && path[-1] != 'Diagnose' && path[-1] != 'Plan' && path[-1] != 'Teach' && path[-1] != 'Practice' && path[-1] != 'Assess' && path[-1] != 'Remediate' && path[-1] != 'Stretch' && path[-1] != 'Reflect' && path[-1] != 'GradeDispute' && path[-1] != 'SkillMapEdit' && path[-1] != 'SafetyEscalation'"
+    priority: 12
+  - id: e-sup-dead
+    from: Supervisor
+    to: Reflect
+    condition_id: any.dead_end
+    condition_expr: "(path[-1] == 'Diagnose' && diagnosis.placed != true) || (path[-1] == 'Plan' && diagnosis.placed == true && (plan == null || plan.skill == null || plan.skill == '')) || (diagnosis.placed == true && plan != null && plan.skill != null && plan.skill != '' && path[-1] != null && path[-1] != 'Diagnose' && path[-1] != 'Plan' && path[-1] != 'Teach' && path[-1] != 'Practice' && path[-1] != 'Assess' && path[-1] != 'Remediate' && path[-1] != 'Stretch' && path[-1] != 'Reflect' && path[-1] != 'GradeDispute' && path[-1] != 'SkillMapEdit' && path[-1] != 'SafetyEscalation')"
+    priority: 1
